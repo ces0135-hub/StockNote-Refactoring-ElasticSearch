@@ -2,16 +2,17 @@ package org.com.stocknote.domain.user.entity;
 
 import jakarta.persistence.Entity;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.com.stocknote.global.base.BaseEntity;
 
 import static lombok.AccessLevel.PROTECTED;
 
-@Entity
-@NoArgsConstructor(access = PROTECTED)
-@AllArgsConstructor(access = PROTECTED)
-@Builder
 @Getter
 @Setter
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@SuperBuilder
 public class User extends BaseEntity {
     private String name; //이름
     private String account; //아이디
