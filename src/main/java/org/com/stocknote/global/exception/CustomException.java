@@ -1,8 +1,8 @@
-package com.example.mountain.global.exception;
+package org.com.stocknote.global.exception;
 
-import com.example.mountain.global.error.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.com.stocknote.global.error.ErrorCode;
 
 @Getter
 @AllArgsConstructor

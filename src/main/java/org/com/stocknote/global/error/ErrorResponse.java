@@ -1,4 +1,4 @@
-package com.example.mountain.global.error;
+package org.com.stocknote.global.error;
 
 
 import lombok.Builder;

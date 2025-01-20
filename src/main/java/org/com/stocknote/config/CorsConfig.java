@@ -1,4 +1,4 @@
-package com.example.mountain.config;
+package org.com.stocknote.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

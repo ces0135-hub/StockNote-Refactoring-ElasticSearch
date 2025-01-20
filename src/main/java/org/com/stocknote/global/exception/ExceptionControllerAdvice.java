@@ -1,9 +1,9 @@
-package com.example.mountain.global.exception;
+package org.com.stocknote.global.exception;
 
-import com.example.mountain.global.error.ErrorCode;
-import com.example.mountain.global.error.ErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.com.stocknote.global.error.ErrorCode;
+import org.com.stocknote.global.error.ErrorResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;

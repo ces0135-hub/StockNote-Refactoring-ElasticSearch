@@ -1,4 +1,4 @@
-package com.example.mountain.config;
+package org.com.stocknote.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
