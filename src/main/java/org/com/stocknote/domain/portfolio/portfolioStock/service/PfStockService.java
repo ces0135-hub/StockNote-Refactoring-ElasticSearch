@@ -18,7 +18,7 @@ public class PfStockService {
   private final StockRepository stockRepository;
 
   public List<PfStock> getStockList(Long portfolioNo) {
-    return pfStockRepository.findAll();
+    return pfStockRepository.findByPortfolioId(portfolioNo);
   }
 
   public PfStock savePfStock(PfStock pfStock) {

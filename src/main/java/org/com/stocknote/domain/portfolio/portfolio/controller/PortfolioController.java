@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.portfolio.portfolio.dto.PortfolioResponse;
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
 import org.com.stocknote.domain.portfolio.portfolio.service.PortfolioService;
+import org.com.stocknote.domain.portfolio.portfolioStock.dto.PfStockResponse;
 import org.com.stocknote.domain.portfolio.portfolioStock.entity.PfStock;
 import org.com.stocknote.domain.portfolio.portfolioStock.service.PfStockService;
 import org.com.stocknote.global.dto.GlobalResponse;
@@ -29,10 +30,13 @@ public class PortfolioController {
   }
 
   @GetMapping("/{portfolio_no}")
-  public String getPortfolioStock(
+  public GlobalResponse<List<PfStockResponse>> getPortfolioStock(
       @PathVariable("portfolio_no") Long portfolioNo) {
     List<PfStock> pfStockList = pfStockService.getStockList(portfolioNo);
-    return "Portfolio get";
+    List<PfStockResponse> response = pfStockList.stream()
+        .map(PfStockResponse::from)
+        .collect(Collectors.toList());
+    return GlobalResponse.success(response);
   }
 
   @PostMapping
