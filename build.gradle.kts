@@ -59,6 +59,7 @@ dependencies {
 
     //Swagger
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
+    implementation("org.java-websocket:Java-WebSocket:1.5.2")
 
     // Http
     implementation ("org.springframework.boot:spring-boot-starter-web")
