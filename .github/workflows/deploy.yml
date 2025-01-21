@@ -63,24 +63,24 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ env.OWNER_LC }}/blog:${{ needs.makeTagAndRelease.outputs.tag_name }},
-            ghcr.io/${{ env.OWNER_LC }}/blog:latest
-#  deploy:
-#    runs-on: ubuntu-latest
-#    needs: [ buildImageAndPush ]
-#    steps:
-#      - name: AWS SSM Send-Command
-#        uses: peterkimzz/aws-ssm-send-command@master
-#        id: ssm
-#        with:
-#          aws-region: ${{ secrets.AWS_REGION }}
-#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          instance-ids: "i-002bdd58eebd6746c"
-#          working-directory: /
-#          comment: Deploy
-#          command: |
-#            mkdir -p /dockerProjects/blog
-#            curl -o /dockerProjects/blog/zero_downtime_deploy.py https://raw.githubusercontent.com/kknaks/deploy-demo-01-25/main/infraScript/zero_downtime_deploy.py
-#            chmod +x /dockerProjects/blog/zero_downtime_deploy.py
-#            /dockerProjects/blog/zero_downtime_deploy.py
+            ghcr.io/${{ env.OWNER_LC }}/stocknote_be:${{ needs.makeTagAndRelease.outputs.tag_name }},
+            ghcr.io/${{ env.OWNER_LC }}/stocknote_be:latest
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [ buildImageAndPush ]
+    steps:
+      - name: AWS SSM Send-Command
+        uses: peterkimzz/aws-ssm-send-command@master
+        id: ssm
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          instance-ids: "i-002bdd58eebd6746c"
+          working-directory: /
+          comment: Deploy
+          command: |
+            mkdir -p /dockerProjects/stock_note
+            curl -o /dockerProjects/stock_note/zero_downtime_deploy.py https://raw.githubusercontent.com/BackEndSchoolPlus3th/StockNote_BE/main/infraScript/zero_downtime_deploy.py
+            chmod +x /dockerProjects/stock_note/zero_downtime_deploy.py
+            /dockerProjects/stock_note/zero_downtime_deploy.py
