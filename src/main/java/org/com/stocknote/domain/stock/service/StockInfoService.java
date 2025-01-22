@@ -1,7 +1,7 @@
 package org.com.stocknote.domain.stock.service;
 
 import lombok.AllArgsConstructor;
-import org.com.stocknote.domain.stock.dto.StockInfoResponse;
+import org.com.stocknote.domain.stock.dto.response.StockInfoResponse;
 import org.com.stocknote.domain.stock.repository.StockInfoRepository;
 import org.com.stocknote.global.error.ErrorCode;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package org.com.stocknote.domain.stock.dto;
+package org.com.stocknote.domain.stock.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

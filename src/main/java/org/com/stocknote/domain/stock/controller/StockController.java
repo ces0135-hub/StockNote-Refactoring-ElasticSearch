@@ -3,13 +3,17 @@ package org.com.stocknote.domain.stock.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.com.stocknote.domain.stock.PeriodType;
-import org.com.stocknote.domain.stock.dto.*;
+import org.com.stocknote.domain.stock.entity.PeriodType;
+import org.com.stocknote.domain.stock.dto.request.StockVoteRequest;
+import org.com.stocknote.domain.stock.dto.response.*;
+import org.com.stocknote.domain.stock.entity.VoteStatistics;
 import org.com.stocknote.domain.stock.service.StockChartService;
 import org.com.stocknote.domain.stock.service.StockInfoService;
 import org.com.stocknote.domain.stock.service.StockService;
+import org.com.stocknote.domain.stock.service.StockVoteService;
 import org.com.stocknote.global.dto.GlobalResponse;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -23,6 +27,7 @@ public class StockController {
     private final StockService stockService;
     private final StockInfoService stockInfoService;
     private final StockChartService stockChartService;
+    private final StockVoteService stockVoteService;
 
     //이름으로 종목 검색
     @GetMapping
@@ -88,6 +93,20 @@ public class StockController {
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
         return stockChartService.getChartData(stockCode, periodType, startDate, endDate);
+    }
+
+    //추후 유저 추가
+    @PostMapping("/{stockCode}/vote")
+    public GlobalResponse<Void> vote(
+            @PathVariable String stockCode,
+            @RequestBody StockVoteRequest request) {
+        stockVoteService.vote(stockCode, request.getVoteType());
+        return GlobalResponse.success();
+    }
+
+    @GetMapping("/{stockCode}/vote-statistics")
+    public ResponseEntity<VoteStatistics> getVoteStatistics(@PathVariable String stockCode) {
+        return ResponseEntity.ok(stockVoteService.getVoteStatistics(stockCode));
     }
 
 }

@@ -1,9 +1,8 @@
-package org.com.stocknote.domain.stock.dto;
+package org.com.stocknote.domain.stock.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
-import org.com.stocknote.domain.stock.entity.Stock;
 import org.com.stocknote.domain.stock.entity.StockInfo;
 
 @Data

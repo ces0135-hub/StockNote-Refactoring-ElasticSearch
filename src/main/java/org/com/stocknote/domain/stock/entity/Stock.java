@@ -21,8 +21,4 @@ public class Stock {
     private String name; //종목명
     private String category; //종목분류
 
-    //투표
-    private boolean sell;
-    private boolean buy;
-
 }

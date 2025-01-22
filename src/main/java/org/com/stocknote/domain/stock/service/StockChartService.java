@@ -2,12 +2,12 @@ package org.com.stocknote.domain.stock.service;
 
 
 import lombok.AllArgsConstructor;
-import org.com.stocknote.domain.stock.PeriodType;
-import org.com.stocknote.domain.stock.dto.ChartResponse;
-import org.com.stocknote.domain.stock.dto.StockDailyResponse;
+import org.com.stocknote.domain.stock.entity.PeriodType;
+import org.com.stocknote.domain.stock.dto.response.ChartResponse;
+import org.com.stocknote.domain.stock.dto.response.StockDailyResponse;
 import org.springframework.stereotype.Service;
-import org.com.stocknote.domain.stock.dto.ChartResponse.CandleData;
-import org.com.stocknote.domain.stock.dto.ChartResponse.StockSummary;
+import org.com.stocknote.domain.stock.dto.response.ChartResponse.CandleData;
+import org.com.stocknote.domain.stock.dto.response.ChartResponse.StockSummary;
 
 import java.time.LocalDate;
 import java.util.List;

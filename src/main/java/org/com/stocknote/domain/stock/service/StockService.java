@@ -2,10 +2,11 @@ package org.com.stocknote.domain.stock.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.com.stocknote.domain.stock.PeriodType;
-import org.com.stocknote.domain.stock.dto.StockDailyResponse;
-import org.com.stocknote.domain.stock.dto.StockPriceResponse;
-import org.com.stocknote.domain.stock.dto.StockTimeResponse;
+import org.com.stocknote.domain.stock.entity.PeriodType;
+import org.com.stocknote.domain.stock.dto.request.StockVoteRequest;
+import org.com.stocknote.domain.stock.dto.response.StockDailyResponse;
+import org.com.stocknote.domain.stock.dto.response.StockPriceResponse;
+import org.com.stocknote.domain.stock.dto.response.StockTimeResponse;
 import org.com.stocknote.global.kis.KisKeyManager;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -190,8 +191,5 @@ public class StockService {
             throw new RuntimeException("시간대별 주식 데이터 조회 중 오류 발생", e);
         }
     }
-
-
-
 
 }
