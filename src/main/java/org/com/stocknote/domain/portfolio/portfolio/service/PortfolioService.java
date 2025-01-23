@@ -2,6 +2,7 @@ package org.com.stocknote.domain.portfolio.portfolio.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.com.stocknote.domain.portfolio.portfolio.dto.PortfolioPatchRequest;
 import org.com.stocknote.domain.portfolio.portfolio.dto.PortfolioRequest;
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
 import org.com.stocknote.domain.portfolio.portfolio.repository.PortfolioRepository;
@@ -30,5 +31,20 @@ public class PortfolioService {
         .description(portfolioRequest.getDescription())
         .build();
     savePfList(portfolio);
+  }
+
+  public void update(PortfolioPatchRequest portfolioPatchRequest) {
+    Portfolio portfolio = portfolioRepository.findById(portfolioPatchRequest.getId())
+        .orElse(null);
+    // 여기서 실패하면 프론트에 실패했다는 코드를 띄워줘야함
+    if (portfolio == null) {
+        log.error("Portfolio not found");
+        return;
+    }
+
+    portfolio.setName(portfolioPatchRequest.getName().orElse(portfolio.getName()));
+    portfolio.setDescription(portfolioPatchRequest.getDescription().orElse(portfolio.getDescription()));
+
+    portfolioRepository.save(portfolio);
   }
 }
