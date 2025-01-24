@@ -2,6 +2,7 @@ package org.com.stocknote.domain.portfolio.portfolio.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.com.stocknote.domain.portfolio.portfolio.dto.PortfolioPatchRequest;
 import org.com.stocknote.domain.portfolio.portfolio.dto.PortfolioRequest;
 import org.com.stocknote.domain.portfolio.portfolio.dto.PortfolioResponse;
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
@@ -42,15 +43,19 @@ public class PortfolioController {
   }
 
   @PostMapping
-  public GlobalResponse<String> postPortfolioList(
+  public GlobalResponse<String> addPortfolio(
       @RequestBody PortfolioRequest portfolioRequest) {
     portfolioService.save(portfolioRequest);
     return GlobalResponse.success("PortfolioList post");
   }
 
-  @PatchMapping
-  public String patchPortfolioList() {
-    return "PortfolioList modify";
+  @PatchMapping("/{portfolio_no}")
+  public GlobalResponse<String> updatePortfolio(
+      @PathVariable("portfolio_no") Long portfolioNo,
+      @Valid @RequestBody PortfolioPatchRequest request) {
+    request.setId(portfolioNo);
+    portfolioService.update(request);
+    return GlobalResponse.success("Portfolio updated successfully");
   }
 
   @DeleteMapping
