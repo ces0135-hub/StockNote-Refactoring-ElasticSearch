@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
-public class TokenService {
+public class StockTokenService {
     private WebClient webClient;
     private String cachedToken;  // 토큰 저장 변수
 

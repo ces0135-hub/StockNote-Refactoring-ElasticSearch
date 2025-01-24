@@ -1,7 +1,7 @@
 package org.com.stocknote.domain.stock.volume.service;
 
 import lombok.RequiredArgsConstructor;
-import org.com.stocknote.domain.stock.token.service.TokenService;
+import org.com.stocknote.domain.stock.token.service.StockTokenService;
 import org.com.stocknote.domain.stock.volume.dto.VolumeResponseDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -19,11 +19,11 @@ public class VolumeService {
     @Value("${kis.volume-base-url}")
     private String volumeBaseUrl;
 
-    private final TokenService tokenService;
+    private final StockTokenService stockTokenService;
     private final WebClient.Builder webClientBuilder;
 
     public Mono<VolumeResponseDto> getVolumeData() {
-        String accessToken = tokenService.getAccessToken();
+        String accessToken = stockTokenService.getAccessToken();
         WebClient webClient = webClientBuilder.baseUrl(volumeBaseUrl).build();
 
         return webClient.get()

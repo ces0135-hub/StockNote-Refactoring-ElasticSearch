@@ -3,7 +3,7 @@ package org.com.stocknote.domain.stock.index.service;
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.stock.index.dto.CurrentIndexResponseDto;
 import org.com.stocknote.domain.stock.index.dto.StockIndexDto;
-import org.com.stocknote.domain.stock.token.service.TokenService;
+import org.com.stocknote.domain.stock.token.service.StockTokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -20,11 +20,11 @@ public class CurrentIndexService {
     @Value("${kis.index-base-url}")
     private String indexBaseUrl;
 
-    private final TokenService tokenService;
+    private final StockTokenService stockTokenService;
     private final WebClient.Builder webClientBuilder;
 
     public Mono<CurrentIndexResponseDto> getKOSPI() {
-        String accessToken = tokenService.getAccessToken();
+        String accessToken = stockTokenService.getAccessToken();
         WebClient webClient = webClientBuilder.baseUrl(indexBaseUrl).build();
 
         return webClient.get()
@@ -45,7 +45,7 @@ public class CurrentIndexService {
 
 
     public Mono<CurrentIndexResponseDto> getKOSDAQ() {
-        String accessToken = tokenService.getAccessToken();
+        String accessToken = stockTokenService.getAccessToken();
         WebClient webClient = webClientBuilder.baseUrl(indexBaseUrl).build();
 
         return webClient.get()
@@ -65,7 +65,7 @@ public class CurrentIndexService {
     }
 
     public Mono<CurrentIndexResponseDto> getKOSPI200() {
-        String accessToken = tokenService.getAccessToken();
+        String accessToken = stockTokenService.getAccessToken();
         WebClient webClient = webClientBuilder.baseUrl(indexBaseUrl).build();
 
         return webClient.get()
