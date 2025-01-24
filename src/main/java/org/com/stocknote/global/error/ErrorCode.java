@@ -31,7 +31,6 @@ public enum ErrorCode {
 
     // Stock
     NOT_FOUND_STOCK(HttpStatus.BAD_REQUEST, "해당 종목이 존재하지 않습니다" ),
-    PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
 
     //에러 추가해서 넣으시면 됩니다!
     ACCESS_DENIED(HttpStatus.UNAUTHORIZED, "인증되지 않은 유저입니다."),
