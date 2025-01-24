@@ -1,6 +1,8 @@
 package org.com.stocknote.domain.portfolio.portfolio.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.com.stocknote.domain.portfolio.portfolio.dto.PortfolioRequest;
 import org.com.stocknote.domain.portfolio.portfolio.dto.PortfolioResponse;
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
 import org.com.stocknote.domain.portfolio.portfolio.service.PortfolioService;
@@ -40,8 +42,10 @@ public class PortfolioController {
   }
 
   @PostMapping
-  public String postPortfolioList() {
-    return "PortfolioList post";
+  public GlobalResponse<String> postPortfolioList(
+      @RequestBody PortfolioRequest portfolioRequest) {
+    portfolioService.save(portfolioRequest);
+    return GlobalResponse.success("PortfolioList post");
   }
 
   @PatchMapping
