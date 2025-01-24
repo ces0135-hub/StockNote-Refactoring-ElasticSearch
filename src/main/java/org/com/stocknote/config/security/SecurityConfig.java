@@ -7,6 +7,7 @@ import org.com.stocknote.domain.oauth.token.TokenAuthenticationFilter;
 import org.com.stocknote.domain.oauth.token.TokenExceptionFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -50,16 +51,23 @@ public class SecurityConfig {
                 .sessionManagement(c ->
                         c.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용하지 않음
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
-
-                // request 인증, 인가 설정
-                .authorizeHttpRequests(request ->
-                        request.requestMatchers(
-                                new AntPathRequestMatcher("/"),
-//                                new AntPathRequestMatcher("/auth/success"),
-                                new AntPathRequestMatcher("/auth/google/redirect")
-                                ).permitAll() //
-                .anyRequest().authenticated() //나머지는 인증 필요
+                .authorizeHttpRequests(
+                    authorizeRequests -> authorizeRequests
+                        .requestMatchers(HttpMethod.GET, "/api/*").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/*").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "/api/*").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/*").permitAll()
+                        .anyRequest().permitAll()
                 )
+//                // request 인증, 인가 설정
+//                .authorizeHttpRequests(request ->
+//                        request.requestMatchers(
+//                                new AntPathRequestMatcher("/"),
+////                                new AntPathRequestMatcher("/auth/success"),
+//                                new AntPathRequestMatcher("/auth/google/redirect")
+//                                ).permitAll() //
+//                .anyRequest().authenticated() //나머지는 인증 필요
+//                )
 
                 // oauth2 설정
                 .oauth2Login(oauth -> // OAuth2 로그인 기능에 대한 여러 설정의 진입점
