@@ -58,9 +58,11 @@ public class PortfolioController {
     return GlobalResponse.success("Portfolio updated successfully");
   }
 
-  @DeleteMapping
-  public String deletePortfolioList() {
-
-    return "PortfolioList del";
+  @DeleteMapping("/{portfolio_no}")
+  public GlobalResponse<String> deletePortfolio(
+      @PathVariable("portfolio_no") Long portfolioNo
+  ) {
+    portfolioService.delete(portfolioNo);
+    return GlobalResponse.success("Portfolio deleted successfully");
   }
 }

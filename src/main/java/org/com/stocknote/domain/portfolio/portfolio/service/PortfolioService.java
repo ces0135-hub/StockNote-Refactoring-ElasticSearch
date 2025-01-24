@@ -47,4 +47,13 @@ public class PortfolioService {
 
     portfolioRepository.save(portfolio);
   }
+
+  public Portfolio getPortfolio(Long portfolioNo) {
+    return portfolioRepository.findById(portfolioNo)
+        .orElseThrow(() -> new RuntimeException("Portfolio not found"));
+  }
+
+  public void delete(Long portfolioNo) {
+    portfolioRepository.deleteById(portfolioNo);
+  }
 }
