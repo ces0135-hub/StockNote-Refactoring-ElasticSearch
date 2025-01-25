@@ -68,6 +68,8 @@ dependencies {
     implementation ("io.netty:netty-resolver-dns-native-macos:4.1.94.Final:osx-aarch_64") // 최신 버전 확인
     implementation ("org.springframework.boot:spring-boot-starter-web")
 
+    implementation("com.opencsv:opencsv:5.7.1")
+
 }
 
 tasks.withType<Test> {

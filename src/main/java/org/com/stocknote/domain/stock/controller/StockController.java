@@ -115,9 +115,4 @@ public class StockController {
     public ResponseEntity<VoteStatistics> getVoteStatistics(@PathVariable String stockCode) {
         return ResponseEntity.ok(stockVoteService.getVoteStatistics(stockCode));
     }
-    @PostMapping("/upload-csv")
-    public String uploadCsv(@RequestParam("filePath") String filePath) {
-        stockDataService.saveStockDataFromCsv(filePath);
-        return "CSV data has been successfully saved!";
-    }
 }
