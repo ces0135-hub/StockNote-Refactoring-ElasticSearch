@@ -35,7 +35,7 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() { // security를 적용하지 않을 리소스
         return web -> web.ignoring()
                 // error endpoint를 열어줘야 함, favicon.ico 추가!
-                .requestMatchers("/error", "/favicon.ico");
+                .requestMatchers("/error", "/favicon.ico", "/swagger-ui/**", "/v3/api-docs/**");
     }
 
     @Bean
@@ -53,17 +53,19 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
 
                 // request 인증, 인가 설정
-                .authorizeHttpRequests(request ->
-                        request.requestMatchers(
-                                new AntPathRequestMatcher("/"), //메인 페이지 허용
-                                new AntPathRequestMatcher("/api/filtered/*"), //메인 페이지에 종목 정보 가져오는 것 다 엑세스 허용
-                                new AntPathRequestMatcher("/api/kospi"),
-                                new AntPathRequestMatcher("/api/kosdaq"),
-                                new AntPathRequestMatcher("/api/kospi200"),
-                                new AntPathRequestMatcher("/api/volume"),
-                                new AntPathRequestMatcher("/auth/google/redirect")
-                                ).permitAll() //
-                .anyRequest().authenticated() //나머지는 인증 필요
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers(
+                                "/",
+                                "/api/filtered/*",
+                                "/api/kospi",
+                                "/api/kosdaq",
+                                "/api/kospi200",
+                                "/api/volume",
+                                "/auth/google/redirect",
+                                "/swagger-ui/**", // Swagger UI 경로 허용
+                                "/v3/api-docs/**"  // Swagger API Docs 경로 허용
+                        ).permitAll()
+                        .anyRequest().authenticated()
                 )
 //                // request 인증, 인가 설정
 //                .authorizeHttpRequests(request ->

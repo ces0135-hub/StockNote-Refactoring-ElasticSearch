@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.config.AppConfig;
-import org.com.stocknote.domain.oauth.token.TokenProvider;
 import org.com.stocknote.oauth.token.TokenProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
