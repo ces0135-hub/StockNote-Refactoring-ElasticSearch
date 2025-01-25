@@ -8,12 +8,13 @@ import org.com.stocknote.domain.stock.dto.request.StockVoteRequest;
 import org.com.stocknote.domain.stock.dto.response.*;
 import org.com.stocknote.domain.stock.entity.VoteStatistics;
 import org.com.stocknote.domain.stock.service.StockChartService;
-import org.com.stocknote.domain.stock.service.StockInfoService;
+import org.com.stocknote.domain.stock.service.StockDataService;
 import org.com.stocknote.domain.stock.service.StockService;
 import org.com.stocknote.domain.stock.service.StockVoteService;
-import org.com.stocknote.global.dto.GlobalResponse;
+import org.com.stocknote.global.globalDto.GlobalResponse;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -25,19 +26,25 @@ import java.time.LocalDate;
 @Tag(name = "관심종목 API", description = "관심 종목(Stock)")
 public class StockController {
     private final StockService stockService;
-    private final StockInfoService stockInfoService;
     private final StockChartService stockChartService;
     private final StockVoteService stockVoteService;
+    private final StockDataService stockDataService;
 
     //이름으로 종목 검색
     @GetMapping
     @Operation(summary = "종목 이름 검색")
     public GlobalResponse findStock(@RequestParam String name) {
-        StockInfoResponse stockInfoResponse = stockInfoService.findStock(name);
+        StockInfoResponse stockInfoResponse = stockDataService.findStock(name);
         return GlobalResponse.success(stockInfoResponse);
     }
 
-    //종목 상세 검색 Api들
+    @PostMapping
+    @Operation(summary = "종목 추가")
+    public GlobalResponse addStock(@RequestParam String stockCode,
+                                   @AuthenticationPrincipal Long memberId) {
+        stockService.addStock(stockCode, memberId);
+        return GlobalResponse.success();
+    }
 
     @GetMapping("/price")
     public StockPriceResponse getStockPrice(@RequestParam String stockCode) {
@@ -103,10 +110,14 @@ public class StockController {
         stockVoteService.vote(stockCode, request.getVoteType());
         return GlobalResponse.success();
     }
-
+    // 투표기능
     @GetMapping("/{stockCode}/vote-statistics")
     public ResponseEntity<VoteStatistics> getVoteStatistics(@PathVariable String stockCode) {
         return ResponseEntity.ok(stockVoteService.getVoteStatistics(stockCode));
     }
-
+    @PostMapping("/upload-csv")
+    public String uploadCsv(@RequestParam("filePath") String filePath) {
+        stockDataService.saveStockDataFromCsv(filePath);
+        return "CSV data has been successfully saved!";
+    }
 }

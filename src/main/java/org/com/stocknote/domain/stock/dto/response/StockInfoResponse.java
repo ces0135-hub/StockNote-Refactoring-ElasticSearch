@@ -3,7 +3,7 @@ package org.com.stocknote.domain.stock.dto.response;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
-import org.com.stocknote.domain.stock.entity.StockInfo;
+import org.com.stocknote.domain.stock.entity.Stock;
 
 @Data
 @Getter
@@ -12,10 +12,10 @@ public class StockInfoResponse {
     private String name;
     private String code;
 
-    public static StockInfoResponse of (StockInfo stockInfo){
+    public static StockInfoResponse of (Stock stock){
         return StockInfoResponse.builder()
-                .name(stockInfo.getName())
-                .code(stockInfo.getCode())
+                .name(stock.getName())
+                .code(stock.getCode())
                 .build();
     }
 }

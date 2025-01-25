@@ -2,12 +2,13 @@ package org.com.stocknote.domain.stock.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.com.stocknote.domain.member.entity.Member;
+import org.com.stocknote.domain.member.repository.MemberRepository;
 import org.com.stocknote.domain.stock.entity.PeriodType;
-import org.com.stocknote.domain.stock.dto.request.StockVoteRequest;
 import org.com.stocknote.domain.stock.dto.response.StockDailyResponse;
 import org.com.stocknote.domain.stock.dto.response.StockPriceResponse;
 import org.com.stocknote.domain.stock.dto.response.StockTimeResponse;
-import org.com.stocknote.global.kis.KisKeyManager;
+import org.com.stocknote.domain.stock.kis.KisKeyManager;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -17,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -24,10 +26,12 @@ public class StockService {
 
     private final KisKeyManager kisKeyManager;
     private final RestTemplate restTemplate;
+    private final MemberRepository memberRepository;
 
-    public StockService(KisKeyManager keyManager, RestTemplate restTemplate) {
+    public StockService(KisKeyManager keyManager, RestTemplate restTemplate, MemberRepository memberRepository) {
         this.kisKeyManager = keyManager;
         this.restTemplate = restTemplate; // RestTemplate 주입
+        this.memberRepository = memberRepository;
     }
 
     public StockPriceResponse getStockPrice(String stockCode) {
@@ -190,6 +194,14 @@ public class StockService {
             log.error("API Error for stockCode {}: {}", stockCode, e.getMessage());
             throw new RuntimeException("시간대별 주식 데이터 조회 중 오류 발생", e);
         }
+    }
+
+    public void addStock (String stockCode, Long memberId) {
+        Optional<Member> member = memberRepository.findById(memberId);
+        if (member.isEmpty()) {
+            throw new RuntimeException("회원 정보를 찾을 수 없습니다.");
+        }
+
     }
 
 }

@@ -1,12 +1,12 @@
 package org.com.stocknote.domain.stock.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.global.base.BaseEntity;
 
 @Entity
@@ -17,8 +17,18 @@ import org.com.stocknote.global.base.BaseEntity;
 @SuperBuilder
 public class Stock {
     @Id
-    private String code; //종목코드
-    private String name; //종목명
-    private String category; //종목분류
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; // 기본 키
+    private String code; // 종목코드
+    private String name; // 종목명
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member; // 회원
+
+
+    public Stock (String code, String name) {
+        this.code = code;
+        this.name = name;
+    }
 }

@@ -2,11 +2,10 @@ package org.com.stocknote.domain.portfolio.portfolioStock.controller;
 
 
 import lombok.RequiredArgsConstructor;
-import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
 import org.com.stocknote.domain.portfolio.portfolioStock.dto.PfStockPatchRequest;
 import org.com.stocknote.domain.portfolio.portfolioStock.dto.PfStockRequest;
 import org.com.stocknote.domain.portfolio.portfolioStock.service.PfStockService;
-import org.com.stocknote.global.dto.GlobalResponse;
+import org.com.stocknote.global.globalDto.GlobalResponse;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

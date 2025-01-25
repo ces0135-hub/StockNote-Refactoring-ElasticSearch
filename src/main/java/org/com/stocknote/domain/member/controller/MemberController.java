@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.member.dto.MemberDto;
 import org.com.stocknote.domain.member.service.MemberService;
-import org.com.stocknote.domain.oauth.token.TokenProvider;
-import org.com.stocknote.global.dto.GlobalResponse;
+import org.com.stocknote.oauth.token.TokenProvider;
+import org.com.stocknote.global.globalDto.GlobalResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,4 +29,3 @@ public class MemberController {
         return GlobalResponse.success(userProfile);
     }
 }
-

@@ -3,9 +3,14 @@ package org.com.stocknote.domain.member.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.OneToMany;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.com.stocknote.domain.stock.entity.Stock;
 import org.com.stocknote.global.base.BaseEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,4 +27,7 @@ public class Member extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private Role role=Role.USER;
+
+    @OneToMany(mappedBy = "member")
+    private List<Stock> stockList = new ArrayList<>();
 }
