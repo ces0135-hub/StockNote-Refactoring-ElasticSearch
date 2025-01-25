@@ -29,6 +29,6 @@ public class PfStock extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   private Portfolio portfolio;
 
-  @OneToOne
+  @ManyToOne
   private Stock stock;
 }

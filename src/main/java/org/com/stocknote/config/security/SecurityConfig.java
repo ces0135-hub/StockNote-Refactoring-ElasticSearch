@@ -58,10 +58,10 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/"), //메인 페이지 허용
                                 new AntPathRequestMatcher("/api/filtered/*"), //메인 페이지에 종목 정보 가져오는 것 다 엑세스 허용
                                 new AntPathRequestMatcher("/api/kospi"),
-                                         new AntPathRequestMatcher("/api/kosdaq"),
-                                        new AntPathRequestMatcher("/api/kospi200"),
-                                        new AntPathRequestMatcher("/api/volume"),
-                                        new AntPathRequestMatcher("/auth/google/redirect")
+                                new AntPathRequestMatcher("/api/kosdaq"),
+                                new AntPathRequestMatcher("/api/kospi200"),
+                                new AntPathRequestMatcher("/api/volume"),
+                                new AntPathRequestMatcher("/auth/google/redirect")
                                 ).permitAll() //
                 .anyRequest().authenticated() //나머지는 인증 필요
                 )

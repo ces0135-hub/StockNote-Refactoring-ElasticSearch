@@ -28,41 +28,36 @@ public class PortfolioController {
   @GetMapping
   public GlobalResponse<List<PortfolioResponse>> getPortfolioList() {
     List<Portfolio> portfolio = portfolioService.getPortfolioList();
-    List<PortfolioResponse> response = portfolio.stream()
-        .map(PortfolioResponse::from)
-        .collect(Collectors.toList());
+    List<PortfolioResponse> response =
+        portfolio.stream().map(PortfolioResponse::from).collect(Collectors.toList());
     return GlobalResponse.success(response);
   }
 
   @GetMapping("/{portfolio_no}")
   public GlobalResponse<List<PfStockResponse>> getPortfolioStock(
       @PathVariable("portfolio_no") Long portfolioNo) {
+    // ...existing code...
     List<PfStock> pfStockList = pfStockService.getStockList(portfolioNo);
-    List<PfStockResponse> response = pfStockList.stream()
-        .map(PfStockResponse::from)
-        .collect(Collectors.toList());
+    List<PfStockResponse> response =
+        pfStockList.stream().map(PfStockResponse::from).collect(Collectors.toList());
     return GlobalResponse.success(response);
   }
 
   @PostMapping
-  public GlobalResponse<String> addPortfolio(
-      @RequestBody PortfolioRequest portfolioRequest) {
+  public GlobalResponse<String> addPortfolio(@RequestBody PortfolioRequest portfolioRequest) {
     portfolioService.save(portfolioRequest);
     return GlobalResponse.success("PortfolioList post");
   }
 
   @PatchMapping("/{portfolio_no}")
-  public GlobalResponse<String> updatePortfolio(
-      @PathVariable("portfolio_no") Long portfolioNo,
+  public GlobalResponse<String> updatePortfolio(@PathVariable("portfolio_no") Long portfolioNo,
       @Valid @RequestBody PortfolioPatchRequest request) {
     portfolioService.update(portfolioNo, request);
     return GlobalResponse.success("Portfolio updated successfully");
   }
 
   @DeleteMapping("/{portfolio_no}")
-  public GlobalResponse<String> deletePortfolio(
-      @PathVariable("portfolio_no") Long portfolioNo
-  ) {
+  public GlobalResponse<String> deletePortfolio(@PathVariable("portfolio_no") Long portfolioNo) {
     portfolioService.delete(portfolioNo);
     return GlobalResponse.success("Portfolio deleted successfully");
   }
@@ -70,9 +65,8 @@ public class PortfolioController {
   @GetMapping("/tempStock")
   public GlobalResponse<List<StockTempResponse>> getTempStockList() {
     List<Stock> stockList = pfStockService.getTempStockList();
-    List<StockTempResponse> response = stockList.stream()
-        .map(StockTempResponse::new)
-        .collect(Collectors.toList());
+    List<StockTempResponse> response =
+        stockList.stream().map(StockTempResponse::new).collect(Collectors.toList());
     return GlobalResponse.success(response);
   }
 }
