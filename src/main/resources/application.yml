@@ -11,10 +11,6 @@ spring:
     exclude:
       - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
       - org.springframework.boot.autoconfigure.session.SessionAutoConfiguration
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://43.203.126.129/default_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: root
   jpa:
     hibernate:
       ddl-auto: create
@@ -27,7 +23,21 @@ spring:
 logging:
     level:
       root: INFO
-#    org.hibernate.SQL: DEBUG
-#    org.hibernate.orm.jdbc.bind: TRACE
-#    org.hibernate.orm.jdbc.extract: TRACE
-#    org.springframework.transaction.interceptor: TRACE
+#      org.hibernate.SQL: DEBUG
+#      org.hibernate.orm.jdbc.bind: TRACE
+#      org.hibernate.orm.jdbc.extract: TRACE
+#      org.springframework.transaction.interceptor: TRACE
+custom:
+  dev:
+    cookieDomain: localhost
+    frontUrl: "http://${custom.dev.cookieDomain}:5173"
+    backUrl: "http://${custom.dev.cookieDomain}:${server.port}"
+  prod:
+    cookieDomain: stocknote.kknaks.site
+    frontUrl: "https://www.${custom.prod.cookieDomain}"
+    backUrl: "https://api.${custom.prod.cookieDomain}"
+  site:
+    name: "StockNote"
+    cookieDomain: "${custom.dev.cookieDomain}"
+    frontUrl: "${custom.dev.frontUrl}"
+    backUrl: "${custom.dev.backUrl}"

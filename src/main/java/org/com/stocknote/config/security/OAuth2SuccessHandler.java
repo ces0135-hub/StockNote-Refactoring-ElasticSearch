@@ -3,6 +3,7 @@ package org.com.stocknote.config.security;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.com.stocknote.config.AppConfig;
 import org.com.stocknote.domain.oauth.token.TokenProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -15,7 +16,7 @@ import java.io.IOException;
 @Component
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final TokenProvider tokenProvider;
-    private static final String URI = "http://localhost:5173/";
+    private static final String URI = AppConfig.getSiteFrontUrl();
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
