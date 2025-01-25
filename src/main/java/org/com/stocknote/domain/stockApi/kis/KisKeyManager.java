@@ -20,11 +20,11 @@ public class KisKeyManager {
     private String websocketApprovalKey;
 
     @Getter
-    @Value("${korea-investment-api.appkey}")
+    @Value("${kis.app-key}")
     private String appKey;
 
     @Getter
-    @Value("${korea-investment-api.appsecret}")
+    @Value("${kis.app-secret}")
     private String appSecret;
 
 

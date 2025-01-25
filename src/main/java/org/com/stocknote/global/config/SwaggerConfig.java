@@ -1,4 +1,4 @@
-package org.com.stocknote.global.springDoc;
+package org.com.stocknote.global.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
