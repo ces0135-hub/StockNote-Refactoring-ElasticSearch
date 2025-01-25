@@ -1,8 +1,8 @@
-package org.com.stocknote.domain.stock.index.service;
+package org.com.stocknote.domain.stockApi.index.service;
 
 import lombok.RequiredArgsConstructor;
-import org.com.stocknote.domain.stock.index.dto.CurrentIndexResponseDto;
-import org.com.stocknote.domain.stock.index.dto.StockIndexDto;
+import org.com.stocknote.domain.stockApi.index.dto.CurrentIndexResponseDto;
+import org.com.stocknote.domain.stockApi.index.dto.StockIndexDto;
 import org.com.stocknote.domain.stock.token.service.StockTokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -142,4 +142,3 @@ public class CurrentIndexService {
 
 
 }
-

@@ -1,4 +1,4 @@
-package org.com.stocknote.domain.stock.kis;
+package org.com.stocknote.global.kis;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;

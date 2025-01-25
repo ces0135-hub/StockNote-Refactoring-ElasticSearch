@@ -1,4 +1,4 @@
-package org.com.stocknote.domain.stock.kis;
+package org.com.stocknote.global.kis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -8,7 +8,7 @@ import org.com.stocknote.domain.stock.entity.PeriodType;
 import org.com.stocknote.domain.stock.dto.response.StockDailyResponse;
 import org.com.stocknote.domain.stock.dto.response.StockPriceResponse;
 import org.com.stocknote.domain.stock.dto.response.StockTimeResponse;
-import org.com.stocknote.domain.stock.kis.KisKeyManager;
+import org.com.stocknote.domain.stockApi.kis.KisKeyManager;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;

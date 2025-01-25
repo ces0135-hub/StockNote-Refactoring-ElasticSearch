@@ -1,9 +1,9 @@
-package org.com.stocknote.domain.stock.index.controller;
+package org.com.stocknote.domain.stockApi.index.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.com.stocknote.domain.stock.index.dto.CurrentIndexResponseDto;
-import org.com.stocknote.domain.stock.index.dto.StockIndexDto;
-import org.com.stocknote.domain.stock.index.service.CurrentIndexService;
+import org.com.stocknote.domain.stockApi.index.dto.CurrentIndexResponseDto;
+import org.com.stocknote.domain.stockApi.index.dto.StockIndexDto;
+import org.com.stocknote.domain.stockApi.index.service.CurrentIndexService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
@@ -46,4 +46,3 @@ public class CurrentIndexController {
         return currentIndexService.getFilteredKOSPI200();
     }
 }
-

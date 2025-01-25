@@ -1,4 +1,4 @@
-package org.com.stocknote.domain.stock.index.dto;
+package org.com.stocknote.domain.stockApi.index.dto;
 
 import lombok.Getter;
 import lombok.Setter;

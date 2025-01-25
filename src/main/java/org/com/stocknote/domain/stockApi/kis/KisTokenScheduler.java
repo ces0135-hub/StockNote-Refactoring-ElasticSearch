@@ -1,4 +1,4 @@
-package org.com.stocknote.domain.stock.kis;
+package org.com.stocknote.domain.stockApi.kis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
