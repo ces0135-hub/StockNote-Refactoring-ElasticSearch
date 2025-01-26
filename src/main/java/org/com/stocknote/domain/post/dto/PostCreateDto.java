@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.com.stocknote.domain.post.entity.Post;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class PostCreateDto {
@@ -14,6 +16,7 @@ public class PostCreateDto {
     @NotBlank(message = "Body is required")
     private String body;
 
+    private List<String> hashtags;
 
     public Post toEntity(Long userId) {
         return Post.builder()
