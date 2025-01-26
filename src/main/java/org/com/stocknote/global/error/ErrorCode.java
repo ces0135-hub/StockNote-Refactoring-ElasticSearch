@@ -34,6 +34,7 @@ public enum ErrorCode {
     INVALID_JWT_SIGNATURE(HttpStatus.UNAUTHORIZED, "서명 검증에 실패했습니다." ),
     ILLEGAL_REGISTRATION_ID(HttpStatus.BAD_REQUEST,"해당 사항이 없는 로그인 경로입니다.");
 
+
     private final HttpStatus httpStatus;
     private final String message;
 }
