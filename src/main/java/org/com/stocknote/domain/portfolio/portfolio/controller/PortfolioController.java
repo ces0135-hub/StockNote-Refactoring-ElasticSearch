@@ -12,7 +12,7 @@ import org.com.stocknote.domain.portfolio.portfolioStock.dto.StockTempResponse;
 import org.com.stocknote.domain.portfolio.portfolioStock.entity.PfStock;
 import org.com.stocknote.domain.portfolio.portfolioStock.service.PfStockService;
 import org.com.stocknote.domain.stock.entity.Stock;
-import org.com.stocknote.global.dto.GlobalResponse;
+import org.com.stocknote.global.globalDto.GlobalResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

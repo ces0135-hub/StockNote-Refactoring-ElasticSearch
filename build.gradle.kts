@@ -59,6 +59,7 @@ dependencies {
 
     //Swagger
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
+    implementation("org.java-websocket:Java-WebSocket:1.5.2")
 
     // Http
     implementation ("org.springframework.boot:spring-boot-starter-web")
@@ -66,6 +67,11 @@ dependencies {
     implementation ("org.springframework.boot:spring-boot-starter-webflux")
     implementation ("io.netty:netty-resolver-dns-native-macos:4.1.94.Final:osx-aarch_64") // 최신 버전 확인
     implementation ("org.springframework.boot:spring-boot-starter-web")
+
+    implementation("com.opencsv:opencsv:5.7.1")
+
+    implementation ("org.springframework.boot:spring-boot-starter-cache")
+    implementation ("com.github.ben-manes.caffeine:caffeine")
 
 }
 
