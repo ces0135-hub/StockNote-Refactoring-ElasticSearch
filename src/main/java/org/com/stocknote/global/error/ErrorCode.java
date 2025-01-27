@@ -28,11 +28,21 @@ public enum ErrorCode {
     NOT_FOUND_USER(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다"),
     PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
 
+
+    // Stock
+    STOCK_NOT_FOUND(HttpStatus.BAD_REQUEST,  "해당 종목이 존재하지 않습니다" ),
+
     //에러 추가해서 넣으시면 됩니다!
     ACCESS_DENIED(HttpStatus.UNAUTHORIZED, "인증되지 않은 유저입니다."),
     SC_FORBIDDEN(HttpStatus.UNAUTHORIZED, "권한이 없는 유저입니다."),
     INVALID_JWT_SIGNATURE(HttpStatus.UNAUTHORIZED, "서명 검증에 실패했습니다." ),
-    ILLEGAL_REGISTRATION_ID(HttpStatus.BAD_REQUEST,"해당 사항이 없는 로그인 경로입니다.");
+    ILLEGAL_REGISTRATION_ID(HttpStatus.BAD_REQUEST,"해당 사항이 없는 로그인 경로입니다."),
+
+    TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "토큰이 만료되었습니다."),
+
+    // comment
+    COMMENT_UPDATE_DENIED(HttpStatus.FORBIDDEN, "댓글 수정은 댓글 작성자만 할 수 있습니다."),
+    COMMENT_DELETE_DENIED(HttpStatus.FORBIDDEN, "댓글 삭제는 댓글 작성자만 할 수 있습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
