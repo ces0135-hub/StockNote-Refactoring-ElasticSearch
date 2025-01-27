@@ -3,6 +3,7 @@ package org.com.stocknote.domain.stockApi.kis;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -10,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Component
 public class KisKeyManager {
@@ -19,6 +21,7 @@ public class KisKeyManager {
     private LocalDateTime tokenExpirationTime;
     private String websocketApprovalKey;
 
+    private final ReentrantLock lock = new ReentrantLock();
     @Getter
     @Value("${kis.app-key}")
     private String appKey;
@@ -35,9 +38,10 @@ public class KisKeyManager {
     /**
      * 1. Access Token 발급 또는 재발급
      */
-    public synchronized String getAccessToken() {
+    @Cacheable(value = "accessToken", unless = "#result == null")
+    public String getAccessToken() {
         if (accessToken == null || isTokenExpired()) {
-            requestNewAccessToken(); // 토큰 만료 시에만 새로 발급
+            requestNewAccessToken();
         }
         return accessToken;
     }

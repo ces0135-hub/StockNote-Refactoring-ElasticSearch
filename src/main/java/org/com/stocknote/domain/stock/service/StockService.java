@@ -11,6 +11,7 @@ import org.com.stocknote.domain.stock.dto.response.StockTimeResponse;
 import org.com.stocknote.domain.stockApi.kis.KisKeyManager;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -195,12 +196,13 @@ public class StockService {
             throw new RuntimeException("시간대별 주식 데이터 조회 중 오류 발생", e);
         }
     }
-
-    public void addStock (String stockCode, Long memberId) {
-        Optional<Member> member = memberRepository.findById(memberId);
+    @Transactional
+    public void addStock (String stockCode, String email) {
+        Optional<Member> member = memberRepository.findByEmail(email);
         if (member.isEmpty()) {
             throw new RuntimeException("회원 정보를 찾을 수 없습니다.");
         }
+
 
     }
 

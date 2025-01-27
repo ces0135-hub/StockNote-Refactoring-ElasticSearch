@@ -15,6 +15,7 @@ public record PrincipalDetails(
         Map<String, Object> attributes,
         String attributeKey) implements OAuth2User, UserDetails {
 
+
     @Override
     public String getName() {
         return attributes.get(attributeKey).toString();

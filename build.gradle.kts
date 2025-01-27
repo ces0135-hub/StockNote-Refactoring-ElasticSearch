@@ -70,6 +70,9 @@ dependencies {
 
     implementation("com.opencsv:opencsv:5.7.1")
 
+    implementation ("org.springframework.boot:spring-boot-starter-cache")
+    implementation ("com.github.ben-manes.caffeine:caffeine")
+
 }
 
 tasks.withType<Test> {

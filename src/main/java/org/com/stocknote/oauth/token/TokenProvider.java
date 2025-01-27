@@ -45,6 +45,24 @@ public class TokenProvider {
         return generateToken(authentication, ACCESS_TOKEN_EXPIRE_TIME);
     }
 
+    public Token createTokens(String email) {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                email, null, Collections.emptyList() // 권한 정보 없이 빈 리스트로 설정
+        );
+
+        // Access Token 생성
+        String accessToken = generateAccessToken(authentication);
+
+        // Refresh Token 생성 및 저장
+        generateRefreshToken(authentication, accessToken);
+
+        // Token 객체 생성 및 반환
+        Token token = new Token(accessToken, null); // Refresh Token 저장은 Redis에서 관리
+        token.setUsername(email);
+        return token;
+    }
+
+
     // 1. refresh token 발급
     public void generateRefreshToken(Authentication authentication, String accessToken) {
         String refreshToken = generateToken(authentication, REFRESH_TOKEN_EXPIRE_TIME);

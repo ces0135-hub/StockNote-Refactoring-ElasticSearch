@@ -13,20 +13,26 @@ spring:
       - org.springframework.boot.autoconfigure.session.SessionAutoConfiguration
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         default_batch_fetch_size: 100
         format_sql: true
         highlight_sql: true
         use_sql_comments: true
+  sql:
+    init:
+      mode: never
 logging:
-    level:
-      root: INFO
+  level:
+    root: INFO
+#    org.springframework.web: DEBUG
+#    org.springdoc: DEBUG
 #      org.hibernate.SQL: DEBUG
 #      org.hibernate.orm.jdbc.bind: TRACE
 #      org.hibernate.orm.jdbc.extract: TRACE
 #      org.springframework.transaction.interceptor: TRACE
+
 custom:
   dev:
     cookieDomain: localhost

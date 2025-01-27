@@ -6,6 +6,8 @@ import org.com.stocknote.domain.stock.entity.Stock;
 import org.com.stocknote.domain.stock.repository.StockRepository;
 import org.com.stocknote.global.error.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.io.FileReader;
@@ -18,7 +20,7 @@ public class StockDataService {
     @Autowired
     private StockRepository stockRepository;
 
-    @PostConstruct
+    @EventListener(ApplicationReadyEvent.class)
     public void loadCsvData() {
         String filePath = "src/main/resources/info.csv"; // CSV 파일 경로
         try (CSVReader csvReader = new CSVReader(new FileReader(filePath))) {

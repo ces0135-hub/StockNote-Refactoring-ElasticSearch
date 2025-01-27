@@ -1,4 +1,4 @@
-package org.com.stocknote.global.config;
+package org.com.stocknote.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

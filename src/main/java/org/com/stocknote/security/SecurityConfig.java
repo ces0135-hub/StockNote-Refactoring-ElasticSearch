@@ -34,9 +34,17 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() { // security를 적용하지 않을 리소스
         return web -> web.ignoring()
-                // error endpoint를 열어줘야 함, favicon.ico 추가!
-                .requestMatchers("/error", "/favicon.ico", "/swagger-ui/**", "/v3/api-docs/**");
+                .requestMatchers(
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-resources/**",
+                        "/auth/login/kakao/**",
+                        "/error",
+                        "/swagger-ui/oauth2-redirect.html",
+                        "/favicon.ico"
+                );
     }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -56,14 +64,20 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(
                                 "/",
+                                "/auth/",
                                 "/api/filtered/*",
                                 "/api/kospi",
                                 "/api/kosdaq",
                                 "/api/kospi200",
                                 "/api/volume",
                                 "/auth/google/redirect",
-                                "/swagger-ui/**", // Swagger UI 경로 허용
-                                "/v3/api-docs/**"  // Swagger API Docs 경로 허용
+                                "/swagger-ui/**",
+                                "/swagger-ui/oauth2-redirect.html",// Swagger UI 경로 허용
+                                "/v3/api-docs/**",
+                                "/auth/kakao/redirect",
+                                "/auth/login",
+                                "/auth/kakao/callback"
+
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

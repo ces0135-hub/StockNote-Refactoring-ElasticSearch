@@ -1,4 +1,4 @@
-package org.com.stocknote.global.config;
+package org.com.stocknote.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

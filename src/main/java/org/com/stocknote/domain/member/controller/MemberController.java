@@ -4,13 +4,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.member.dto.MemberDto;
 import org.com.stocknote.domain.member.service.MemberService;
+import org.com.stocknote.oauth.service.CustomOAuth2UserService;
 import org.com.stocknote.oauth.token.TokenProvider;
 import org.com.stocknote.global.globalDto.GlobalResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+
+import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
     private final MemberService memberService;
     private final TokenProvider tokenProvider;
+    private final CustomOAuth2UserService oAuth2UserService;
 
     @GetMapping("/profile")
     @PreAuthorize("isAuthenticated()")

@@ -14,6 +14,7 @@ import org.com.stocknote.domain.stock.service.StockVoteService;
 import org.com.stocknote.global.globalDto.GlobalResponse;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,8 +42,9 @@ public class StockController {
     @PostMapping
     @Operation(summary = "종목 추가")
     public GlobalResponse addStock(@RequestParam String stockCode,
-                                   @AuthenticationPrincipal Long memberId) {
-        stockService.addStock(stockCode, memberId);
+                                   Authentication authentication) {
+        String email = authentication.getName();
+        stockService.addStock(stockCode, email);
         return GlobalResponse.success();
     }
 

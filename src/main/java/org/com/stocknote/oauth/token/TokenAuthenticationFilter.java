@@ -20,7 +20,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
-    private static final String TOKEN_PREFIX= "bearer";
+    private static final String TOKEN_PREFIX = "Bearer ";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -51,21 +51,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     protected String resolveToken(HttpServletRequest request) {
-        // FirewalledRequest 객체에서 원본 요청을 가져옵니다.
-        HttpServletRequest originalRequest = (HttpServletRequest) request.getAttribute("originalRequest");
-        if (originalRequest == null) {
-            originalRequest = request;  // 원본 요청이 없으면 직접 접근
-        }
-        System.out.println(originalRequest);
-
-        // Authorization 헤더 값을 확인합니다.
-        String bearerToken = originalRequest.getHeader("Authorization");
-        System.out.println("Authorization Header: " + bearerToken);
-
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);  // "Bearer " 이후의 토큰을 반환
+        String bearerToken = request.getHeader("Authorization");
+        System.out.println("Authorization Header: " + bearerToken); // 로그로 확인
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7); // "Bearer " 이후 토큰 반환
         }
         return null;
     }
-
 }

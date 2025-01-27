@@ -30,4 +30,5 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member")
     private List<Stock> stockList = new ArrayList<>();
+
 }
