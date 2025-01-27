@@ -20,23 +20,23 @@ public class StockDataService {
     @Autowired
     private StockRepository stockRepository;
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void loadCsvData() {
-        String filePath = "src/main/resources/info.csv"; // CSV 파일 경로
-        try (CSVReader csvReader = new CSVReader(new FileReader(filePath))) {
-            List<String[]> records = csvReader.readAll();
-            records.forEach(record -> {
-                Stock stock = new Stock();
-                stock.setName(record[0]);
-                stock.setCode(record[1]);
-                stockRepository.save(stock);
-            });
-            System.out.println("CSV 데이터가 성공적으로 저장되었습니다.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("CSV 데이터를 읽는 중 오류가 발생했습니다.");
-        }
-    }
+//    @EventListener(ApplicationReadyEvent.class)
+//    public void loadCsvData() {
+//        String filePath = "src/main/resources/info.csv"; // CSV 파일 경로
+//        try (CSVReader csvReader = new CSVReader(new FileReader(filePath))) {
+//            List<String[]> records = csvReader.readAll();
+//            records.forEach(record -> {
+//                Stock stock = new Stock();
+//                stock.setName(record[0]);
+//                stock.setCode(record[1]);
+//                stockRepository.save(stock);
+//            });
+//            System.out.println("CSV 데이터가 성공적으로 저장되었습니다.");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.out.println("CSV 데이터를 읽는 중 오류가 발생했습니다.");
+//        }
+//    }
 
     //주식종목 검색
     public StockInfoResponse findStock(String name) {

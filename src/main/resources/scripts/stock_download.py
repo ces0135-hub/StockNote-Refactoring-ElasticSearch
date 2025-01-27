@@ -3,8 +3,7 @@ import ssl
 import zipfile
 import os
 import pandas as pd
-import mysql.connector
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 base_dir = os.getcwd()
 
@@ -51,7 +50,7 @@ class KospiAPI:
         part1_columns = ['단축코드', '표준코드', '한글명']
         df1 = pd.read_csv(tmp_fil1, header=None, names=part1_columns)
 
-        field_specs = [2]  # 그룹코드만 읽기
+        field_specs = [2]
         part2_columns = ['그룹코드']
 
         df2 = pd.read_fwf(tmp_fil2, widths=field_specs, names=part2_columns)
@@ -59,19 +58,17 @@ class KospiAPI:
 
         # ST 종목만 필터링
         df = df[df['그룹코드'] == 'ST']
-
-        # 그룹코드 컬럼 삭제
         df = df.drop('그룹코드', axis=1)
-        del (df1)
-        del (df2)
+
         os.remove(tmp_fil1)
         os.remove(tmp_fil2)
+        if os.path.exists(file_name):
+            os.remove(file_name)
 
         return df
 
 class KosdaqAPI:
     def kosdaq_master_download(base_dir, verbose=False):
-
         cwd = os.getcwd()
         if (verbose): print(f"current directory is {cwd}")
         ssl._create_default_https_context = ssl._create_unverified_context
@@ -80,10 +77,8 @@ class KosdaqAPI:
                                    base_dir + "/kosdaq_code.zip")
 
         os.chdir(base_dir)
-        if (verbose): print(f"change directory to {base_dir}")
         kosdaq_zip = zipfile.ZipFile('kosdaq_code.zip')
         kosdaq_zip.extractall()
-
         kosdaq_zip.close()
 
         if os.path.exists("kosdaq_code.zip"):
@@ -110,37 +105,28 @@ class KosdaqAPI:
         wf1.close()
         wf2.close()
 
-        part1_columns = ['단축코드','표준코드','한글종목명']
+        part1_columns = ['단축코드', '표준코드', '한글종목명']
         df1 = pd.read_csv(tmp_fil1, header=None, names=part1_columns)
 
         field_specs = [2]
-
         part2_columns = ['증권그룹구분코드']
 
         df2 = pd.read_fwf(tmp_fil2, widths=field_specs, names=part2_columns)
         df = pd.merge(df1, df2, how='outer', left_index=True, right_index=True)
 
-        # ST 종목만 필터링
         df = df[df['증권그룹구분코드'] == 'ST']
-
-        # 그룹코드 컬럼 삭제
         df = df.drop('증권그룹구분코드', axis=1)
 
-
-        # clean temporary file and dataframe
-        del (df1)
-        del (df2)
         os.remove(tmp_fil1)
         os.remove(tmp_fil2)
-
-        print("Done")
+        if os.path.exists(file_name):
+            os.remove(file_name)
 
         return df
 
 class StockDownloader:
     def __init__(self, base_dir):
         self.base_dir = base_dir
-        # Docker MySQL 연결 설정으로 수정
         self.engine = create_engine(
             'mysql+mysqlconnector://root:1234@localhost/default_db',
             connect_args={
@@ -149,37 +135,76 @@ class StockDownloader:
             }
         )
 
+    def update_stock_data(self, df, should_delete=False):
+        with self.engine.begin() as connection:
+            # 테이블 생성
+            connection.execute(text("""
+                CREATE TABLE IF NOT EXISTS stock (
+                    code VARCHAR(20) PRIMARY KEY,
+                    name VARCHAR(100) NOT NULL,
+                    market VARCHAR(10) NOT NULL,
+                    member_id BIGINT,
+                    FOREIGN KEY (member_id) REFERENCES member(id)
+                )
+            """))
+            
+            # should_delete가 True일 때만 기존 데이터 삭제
+            if should_delete:
+                connection.execute(text("DELETE FROM stock"))
+            
+            # 새 데이터 삽입
+            for _, row in df.iterrows():
+                connection.execute(
+                    text("""
+                        INSERT INTO stock (code, name, market, member_id) 
+                        VALUES (:code, :name, :market, NULL)
+                        ON DUPLICATE KEY UPDATE 
+                        name = :name, 
+                        market = :market
+                    """),
+                    {"code": row['code'], "name": row['name'], "market": row['market']}
+                )
+
     def kospi_download(self):
-        # KospiAPI 클래스 메서드 호출 방식 수정
         KospiAPI.kospi_master_download(self.base_dir)
         df = KospiAPI.get_kospi_master_dataframe(self.base_dir)
-        df.insert(0, 'market', 'kospi')
+
+        # Stock 엔티티에 맞게 컬럼 매핑
         column_mapping = {
-            'market': 'market',
-            '단축코드': 'short_code',
-            '표준코드': 'standard_code',
-            '한글명': 'korean_name'
+            '단축코드': 'code',
+            '한글명': 'name'
         }
-        df = df.rename(columns=column_mapping)
-        df.to_sql('stock', self.engine, if_exists='replace', index=False)
+        df = df[['단축코드', '한글명']].rename(columns=column_mapping)
+        
+        # market 컬럼 추가
+        df['market'] = 'KOSPI'
+
+        # KOSPI 데이터를 넣을 때는 기존 데이터 삭제
+        self.update_stock_data(df, should_delete=True)
 
     def kosdaq_download(self):
-        # KosdaqAPI 클래스 메서드 호출 방식 수정
         KosdaqAPI.kosdaq_master_download(self.base_dir)
         df = KosdaqAPI.get_kosdaq_master_dataframe(self.base_dir)
-        df.insert(0, 'market', 'kosdaq')
-        column_mapping = {
-            'market': 'market',
-            '단축코드': 'short_code',
-            '표준코드': 'standard_code',
-            '한글종목명': 'korean_name'
-        }
-        df = df.rename(columns=column_mapping)
-        df.to_sql('stock', self.engine, if_exists='append', index=False)
 
-# main.py
+        # Stock 엔티티에 맞게 컬럼 매핑
+        column_mapping = {
+            '단축코드': 'code',
+            '한글종목명': 'name'
+        }
+        df = df[['단축코드', '한글종목명']].rename(columns=column_mapping)
+        
+        # market 컬럼 추가
+        df['market'] = 'KOSDAQ'
+
+        # KOSDAQ 데이터를 넣을 때는 기존 데이터 유지하고 추가
+        self.update_stock_data(df, should_delete=False)
+
 if __name__ == "__main__":
     base_dir = os.getcwd()
     downloader = StockDownloader(base_dir)
+
+    # KOSPI 데이터 다운로드 (기존 데이터 삭제 후 새로운 데이터 추가)
     downloader.kospi_download()
+
+    # KOSDAQ 데이터 다운로드 (기존 데이터에 추가)
     downloader.kosdaq_download()

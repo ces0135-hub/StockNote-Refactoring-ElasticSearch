@@ -19,14 +19,14 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder
 public class Member extends BaseEntity {
-    private String name; //이름
-    private String account; //아이디
-    private String email; //이메일
-    private String profile; //프로필 사진
-    private String introduction; //자기소개(한줄소개)
+    private String name; // 이름
+    private String account; // 아이디
+    private String email; // 이메일
+    private String profile; // 프로필 사진
+    private String introduction; // 자기소개(한줄소개)
 
     @Enumerated(EnumType.STRING)
-    private Role role=Role.USER;
+    private Role role = Role.USER;
 
     @OneToMany(mappedBy = "member")
     private List<Stock> stockList = new ArrayList<>();
