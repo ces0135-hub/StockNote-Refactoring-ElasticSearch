@@ -17,17 +17,15 @@ import org.com.stocknote.global.base.BaseEntity;
 @SuperBuilder
 public class Stock {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 기본 키
-    private String code; // 종목코드
-    private String name; // 종목명
+    private String code; // ID를 자동생성에서 직접 코드 사용으로 변경
+    private String name;
+    private String market;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member; // 회원
+    @JoinColumn(name = "member_id", nullable = true) // nullable = true 추가
+    private Member member;
 
-
-    public Stock (String code, String name) {
+    public Stock(String code, String name) {
         this.code = code;
         this.name = name;
     }

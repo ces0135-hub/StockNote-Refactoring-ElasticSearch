@@ -12,7 +12,7 @@ import org.com.stocknote.domain.portfolio.portfolioStock.dto.StockTempResponse;
 import org.com.stocknote.domain.portfolio.portfolioStock.entity.PfStock;
 import org.com.stocknote.domain.portfolio.portfolioStock.service.PfStockService;
 import org.com.stocknote.domain.stock.entity.Stock;
-import org.com.stocknote.global.globalDto.GlobalResponse;
+import org.com.stocknote.global.dto.GlobalResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,7 +36,6 @@ public class PortfolioController {
   @GetMapping("/{portfolio_no}")
   public GlobalResponse<List<PfStockResponse>> getPortfolioStock(
       @PathVariable("portfolio_no") Long portfolioNo) {
-    // ...existing code...
     List<PfStock> pfStockList = pfStockService.getStockList(portfolioNo);
     List<PfStockResponse> response =
         pfStockList.stream().map(PfStockResponse::from).collect(Collectors.toList());
