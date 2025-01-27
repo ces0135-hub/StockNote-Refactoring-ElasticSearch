@@ -2,12 +2,10 @@ package org.com.stocknote.domain.comment.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import org.com.stocknote.global.base.BaseEntity;
 
 @Entity
