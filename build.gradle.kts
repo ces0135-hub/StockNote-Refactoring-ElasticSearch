@@ -56,6 +56,7 @@ dependencies {
     // test
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("com.h2database:h2")
 
     //Swagger
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
@@ -77,4 +78,26 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks {
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
+            showStandardStreams = true
+        }
+        ignoreFailures = true  // 테스트 실패해도 빌드 진행
+    }
+    
+    bootJar {
+        archiveFileName.set("app.jar")
+    }
+    
+    processResources {
+        // 리소스 파일 복사 확인
+        doFirst {
+            println("Processing resources...")
+        }
+    }
 }

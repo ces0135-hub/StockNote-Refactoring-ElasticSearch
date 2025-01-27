@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.util.TimeZone;
 
 @Configuration
 @EnableScheduling
@@ -24,7 +26,7 @@ import java.nio.file.StandardCopyOption;
 @Slf4j
 public class StockScheduler {
 
-  @Value("file:/Users/keonhak/git/likelion_project/StockNote_BE/src/main/resources/scripts/stock_download.py")
+  @Value("classpath:scripts/stock_download.py")
   private Resource pythonScript;
 
   @Bean
@@ -34,10 +36,14 @@ public class StockScheduler {
     return scheduler;
   }
 
-
-  @PostConstruct
+   @PostConstruct /*대신 Scheduled 사용*/
+//  @Scheduled(cron = "0 30 8 * * *", zone = "Asia/Seoul") // 매일 오전 8:30 KST
   public void downloadStockData() {
+    log.info("Starting scheduled stock data download at {}", LocalDateTime.now());
     try {
+      log.info("Python script exists: {}", pythonScript.exists());
+      log.info("Python script path: {}", pythonScript.getURL());
+
       File tempScript = File.createTempFile("stock_download", ".py");
       Files.copy(pythonScript.getInputStream(), tempScript.toPath(),
           StandardCopyOption.REPLACE_EXISTING);
@@ -73,7 +79,7 @@ public class StockScheduler {
       tempScript.deleteOnExit();
 
     } catch (Exception e) {
-      log.error("Failed to execute stock download script", e);
+      log.error("Scheduled stock download failed", e);
       e.printStackTrace(); // 스택 트레이스 출력
     }
   }
