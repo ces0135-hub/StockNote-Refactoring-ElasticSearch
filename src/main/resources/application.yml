@@ -26,8 +26,11 @@ spring:
 logging:
   level:
     root: INFO
+
 #    org.springframework.web: DEBUG
 #    org.springdoc: DEBUG
+#    org.com.stocknote.domain.portfolio.portfolioStock.controller: DEBUG
+#    org.com.stocknote.domain.portfolio.portfolioStock.service: DEBUG
 #      org.hibernate.SQL: DEBUG
 #      org.hibernate.orm.jdbc.bind: TRACE
 #      org.hibernate.orm.jdbc.extract: TRACE
