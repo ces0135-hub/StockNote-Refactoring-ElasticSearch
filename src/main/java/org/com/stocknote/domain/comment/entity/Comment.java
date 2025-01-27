@@ -10,12 +10,15 @@ import org.com.stocknote.global.base.BaseEntity;
 
 @Entity
 @Getter
+
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+
 public class Comment extends BaseEntity {
 
     @Column(nullable = false)
     private Long postId;
+
 
     @Setter
     @Column(nullable = false)
@@ -29,5 +32,4 @@ public class Comment extends BaseEntity {
         this.body = body;
         this.userId = userId;
     }
-
 }
