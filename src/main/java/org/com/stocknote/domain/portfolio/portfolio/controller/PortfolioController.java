@@ -71,24 +71,4 @@ public class PortfolioController {
         stockList.stream().map(StockTempResponse::new).collect(Collectors.toList());
     return GlobalResponse.success(response);
   }
-
-  @PostMapping("/{portfolio_no}/Cash")
-  public GlobalResponse<String> addCash(@PathVariable("portfolio_no") Long portfolioNo,
-      @RequestBody Integer amount) {
-    portfolioService.addCash(portfolioNo, amount);
-    return GlobalResponse.success("Cash added successfully");
-  }
-
-  @PatchMapping("/{portfolio_no}/Cash")
-  public GlobalResponse<String> updateCash(@PathVariable("portfolio_no") Long portfolioNo,
-      @RequestBody Integer amount) {
-    portfolioService.updateCash(portfolioNo, amount);
-    return GlobalResponse.success("Cash updated successfully");
-  }
-
-  @DeleteMapping("/{portfolio_no}/Cash")
-    public GlobalResponse<String> deleteCash(@PathVariable("portfolio_no") Long portfolioNo) {
-        portfolioService.deleteCash(portfolioNo);
-        return GlobalResponse.success("Cash deleted successfully");
-    }
 }
