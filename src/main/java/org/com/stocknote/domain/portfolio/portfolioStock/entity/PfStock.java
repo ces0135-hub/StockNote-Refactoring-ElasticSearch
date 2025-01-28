@@ -22,6 +22,7 @@ public class PfStock extends BaseEntity {
   private int pfstockCount;
   private int pfstockPrice;
   private int pfstockTotalPrice;
+  private int currentPrice;
 
   @Column(nullable = true)
   private LocalDateTime deletedAt;

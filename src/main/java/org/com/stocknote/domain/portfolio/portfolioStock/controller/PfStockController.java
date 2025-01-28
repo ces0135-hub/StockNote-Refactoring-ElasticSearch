@@ -21,8 +21,7 @@ public class PfStockController {
   }
 
   @PostMapping("/AddStock")
-  public GlobalResponse<String> addPortfolioStock(
-      @PathVariable("portfolio_no") Long portfolioNo,
+  public GlobalResponse<String> addPortfolioStock(@PathVariable("portfolio_no") Long portfolioNo,
       @RequestBody PfStockRequest pfStockRequest) {
 
     pfStockService.savePfStock(portfolioNo, pfStockRequest);
@@ -30,8 +29,7 @@ public class PfStockController {
   }
 
   @PatchMapping("/{pfStock_no}/buyStock")
-  public GlobalResponse<String> buyPortfolioStock(
-      @PathVariable("pfStock_no") Long pfStockNo,
+  public GlobalResponse<String> buyPortfolioStock(@PathVariable("pfStock_no") Long pfStockNo,
       @RequestBody PfStockPatchRequest pfPfStockRequest) {
 
     pfStockService.buyPfStock(pfStockNo, pfPfStockRequest);
@@ -39,8 +37,7 @@ public class PfStockController {
   }
 
   @PatchMapping("/{pfStock_no}/sellStock")
-  public GlobalResponse<String> sellPortfolioStock(
-      @PathVariable("pfStock_no") Long pfStockNo,
+  public GlobalResponse<String> sellPortfolioStock(@PathVariable("pfStock_no") Long pfStockNo,
       @RequestBody PfStockPatchRequest pfPfStockRequest) {
 
     pfStockService.sellPfStock(pfStockNo, pfPfStockRequest);
@@ -48,17 +45,14 @@ public class PfStockController {
   }
 
   @PatchMapping("/{pfStock_no}")
-  public GlobalResponse<String> patchPortfolioStock(
-        @PathVariable("pfStock_no") Long pfStockNo,
-        @RequestBody PfStockPatchRequest pfPfStockRequest
-  ) {
-    pfStockService.update(pfStockNo,pfPfStockRequest);
+  public GlobalResponse<String> patchPortfolioStock(@PathVariable("pfStock_no") Long pfStockNo,
+      @RequestBody PfStockPatchRequest pfPfStockRequest) {
+    pfStockService.update(pfStockNo, pfPfStockRequest);
     return GlobalResponse.success(" Portfolio modify");
   }
 
   @DeleteMapping("/{pfStock_no}")
-  public GlobalResponse<String> deletePortfolioStock(
-      @PathVariable("portfolio_no") Long portfolioNo,
+  public GlobalResponse<String> deletePortfolioStock(@PathVariable("portfolio_no") Long portfolioNo,
       @PathVariable("pfStock_no") Long pfStockNo) {
 
     pfStockService.deletePfStock(pfStockNo);
