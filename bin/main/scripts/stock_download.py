@@ -135,69 +135,50 @@ class StockDownloader:
             }
         )
 
-    def update_stock_data(self, df, should_delete=False):
+    def update_stock_data(self, df):
         with self.engine.begin() as connection:
-            # 테이블 생성
-            connection.execute(text("""
-                CREATE TABLE IF NOT EXISTS stock (
-                    code VARCHAR(20) PRIMARY KEY,
-                    name VARCHAR(100) NOT NULL,
-                    market VARCHAR(10) NOT NULL,
-                    member_id BIGINT,
-                    FOREIGN KEY (member_id) REFERENCES member(id)
-                )
-            """))
-            
-            # should_delete가 True일 때만 기존 데이터 삭제
-            if should_delete:
-                connection.execute(text("DELETE FROM stock"))
-            
-            # 새 데이터 삽입
+            # 기존 데이터 삭제 대신 MERGE(UPSERT) 방식으로 변경
             for _, row in df.iterrows():
                 connection.execute(
                     text("""
-                        INSERT INTO stock (code, name, market, member_id) 
-                        VALUES (:code, :name, :market, NULL)
+                        INSERT INTO stock (code, name, market) 
+                        VALUES (:code, :name, :market)
                         ON DUPLICATE KEY UPDATE 
-                        name = :name, 
-                        market = :market
+                            name = VALUES(name),
+                            market = VALUES(market)
                     """),
-                    {"code": row['code'], "name": row['name'], "market": row['market']}
+                    {
+                        "code": row['code'],
+                        "name": row['name'],
+                        "market": row['market']
+                    }
                 )
 
     def kospi_download(self):
         KospiAPI.kospi_master_download(self.base_dir)
         df = KospiAPI.get_kospi_master_dataframe(self.base_dir)
 
-        # Stock 엔티티에 맞게 컬럼 매핑
         column_mapping = {
             '단축코드': 'code',
             '한글명': 'name'
         }
         df = df[['단축코드', '한글명']].rename(columns=column_mapping)
-        
-        # market 컬럼 추가
-        df['market'] = 'KOSPI'
+        df['market'] = 'KOSPI'  # 마켓 정보 추가
 
-        # KOSPI 데이터를 넣을 때는 기존 데이터 삭제
-        self.update_stock_data(df, should_delete=True)
+        self.update_stock_data(df)
 
     def kosdaq_download(self):
         KosdaqAPI.kosdaq_master_download(self.base_dir)
         df = KosdaqAPI.get_kosdaq_master_dataframe(self.base_dir)
 
-        # Stock 엔티티에 맞게 컬럼 매핑
         column_mapping = {
             '단축코드': 'code',
             '한글종목명': 'name'
         }
         df = df[['단축코드', '한글종목명']].rename(columns=column_mapping)
-        
-        # market 컬럼 추가
-        df['market'] = 'KOSDAQ'
+        df['market'] = 'KOSDAQ'  # 마켓 정보 추가
 
-        # KOSDAQ 데이터를 넣을 때는 기존 데이터 유지하고 추가
-        self.update_stock_data(df, should_delete=False)
+        self.update_stock_data(df)
 
 if __name__ == "__main__":
     base_dir = os.getcwd()

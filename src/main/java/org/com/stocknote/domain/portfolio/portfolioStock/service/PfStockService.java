@@ -4,14 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
 import org.com.stocknote.domain.portfolio.portfolio.service.PortfolioService;
-import org.com.stocknote.domain.portfolio.portfolioStock.dto.PfStockPatchRequest;
-import org.com.stocknote.domain.portfolio.portfolioStock.dto.PfStockRequest;
+import org.com.stocknote.domain.portfolio.portfolioStock.dto.request.PfStockPatchRequest;
+import org.com.stocknote.domain.portfolio.portfolioStock.dto.request.PfStockRequest;
 import org.com.stocknote.domain.portfolio.portfolioStock.entity.PfStock;
 import org.com.stocknote.domain.portfolio.portfolioStock.repository.PfStockRepository;
 import org.com.stocknote.domain.stock.dto.response.StockPriceResponse;
 import org.com.stocknote.domain.stock.entity.Stock;
 import org.com.stocknote.domain.stock.repository.StockRepository;
-import org.com.stocknote.domain.stock.service.StockService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

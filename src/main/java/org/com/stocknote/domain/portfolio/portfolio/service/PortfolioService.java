@@ -59,4 +59,31 @@ public class PortfolioService {
   public void delete(Long portfolioNo) {
     portfolioRepository.deleteById(portfolioNo);
   }
+
+  @Transactional
+  public void addCash(Long portfolioNo, Integer amount) {
+    Portfolio portfolio = portfolioRepository.findById(portfolioNo)
+        .orElseThrow(() -> new RuntimeException("Portfolio not found"));
+    portfolio.setCash(portfolio.getCash() + amount);
+
+    portfolioRepository.save(portfolio);
+  }
+
+  @Transactional
+  public void updateCash(Long portfolioNo, Integer amount) {
+    Portfolio portfolio = portfolioRepository.findById(portfolioNo)
+        .orElseThrow(() -> new RuntimeException("Portfolio not found"));
+    portfolio.setCash(amount);
+
+    portfolioRepository.save(portfolio);
+  }
+
+  @Transactional
+  public void deleteCash(Long portfolioNo) {
+    Portfolio portfolio = portfolioRepository.findById(portfolioNo)
+        .orElseThrow(() -> new RuntimeException("Portfolio not found"));
+    portfolio.setCash(0);
+
+    portfolioRepository.save(portfolio);
+  }
 }

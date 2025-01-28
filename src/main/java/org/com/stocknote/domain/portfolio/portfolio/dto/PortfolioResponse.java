@@ -3,7 +3,7 @@ package org.com.stocknote.domain.portfolio.portfolio.dto;
 import lombok.Builder;
 import lombok.Getter;
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
-import org.com.stocknote.domain.portfolio.portfolioStock.dto.PfStockResponse;
+import org.com.stocknote.domain.portfolio.portfolioStock.dto.response.PfStockResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;

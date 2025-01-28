@@ -1,9 +1,8 @@
-package org.com.stocknote.domain.portfolio.portfolioStock.dto;
+package org.com.stocknote.domain.portfolio.portfolioStock.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
 import org.com.stocknote.domain.portfolio.portfolioStock.entity.PfStock;
-import org.com.stocknote.domain.stock.dto.StockPriceResponse;
 
 @Getter
 @Builder

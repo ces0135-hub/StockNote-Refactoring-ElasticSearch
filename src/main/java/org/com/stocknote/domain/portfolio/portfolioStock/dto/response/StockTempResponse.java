@@ -1,4 +1,4 @@
-package org.com.stocknote.domain.portfolio.portfolioStock.dto;
+package org.com.stocknote.domain.portfolio.portfolioStock.dto.response;
 
 import lombok.Data;
 import org.com.stocknote.domain.stock.entity.Stock;

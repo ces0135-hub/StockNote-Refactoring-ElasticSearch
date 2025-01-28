@@ -2,11 +2,10 @@ package org.com.stocknote.domain.portfolio.portfolioStock.controller;
 
 
 import lombok.RequiredArgsConstructor;
-import org.com.stocknote.domain.portfolio.portfolioStock.dto.PfStockPatchRequest;
-import org.com.stocknote.domain.portfolio.portfolioStock.dto.PfStockRequest;
+import org.com.stocknote.domain.portfolio.portfolioStock.dto.request.PfStockPatchRequest;
+import org.com.stocknote.domain.portfolio.portfolioStock.dto.request.PfStockRequest;
 import org.com.stocknote.domain.portfolio.portfolioStock.service.PfStockService;
 import org.com.stocknote.global.dto.GlobalResponse;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,10 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class PfStockController {
   private final PfStockService pfStockService;
 
-  @PostMapping
-  public String postPortfolioCash() {
-    return "Portfolio post";
-  }
+
 
   @PostMapping("/AddStock")
   public GlobalResponse<String> addPortfolioStock(@PathVariable("portfolio_no") Long portfolioNo,
