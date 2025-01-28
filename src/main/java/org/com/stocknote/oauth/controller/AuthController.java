@@ -1,5 +1,7 @@
 package org.com.stocknote.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.oauth.service.CustomOAuth2UserService;
 import org.com.stocknote.oauth.token.TokenProvider;
@@ -18,12 +20,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag(name = "스웨거 로그인 API", description = "Google, Kakao 로그인 API")
 public class AuthController {
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final TokenProvider tokenProvider;
 
     @GetMapping("/google/manual")
+    @Operation(summary = "수동 구글 로그인")
     public ResponseEntity<?> googleManualRedirect(@RequestParam String code) {
         // 단순히 code를 확인만 하고,
         // 이후에 '/auth/google/token' 같은 API 호출을 유도해도 되고,
@@ -43,9 +47,10 @@ public class AuthController {
      *    서버가 code->AccessToken->UserInfo->회원DB->JWT 발급 과정을 처리
      */
     @PostMapping("/google/token")
+    @Operation(summary = "구글 로그인(토큰 발급용)")
     public ResponseEntity<?> getGoogleToken(@RequestParam String code) {
         // (A) code 로 구글 AccessToken + 유저정보 획득
-        OAuth2User oAuth2User = customOAuth2UserService.processOAuth2User("google", code);
+        OAuth2User oAuth2User = customOAuth2UserService.processOAuth2User("googleManual", code);
 
         // (B) DB 저장은 processOAuth2User() 내부에서
         //     customOAuth2UserService.getOrSave(...) 로 처리됨

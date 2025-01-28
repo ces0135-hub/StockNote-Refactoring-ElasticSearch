@@ -75,8 +75,9 @@ public class SecurityConfig {
                                 "/auth/google/redirect",
                                 "/auth/kakao/redirect",
                                 "/auth/google/manual",
-                                "/auth/kakao/manual"
-
+                                "/auth/kakao/manual",
+                                "/auth/google/token",
+                                "/oauth2.googleapis.com/token"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
