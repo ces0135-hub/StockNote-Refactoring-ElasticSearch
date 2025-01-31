@@ -31,13 +31,6 @@ public class KisController {
         return GlobalResponse.success(approvalKey);
     }
 
-    @GetMapping("/connect")
-    public GlobalResponse<String> connectToWebSocket() {
-        webSocketClientService.connectToWebSocket();
-        return GlobalResponse.success("WebSocket connection initiated.");
-    }
-
-
 
 //    @GetMapping("/realtime/{stockCode}")
 //    @Operation(summary = "실시간 주식 현재가 조회")

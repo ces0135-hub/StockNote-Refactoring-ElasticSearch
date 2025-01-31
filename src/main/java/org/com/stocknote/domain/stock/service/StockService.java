@@ -1,15 +1,24 @@
 package org.com.stocknote.domain.stock.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.member.repository.MemberRepository;
+import org.com.stocknote.domain.stock.dto.response.*;
+import org.com.stocknote.domain.stock.entity.MemberStock;
 import org.com.stocknote.domain.stock.entity.PeriodType;
-import org.com.stocknote.domain.stock.dto.response.StockDailyResponse;
-import org.com.stocknote.domain.stock.dto.response.StockPriceResponse;
-import org.com.stocknote.domain.stock.dto.response.StockTimeResponse;
+import org.com.stocknote.domain.stock.entity.Stock;
+import org.com.stocknote.domain.stock.entity.StockPriceUpdateEvent;
+import org.com.stocknote.domain.stock.repository.MemberStockRepository;
+import org.com.stocknote.domain.stock.repository.StockRepository;
 import org.com.stocknote.domain.stockApi.kis.KisKeyManager;
+import org.com.stocknote.domain.stockApi.kis.WebSocketClientService;
+import org.com.stocknote.global.error.ErrorCode;
+import org.com.stocknote.global.exception.CustomException;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -19,33 +28,31 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class StockService {
 
+    private final WebSocketClientService webSocketClientService;
     private final KisKeyManager kisKeyManager;
     private final RestTemplate restTemplate;
     private final MemberRepository memberRepository;
-
-    public StockService(KisKeyManager keyManager, RestTemplate restTemplate, MemberRepository memberRepository) {
-        this.kisKeyManager = keyManager;
-        this.restTemplate = restTemplate; // RestTemplate 주입
-        this.memberRepository = memberRepository;
-    }
+    private final StockRepository stockRepository;
+    private final MemberStockRepository memberStockRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public StockPriceResponse getStockPrice(String stockCode) {
-        String baseUrl = "https://openapivts.koreainvestment.com:29443";  // Change to production URL if needed
+        String baseUrl = "https://openapivts.koreainvestment.com:29443";
         String endpoint = "/uapi/domestic-stock/v1/quotations/inquire-price";
 
-        // Build URL with query parameters
         String url = UriComponentsBuilder.fromHttpUrl(baseUrl + endpoint)
                 .queryParam("FID_COND_MRKT_DIV_CODE", "J")
                 .queryParam("FID_INPUT_ISCD", stockCode)
                 .toUriString();
 
-        // Set up headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("authorization", "Bearer " + kisKeyManager.getAccessToken());
@@ -60,8 +67,11 @@ public class StockService {
                     url,
                     HttpMethod.GET,
                     entity,
-                    StockPriceResponse.class
+                    StockPriceResponse.class // StockPriceResponse로 수정
             );
+
+            log.info("Response Status: {}", response.getStatusCode());
+            log.info("Response Body: {}", response.getBody());
 
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 return response.getBody();
@@ -69,11 +79,14 @@ public class StockService {
                 throw new RuntimeException("Failed to get stock price. Status code: " + response.getStatusCode());
             }
         } catch (HttpStatusCodeException e) {
+            log.error("Stock price request failed: {}", e.getResponseBodyAsString());
             throw new RuntimeException("주식 가격 조회 실패: " + e.getResponseBodyAsString(), e);
         } catch (Exception e) {
+            log.error("Stock price request error: {}", e.getMessage());
             throw new RuntimeException("주식 가격 조회 중 오류 발생", e);
         }
     }
+
 
 
     public StockDailyResponse getStockPrices(String stockCode, PeriodType periodType, LocalDate startDate, LocalDate endDate) {
@@ -197,13 +210,72 @@ public class StockService {
         }
     }
     @Transactional
-    public void addStock (String stockCode, String email) {
-        Optional<Member> member = memberRepository.findByEmail(email);
-        if (member.isEmpty()) {
-            throw new RuntimeException("회원 정보를 찾을 수 없습니다.");
+    public void addStock (String name, String email) {
+
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        Stock stock = stockRepository.findByName(name)
+                .orElseThrow(() -> new CustomException(ErrorCode.STOCK_NOT_FOUND));
+        if (memberStockRepository.existsByMemberAndStock(member, stock)) {
+            throw new CustomException(ErrorCode.ALREADY_EXIST_STOCK);
         }
-
-
+        MemberStock memberStock = MemberStock.create(member, stock);
+        memberStockRepository.save(memberStock);
     }
+
+    @Transactional(readOnly = true)
+    public List<StockResponse> getMyStocks(String email) {
+        List<MemberStock> memberStocks = memberStockRepository
+                .findByMemberEmailOrderByAddedAtDesc(email);
+
+        return memberStocks.stream().map(memberStock -> {
+            String stockCode = memberStock.getStock().getCode();
+            StockResponse stockResponse = StockResponse.of(memberStock.getStock(), memberStock);
+
+            try {
+                // 실시간 가격 조회 후 `StockResponse` 업데이트
+                StockPriceResponse priceResponse = getStockPrice(stockCode); // StockPriceResponse로 수정
+                if (priceResponse != null && priceResponse.getOutput() != null) {
+                    StockPriceResponse.Output output = priceResponse.getOutput();
+
+                    Long currentPrice = parseLongOrNull(output.getStck_prpr()); // 현재가
+                    Long openingPrice = parseLongOrNull(output.getStck_oprc()); // 시가
+                    String change = calculateChange(currentPrice, openingPrice);
+                    boolean isPositive = (currentPrice != null && openingPrice != null) ? currentPrice >= openingPrice : false;
+
+                    stockResponse.updatePriceInfo(currentPrice, change, isPositive);
+
+                    // WebSocket을 통해 가격 정보 전송
+                    webSocketClientService.subscribeStockPrice(stockCode);
+                }
+            } catch (Exception e) {
+                log.error("❌ Failed to fetch stock price for {}: {}", stockCode, e.getMessage());
+            }
+
+            return stockResponse;
+        }).collect(Collectors.toList());
+    }
+
+
+
+    // 변동률 계산 함수
+    private String calculateChange(Long currentPrice, Long openingPrice) {
+        if (currentPrice == null || openingPrice == null || openingPrice == 0) {
+            return "-";
+        }
+        double changePercent = ((double) (currentPrice - openingPrice) / openingPrice) * 100;
+        return String.format("%.2f%%", changePercent);
+    }
+
+    // 안전한 Long 변환 함수
+    private Long parseLongOrNull(String value) {
+        try {
+            return value != null ? Long.parseLong(value) : null;
+        } catch (NumberFormatException e) {
+            log.error("❌ Failed to parse Long value from string: {}", value);
+            return null;
+        }
+    }
+
 
 }

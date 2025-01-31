@@ -76,7 +76,9 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/auth/kakao/redirect",
                                 "/auth/login",
-                                "/auth/kakao/callback"
+                                "/auth/kakao/callback",
+                                "/ws/**",
+                                "/topic/**"
 
                         ).permitAll()
                         .anyRequest().authenticated()

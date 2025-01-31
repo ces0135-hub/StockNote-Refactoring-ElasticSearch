@@ -26,7 +26,13 @@ spring:
 logging:
   level:
     root: INFO
-
+    org.springframework.web.socket: DEBUG
+    org.springframework.messaging: DEBUG
+    org:
+      com:
+        stocknote:
+          domain:
+            stock: DEBUG
 #    org.springframework.web: DEBUG
 #    org.springdoc: DEBUG
 #    org.com.stocknote.domain.portfolio.portfolioStock.controller: DEBUG

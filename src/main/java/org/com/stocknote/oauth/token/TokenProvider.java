@@ -5,6 +5,9 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.com.stocknote.domain.member.entity.Member;
+import org.com.stocknote.domain.member.repository.MemberRepository;
+import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.com.stocknote.oauth.token.entity.Token;
 import org.com.stocknote.oauth.token.service.TokenService;
 import org.springframework.security.core.userdetails.User;
@@ -35,6 +38,7 @@ public class TokenProvider {
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60L * 24 * 7;
     private static final String KEY_ROLE = "role";
     private final TokenService tokenService;
+    private final MemberRepository memberRepository;
 
     @PostConstruct
     private void setSecretKey() {
@@ -90,9 +94,16 @@ public class TokenProvider {
         Claims claims = parseClaims(token);
         List<SimpleGrantedAuthority> authorities = getAuthorities(claims);
 
-        // 2. security의 User 객체 생성
-        User principal = new User(claims.getSubject(),"", authorities);
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+        Member member = memberRepository.findByEmail(claims.getSubject())
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        PrincipalDetails principalDetails = new PrincipalDetails(
+                member,
+                Collections.emptyMap(), // OAuth2 인증이 아닌 경우 빈 맵
+                "email"  // 기본 attributeKey
+        );
+
+        return new UsernamePasswordAuthenticationToken(principalDetails, token, authorities);
     }
 
     private List<SimpleGrantedAuthority> getAuthorities(Claims claims) {

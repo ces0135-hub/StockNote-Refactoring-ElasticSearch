@@ -33,6 +33,16 @@ public class StockPriceResponse {
         private String acml_vol;       // 누적 거래량
         private String acml_tr_pbmn;   // 누적 거래 대금
     }
-
-
+    @Override
+    public String toString() {
+        return "StockPriceResponse{" +
+                "rt_cd='" + rt_cd + '\'' +
+                ", msg_cd='" + msg_cd + '\'' +
+                ", msg1='" + msg1 + '\'' +
+                ", output=" + (output != null ?
+                "{stck_prpr='" + output.getStck_prpr() +
+                        "', stck_oprc='" + output.getStck_oprc() + "'}"
+                : "null") +
+                '}';
+    }
 }

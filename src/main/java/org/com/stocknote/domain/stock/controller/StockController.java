@@ -3,6 +3,7 @@ package org.com.stocknote.domain.stock.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.com.stocknote.domain.stock.dto.request.StockAddRequest;
 import org.com.stocknote.domain.stock.entity.PeriodType;
 import org.com.stocknote.domain.stock.dto.request.StockVoteRequest;
 import org.com.stocknote.domain.stock.dto.response.*;
@@ -11,7 +12,9 @@ import org.com.stocknote.domain.stock.service.StockChartService;
 import org.com.stocknote.domain.stock.service.StockDataService;
 import org.com.stocknote.domain.stock.service.StockService;
 import org.com.stocknote.domain.stock.service.StockVoteService;
+import org.com.stocknote.domain.stockApi.kis.WebSocketClientService;
 import org.com.stocknote.global.globalDto.GlobalResponse;
+import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,6 +22,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 
 @RestController
@@ -30,6 +34,7 @@ public class StockController {
     private final StockChartService stockChartService;
     private final StockVoteService stockVoteService;
     private final StockDataService stockDataService;
+    private final WebSocketClientService webSocketClientService;
 
     //이름으로 종목 검색
     @GetMapping
@@ -41,17 +46,35 @@ public class StockController {
 
     @PostMapping
     @Operation(summary = "종목 추가")
-    public GlobalResponse addStock(@RequestParam String stockCode,
-                                   Authentication authentication) {
-        String email = authentication.getName();
-        stockService.addStock(stockCode, email);
+    public GlobalResponse addStock(@RequestBody StockAddRequest request,
+                                   @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        String email = principalDetails.getUsername();
+        stockService.addStock(request.getStockName(), email);
         return GlobalResponse.success();
     }
 
-    @GetMapping("/price")
-    public StockPriceResponse getStockPrice(@RequestParam String stockCode) {
-        return stockService.getStockPrice(stockCode);
+    @GetMapping("/list")
+    @Operation(summary = "나의 관심 종목 조회")
+    public GlobalResponse getStockList(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        String email = principalDetails.getUsername();
+        List<StockResponse> myStocks = stockService.getMyStocks(email);
+
+        // WebSocket을 통해 실시간 가격 정보 전송 (이제 한 번만 실행됨)
+        myStocks.forEach(stock -> {
+            if (stock.getPrice() != null) {  // 가격 정보가 있는 경우만 전송
+                webSocketClientService.subscribeStockPrice(stock.getCode());
+            }
+        });
+
+        return GlobalResponse.success(myStocks);
     }
+
+
+
+//    @GetMapping("/price")
+//    public StockPriceResponse getStockPrice(@RequestParam String stockCode) {
+//        return stockService.getStockPrice(stockCode);
+//    }
 
     @GetMapping("/daily-prices")
     @Operation(summary = "일별 주식 데이터 조회")
