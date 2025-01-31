@@ -2,9 +2,9 @@ package org.com.stocknote.domain.portfolio.portfolio.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.com.stocknote.domain.portfolio.portfolio.dto.PortfolioPatchRequest;
-import org.com.stocknote.domain.portfolio.portfolio.dto.PortfolioRequest;
-import org.com.stocknote.domain.portfolio.portfolio.dto.PortfolioResponse;
+import org.com.stocknote.domain.portfolio.portfolio.dto.request.PortfolioPatchRequest;
+import org.com.stocknote.domain.portfolio.portfolio.dto.request.PortfolioRequest;
+import org.com.stocknote.domain.portfolio.portfolio.dto.response.PortfolioResponse;
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
 import org.com.stocknote.domain.portfolio.portfolio.service.PortfolioService;
 import org.com.stocknote.domain.portfolio.portfolioStock.dto.response.PfStockResponse;
@@ -35,11 +35,10 @@ public class PortfolioController {
   }
 
   @GetMapping("/{portfolio_no}")
-  public GlobalResponse<List<PfStockResponse>> getPortfolioStock(
+  public GlobalResponse<PortfolioResponse> getPortfolioStock(
       @PathVariable("portfolio_no") Long portfolioNo) {
-    List<PfStock> pfStockList = pfStockService.getStockList(portfolioNo);
-    List<PfStockResponse> response =
-        pfStockList.stream().map(PfStockResponse::from).collect(Collectors.toList());
+    Portfolio portfolio = portfolioService.getPortfolio(portfolioNo);
+    PortfolioResponse response = PortfolioResponse.from(portfolio);
     return GlobalResponse.success(response);
   }
 

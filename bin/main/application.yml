@@ -26,6 +26,13 @@ spring:
 logging:
   level:
     root: INFO
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
 
 #    org.springframework.web: DEBUG
 #    org.springdoc: DEBUG

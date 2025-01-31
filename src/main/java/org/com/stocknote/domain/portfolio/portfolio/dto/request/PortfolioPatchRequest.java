@@ -1,8 +1,7 @@
-package org.com.stocknote.domain.portfolio.portfolio.dto;
+package org.com.stocknote.domain.portfolio.portfolio.dto.request;
 
 
 import lombok.Data;
-import lombok.Getter;
 
 import java.util.Optional;
 

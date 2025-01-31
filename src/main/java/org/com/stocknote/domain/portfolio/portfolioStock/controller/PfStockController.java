@@ -25,18 +25,22 @@ public class PfStockController {
   }
 
   @PatchMapping("/{pfStock_no}/buyStock")
-  public GlobalResponse<String> buyPortfolioStock(@PathVariable("pfStock_no") Long pfStockNo,
+  public GlobalResponse<String> buyPortfolioStock(
+      @PathVariable("portfolio_no") Long portfolioNo,
+      @PathVariable("pfStock_no") Long pfStockNo,
       @RequestBody PfStockPatchRequest pfPfStockRequest) {
 
-    pfStockService.buyPfStock(pfStockNo, pfPfStockRequest);
+    pfStockService.buyPfStock(portfolioNo, pfStockNo, pfPfStockRequest);
     return GlobalResponse.success("buy Stock");
   }
 
   @PatchMapping("/{pfStock_no}/sellStock")
-  public GlobalResponse<String> sellPortfolioStock(@PathVariable("pfStock_no") Long pfStockNo,
+  public GlobalResponse<String> sellPortfolioStock(
+      @PathVariable("portfolio_no") Long portfolioNo,
+      @PathVariable("pfStock_no") Long pfStockNo,
       @RequestBody PfStockPatchRequest pfPfStockRequest) {
 
-    pfStockService.sellPfStock(pfStockNo, pfPfStockRequest);
+    pfStockService.sellPfStock(portfolioNo, pfStockNo, pfPfStockRequest);
     return GlobalResponse.success("sell Stock");
   }
 

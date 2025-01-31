@@ -3,6 +3,7 @@ package org.com.stocknote.domain.portfolio.portfolioStock.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
+import org.com.stocknote.domain.portfolio.portfolio.repository.PortfolioRepository;
 import org.com.stocknote.domain.portfolio.portfolio.service.PortfolioService;
 import org.com.stocknote.domain.portfolio.portfolioStock.dto.request.PfStockPatchRequest;
 import org.com.stocknote.domain.portfolio.portfolioStock.dto.request.PfStockRequest;
@@ -12,6 +13,7 @@ import org.com.stocknote.domain.stock.dto.response.StockPriceResponse;
 import org.com.stocknote.domain.stock.entity.Stock;
 import org.com.stocknote.domain.stock.repository.StockRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Collections;
@@ -26,6 +28,7 @@ public class PfStockService {
 
   // 임시
   private final StockRepository stockRepository;
+  private final PortfolioRepository portfolioRepository;
 
   public List<PfStock> getStockList(Long portfolioNo) {
     List<PfStock> pfStockList = pfStockRepository.findByPortfolioId(portfolioNo);
@@ -38,6 +41,7 @@ public class PfStockService {
     return pfStockList;
   }
 
+  @Transactional
   public PfStock savePfStock(Long portfolioNo, PfStockRequest pfStockRequest) {
     Portfolio portfolio = portfolioService.getPortfolio(portfolioNo);
 
@@ -45,6 +49,7 @@ public class PfStockService {
     int currentPriceInt = Integer.parseInt(currentPrice.getOutput().getStck_prpr());
 
     Stock stock = stockRepository.findByCode(pfStockRequest.getStockCode()).orElse(null);
+
     PfStock pfStock = PfStock.builder().portfolio(portfolio).stock(stock)
         .pfstockCount(pfStockRequest.getPfstockCount())
         .pfstockPrice(pfStockRequest.getPfstockPrice())
@@ -61,41 +66,73 @@ public class PfStockService {
     pfStockRepository.deleteById(pfStockNo);
   }
 
-  public void buyPfStock(Long pfStockNo, PfStockPatchRequest pfStockPatchRequest) {
+  @Transactional
+  public void buyPfStock(Long portfolioNo, Long pfStockNo,
+      PfStockPatchRequest pfStockPatchRequest) {
+    Portfolio portfolio = portfolioService.getPortfolio(portfolioNo);
     PfStock pfStock = pfStockRepository.findById(pfStockNo).orElse(null);
-    log.debug("pfStock : {}", pfStock);
 
     int quantity = pfStock.getPfstockCount();
-    log.debug("quantity : {}", quantity);
-
     int totalPrice = pfStock.getPfstockPrice() * quantity;
-    quantity += pfStockPatchRequest.getPfstockCount();
-    log.debug("quantity : {}", quantity);
 
-    totalPrice += pfStockPatchRequest.getPfstockPrice() * pfStockPatchRequest.getPfstockCount();
+    int buyQuantity = pfStockPatchRequest.getPfstockCount();
+    int buyTotalPrice = pfStockPatchRequest.getPfstockPrice() * buyQuantity;
+
+    quantity += buyQuantity;
+    totalPrice += buyTotalPrice;
+
+    int avgPrice = totalPrice / quantity;
 
     pfStock.setPfstockCount(quantity);
     pfStock.setPfstockTotalPrice(totalPrice);
+    pfStock.setPfstockPrice(avgPrice);
 
+    portfolio.setCash(portfolio.getCash() - buyTotalPrice);
+
+    portfolioRepository.save(portfolio);
     pfStockRepository.save(pfStock);
   }
 
-  public void sellPfStock(Long pfStockNo, PfStockPatchRequest pfStockPatchRequest) {
-    PfStock pfStock = pfStockRepository.findById(pfStockNo).orElse(null);
+  @Transactional
+  public void sellPfStock(Long portfolioNo, Long pfStockNo,
+      PfStockPatchRequest pfStockPatchRequest) {
+    try {
+      Portfolio portfolio = portfolioService.getPortfolio(portfolioNo);
+      PfStock pfStock = pfStockRepository.findById(pfStockNo)
+          .orElseThrow(() -> new RuntimeException("Stock not found"));
 
-    int quantity = pfStock.getPfstockCount();
-    log.debug("quantity : {}", quantity);
+      int quantity = pfStock.getPfstockCount();
+      int sellQuantity = pfStockPatchRequest.getPfstockCount();
+      int sellTotalPrice = pfStockPatchRequest.getPfstockPrice() * sellQuantity;
 
-    quantity -= pfStockPatchRequest.getPfstockCount();
-    log.debug("quantity : {}", quantity);
+      // 매도 후 남은 수량 계산
+      quantity -= sellQuantity;
 
-    pfStock.setPfstockCount(quantity);
+      // 현금 업데이트
+      portfolio.setCash(portfolio.getCash() + sellTotalPrice);
 
-    /* 매도금액만큼 현금 추가하기 */
+      if (quantity == 0) {
+        // 수량이 0이면 Portfolio에서 PfStock 제거
+        portfolio.getPfStockList().remove(pfStock);
+        // DB에서 PfStock 삭제
+        pfStockRepository.delete(pfStock);
+        log.info("Stock with ID {} has been deleted", pfStockNo);
+      } else {
+        // 수량이 남아있으면 업데이트
+        pfStock.setPfstockCount(quantity);
+        int remainingTotalPrice = pfStock.getPfstockPrice() * quantity;
+        pfStock.setPfstockTotalPrice(remainingTotalPrice);
+        pfStockRepository.save(pfStock);
+      }
 
-    pfStockRepository.save(pfStock);
+      // Portfolio 저장
+      portfolioRepository.save(portfolio);
+
+    } catch (Exception e) {
+      log.error("Error in sellPfStock: ", e);
+      throw new RuntimeException("Failed to process sell stock operation", e);
+    }
   }
-
 
   public void update(Long pfStockNo, PfStockPatchRequest request) {
     PfStock pfStock = pfStockRepository.findById(pfStockNo).orElse(null);
