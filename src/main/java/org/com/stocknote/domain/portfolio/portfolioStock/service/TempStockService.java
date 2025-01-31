@@ -1,27 +1,14 @@
 package org.com.stocknote.domain.portfolio.portfolioStock.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.com.stocknote.domain.member.entity.Member;
-import org.com.stocknote.domain.member.repository.MemberRepository;
-import org.com.stocknote.domain.stock.entity.PeriodType;
-import org.com.stocknote.domain.stock.dto.response.StockDailyResponse;
 import org.com.stocknote.domain.stock.dto.response.StockPriceResponse;
-import org.com.stocknote.domain.stock.dto.response.StockTimeResponse;
 import org.com.stocknote.domain.stock.token.service.StockTokenService;
-import org.com.stocknote.domain.stockApi.kis.KisKeyManager;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 @Service
 @Slf4j

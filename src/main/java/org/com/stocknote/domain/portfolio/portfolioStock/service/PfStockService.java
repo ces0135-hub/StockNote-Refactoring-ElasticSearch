@@ -25,10 +25,11 @@ public class PfStockService {
   private final PfStockRepository pfStockRepository;
   private final PortfolioService portfolioService;
   private final TempStockService stockService;
-
+  private final TempStockInfoService stockInfoService;
   // 임시
   private final StockRepository stockRepository;
   private final PortfolioRepository portfolioRepository;
+  private final TempStockInfoService tempStockInfoService;
 
   public List<PfStock> getStockList(Long portfolioNo) {
     List<PfStock> pfStockList = pfStockRepository.findByPortfolioId(portfolioNo);
@@ -49,8 +50,11 @@ public class PfStockService {
     int currentPriceInt = Integer.parseInt(currentPrice.getOutput().getStck_prpr());
 
     Stock stock = stockRepository.findByCode(pfStockRequest.getStockCode()).orElse(null);
+    String idxBztpSclsCdName = tempStockInfoService.getStockInfo(pfStockRequest.getStockCode())
+        .getOutput().getIdx_bztp_scls_cd_name();
 
     PfStock pfStock = PfStock.builder().portfolio(portfolio).stock(stock)
+        .idxBztpSclsCdName(idxBztpSclsCdName)
         .pfstockCount(pfStockRequest.getPfstockCount())
         .pfstockPrice(pfStockRequest.getPfstockPrice())
         .pfstockTotalPrice(pfStockRequest.getPfstockPrice() * pfStockRequest.getPfstockCount())
