@@ -31,5 +31,4 @@ public class Comment extends BaseEntity {
         this.body = body;
         this.userId = userId;
     }
-
 }
