@@ -11,7 +11,6 @@ import org.com.stocknote.domain.portfolio.portfolio.dto.request.PortfolioRequest
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
 import org.com.stocknote.domain.portfolio.portfolio.repository.PortfolioRepository;
 import org.com.stocknote.domain.portfolio.portfolioStock.entity.PfStock;
-import org.com.stocknote.domain.portfolio.portfolioStock.repository.PfStockRepository;
 import org.com.stocknote.domain.portfolio.portfolioStock.service.TempStockService;
 import org.com.stocknote.domain.stock.dto.response.StockPriceResponse;
 import org.com.stocknote.domain.stock.entity.Stock;
@@ -74,7 +73,7 @@ public class PortfolioService {
     noteRepository.save(notePortfolio(portfolio, "포트폴리오 생성", "포트폴리오 생성"));
     portfolioRepository.save(portfolio);
   }
-
+//test
   @Transactional
   public void update(Long portfoliNo, PortfolioPatchRequest portfolioPatchRequest) {
     Portfolio portfolio = portfolioRepository.findById(portfoliNo)
