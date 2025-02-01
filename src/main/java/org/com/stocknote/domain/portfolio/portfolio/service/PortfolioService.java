@@ -68,7 +68,7 @@ public class PortfolioService {
         .build();
     portfolioRepository.save(portfolio);
   }
-
+//test
   @Transactional
   public void update(Long portfoliNo, PortfolioPatchRequest portfolioPatchRequest) {
     Portfolio portfolio = portfolioRepository.findById(portfoliNo)
