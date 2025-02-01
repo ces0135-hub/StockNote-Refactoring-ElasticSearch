@@ -42,6 +42,7 @@ public enum ErrorCode {
 
     // comment
     COMMENT_UPDATE_DENIED(HttpStatus.FORBIDDEN, "댓글 수정은 댓글 작성자만 할 수 있습니다."),
+    COMMENT_DELETE_DENIED(HttpStatus.FORBIDDEN, "댓글 삭제는 댓글 작성자만 할 수 있습니다."),
 
     // member
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다");

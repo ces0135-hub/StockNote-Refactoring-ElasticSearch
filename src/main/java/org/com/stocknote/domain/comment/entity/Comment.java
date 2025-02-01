@@ -10,7 +10,6 @@ import org.com.stocknote.global.base.BaseEntity;
 
 @Entity
 @Getter
-
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 

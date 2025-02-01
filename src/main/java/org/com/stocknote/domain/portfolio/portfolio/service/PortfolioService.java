@@ -3,12 +3,12 @@ package org.com.stocknote.domain.portfolio.portfolio.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.com.stocknote.domain.member.entity.Member;
+
 import org.com.stocknote.domain.portfolio.portfolio.dto.request.PortfolioPatchRequest;
 import org.com.stocknote.domain.portfolio.portfolio.dto.request.PortfolioRequest;
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
 import org.com.stocknote.domain.portfolio.portfolio.repository.PortfolioRepository;
 import org.com.stocknote.domain.portfolio.portfolioStock.entity.PfStock;
-import org.com.stocknote.domain.portfolio.portfolioStock.repository.PfStockRepository;
 import org.com.stocknote.domain.portfolio.portfolioStock.service.TempStockService;
 import org.com.stocknote.domain.stock.dto.response.StockPriceResponse;
 import org.com.stocknote.domain.stock.entity.Stock;
