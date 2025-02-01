@@ -22,6 +22,8 @@ public class PfStock extends BaseEntity {
   private int pfstockCount;
   private int pfstockPrice;
   private int pfstockTotalPrice;
+  private int currentPrice;
+  private String idxBztpSclsCdName; //종목소분류
 
   @Column(nullable = true)
   private LocalDateTime deletedAt;

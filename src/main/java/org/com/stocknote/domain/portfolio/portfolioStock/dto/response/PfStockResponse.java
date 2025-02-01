@@ -1,4 +1,4 @@
-package org.com.stocknote.domain.portfolio.portfolioStock.dto;
+package org.com.stocknote.domain.portfolio.portfolioStock.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -11,6 +11,9 @@ public class PfStockResponse {
   private int pfstockCount;
   private int pfstockPrice;
   private int pfstockTotalPrice;
+  private int currentPrice;
+  private String market; //시장구분
+  private String idxBztpSclsCdName; //종목소분류
   private String stockName;
   private String stockCode;
 
@@ -20,6 +23,9 @@ public class PfStockResponse {
         .pfstockCount(pfStock.getPfstockCount())
         .pfstockPrice(pfStock.getPfstockPrice())
         .pfstockTotalPrice(pfStock.getPfstockTotalPrice())
+        .currentPrice(pfStock.getCurrentPrice())
+        .market(pfStock.getStock().getMarket())
+        .idxBztpSclsCdName(pfStock.getIdxBztpSclsCdName())
         .stockName(pfStock.getStock().getName())
         .stockCode(pfStock.getStock().getCode())
         .build();

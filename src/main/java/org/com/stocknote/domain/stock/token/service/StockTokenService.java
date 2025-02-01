@@ -1,6 +1,7 @@
 package org.com.stocknote.domain.stock.token.service;
 
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import org.com.stocknote.domain.stock.token.dto.TokenRequestDto;
 import org.com.stocknote.domain.stock.token.dto.TokenResponseDto;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
+@Getter
 public class StockTokenService {
     private WebClient webClient;
     private String cachedToken;  // 토큰 저장 변수

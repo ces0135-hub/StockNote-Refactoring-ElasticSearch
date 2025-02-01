@@ -26,6 +26,14 @@ spring:
 logging:
   level:
     root: INFO
+    org.com.stocknote: DEBUG
+
+#      hibernate:
+#        SQL: DEBUG
+#        type:
+#          descriptor:
+#            sql:
+#              BasicBinder: TRACE
 
 #    org.springframework.web: DEBUG
 #    org.springdoc: DEBUG
