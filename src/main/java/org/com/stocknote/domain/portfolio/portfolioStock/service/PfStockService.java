@@ -2,6 +2,8 @@ package org.com.stocknote.domain.portfolio.portfolioStock.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.com.stocknote.domain.portfolio.note.entity.Note;
+import org.com.stocknote.domain.portfolio.note.repository.NoteRepository;
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
 import org.com.stocknote.domain.portfolio.portfolio.repository.PortfolioRepository;
 import org.com.stocknote.domain.portfolio.portfolio.service.PortfolioService;
@@ -23,9 +25,11 @@ import java.util.Collections;
 @Slf4j
 public class PfStockService {
   private final PfStockRepository pfStockRepository;
+  private final NoteRepository noteRepository;
   private final PortfolioService portfolioService;
   private final TempStockService stockService;
   private final TempStockInfoService stockInfoService;
+
   // 임시
   private final StockRepository stockRepository;
   private final PortfolioRepository portfolioRepository;
@@ -59,13 +63,12 @@ public class PfStockService {
         .pfstockPrice(pfStockRequest.getPfstockPrice())
         .pfstockTotalPrice(pfStockRequest.getPfstockPrice() * pfStockRequest.getPfstockCount())
         .currentPrice(currentPriceInt).build();
+
+    noteRepository.save(noteStock(portfolio, "주식추가", "주식추가"));
     return pfStockRepository.save(pfStock);
   }
 
-  public PfStock savePfStock(PfStock pfStock) {
-    return pfStockRepository.save(pfStock);
-  }
-
+  @Transactional
   public void deletePfStock(Long pfStockNo) {
     pfStockRepository.deleteById(pfStockNo);
   }
@@ -93,6 +96,7 @@ public class PfStockService {
 
     portfolio.setCash(portfolio.getCash() - buyTotalPrice);
 
+    noteRepository.save(noteStock(portfolio, "주식매수", "주식매수"));
     portfolioRepository.save(portfolio);
     pfStockRepository.save(pfStock);
   }
@@ -132,6 +136,8 @@ public class PfStockService {
       // Portfolio 저장
       portfolioRepository.save(portfolio);
 
+      noteRepository.save(noteStock(portfolio, "주식매도", "주식매도"));
+
     } catch (Exception e) {
       log.error("Error in sellPfStock: ", e);
       throw new RuntimeException("Failed to process sell stock operation", e);
@@ -143,6 +149,7 @@ public class PfStockService {
     pfStock.setPfstockCount(request.getPfstockCount());
     pfStock.setPfstockPrice(request.getPfstockPrice());
     pfStock.setPfstockTotalPrice(request.getPfstockCount() * request.getPfstockPrice());
+
     pfStockRepository.save(pfStock);
   }
 
@@ -155,6 +162,15 @@ public class PfStockService {
     String searchKeyword = keyword.toLowerCase();
     return stockRepository.findByNameContainingIgnoreCaseOrCodeContainingIgnoreCase(searchKeyword,
         searchKeyword);
+  }
+
+  public Note noteStock(Portfolio portfolio, String title, String content){
+    return Note.builder()
+        .title(title)
+        .content(content)
+        .portfolio(portfolio)
+        .member(portfolio.getMember())
+        .build();
   }
 
   // 임시 데이터
