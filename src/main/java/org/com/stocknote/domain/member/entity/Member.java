@@ -6,8 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToMany;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.com.stocknote.domain.stock.entity.MemberStock;
-import org.com.stocknote.domain.stock.entity.Stock;
+import org.com.stocknote.domain.memberStock.entity.MemberStock;
 import org.com.stocknote.global.base.BaseEntity;
 
 import java.util.ArrayList;

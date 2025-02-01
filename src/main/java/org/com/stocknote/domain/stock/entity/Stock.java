@@ -6,8 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.com.stocknote.domain.member.entity.Member;
-import org.com.stocknote.global.base.BaseEntity;
+import org.com.stocknote.domain.memberStock.entity.MemberStock;
 
 import java.util.ArrayList;
 import java.util.List;

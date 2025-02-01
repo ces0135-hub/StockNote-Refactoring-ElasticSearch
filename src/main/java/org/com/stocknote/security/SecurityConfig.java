@@ -65,11 +65,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/auth/",
-                                "/api/filtered/*",
-                                "/api/kospi",
-                                "/api/kosdaq",
-                                "/api/kospi200",
-                                "/api/volume",
+                                "/api/v1/stockApis/**",
                                 "/auth/google/redirect",
                                 "/swagger-ui/**",
                                 "/swagger-ui/oauth2-redirect.html",// Swagger UI 경로 허용

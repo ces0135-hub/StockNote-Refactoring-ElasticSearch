@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.stock.entity.Stock;
 import org.com.stocknote.domain.stock.entity.StockVote;
 import org.com.stocknote.domain.stock.entity.VoteStatistics;
-import org.com.stocknote.domain.stock.entity.VoteType;
+import org.com.stocknote.domain.stock.type.VoteType;
 import org.com.stocknote.domain.stock.repository.StockRepository;
 import org.com.stocknote.domain.stock.repository.StockVoteRepository;
 import org.springframework.stereotype.Service;

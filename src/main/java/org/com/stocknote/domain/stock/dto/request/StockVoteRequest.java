@@ -2,7 +2,7 @@ package org.com.stocknote.domain.stock.dto.request;
 
 import lombok.Data;
 import lombok.Getter;
-import org.com.stocknote.domain.stock.entity.VoteType;
+import org.com.stocknote.domain.stock.type.VoteType;
 
 @Getter
 @Data

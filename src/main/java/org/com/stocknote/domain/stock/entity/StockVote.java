@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.com.stocknote.domain.stock.type.VoteType;
 
 import java.time.LocalDate;
 
