@@ -5,31 +5,32 @@ import org.com.stocknote.domain.hashtag.entity.Hashtag;
 import org.com.stocknote.domain.hashtag.service.HashtagService;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.member.repository.MemberRepository;
+import org.com.stocknote.domain.post.dto.MyPostResponseDto;
 import org.com.stocknote.domain.post.dto.PostCreateDto;
 import org.com.stocknote.domain.post.dto.PostModifyDto;
 import org.com.stocknote.domain.post.dto.PostResponseDto;
 import org.com.stocknote.domain.post.entity.Post;
+import org.com.stocknote.domain.post.entity.PostCategory;
 import org.com.stocknote.domain.post.repository.PostRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
-    private final MemberRepository memberRepository;
     private final HashtagService hashtagService;
 
     @Transactional
-    public Long createPost(PostCreateDto postCreateDto, String userEmail) {
-        Member member = memberRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found for email = " + userEmail));
+    public Long createPost(PostCreateDto postCreateDto, Member member) {
 
-        Post post = postCreateDto.toEntity(member.getId());
+        Post post = postCreateDto.toEntity(member);
         Post savedPost = postRepository.save(post);
 
         hashtagService.createHashtags(savedPost.getId(), postCreateDto.getHashtags());
@@ -42,6 +43,18 @@ public class PostService {
         return posts.map(post -> {
             List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId()).stream()
                     .map(Hashtag::getName).toList();
+            return PostResponseDto.fromPost(post, hashtags);
+        });
+    }
+
+    @Transactional(readOnly=true)
+    public Page<PostResponseDto> getPostsByCategory(PostCategory category, Pageable pageable) {
+        Page<Post> posts = postRepository.findByCategory(category, pageable);  // Pageable 추가
+        return posts.map(post -> {
+            List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId())
+                    .stream()
+                    .map(Hashtag::getName)
+                    .toList();
             return PostResponseDto.fromPost(post, hashtags);
         });
     }
@@ -78,5 +91,9 @@ public class PostService {
         postRepository.save(post);
 
         hashtagService.deleteHashtagsByPostId(id);
+    }
+
+    public Page<MyPostResponseDto> findPostsByMember(Member member, Pageable pageable) {
+        return postRepository.findByMember(member, pageable).map(MyPostResponseDto::of);
     }
 }

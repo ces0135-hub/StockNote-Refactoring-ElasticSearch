@@ -1,7 +1,9 @@
 package org.com.stocknote.domain.comment.repository;
 
+import io.lettuce.core.Value;
 import org.com.stocknote.domain.comment.entity.Comment;
 
+import org.com.stocknote.domain.member.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -12,4 +14,5 @@ import org.springframework.stereotype.Repository;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     Page<Comment> findByPostId(Pageable pageable, Long postId);
 
+    Page<Comment> findByMember(Member member, Pageable pageable);
 }

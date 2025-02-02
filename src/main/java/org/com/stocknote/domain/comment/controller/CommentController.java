@@ -1,16 +1,23 @@
 package org.com.stocknote.domain.comment.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.comment.dto.CommentDetailResponse;
 import org.com.stocknote.domain.comment.dto.CommentRequest;
 import org.com.stocknote.domain.comment.dto.CommentUpdateDto;
+import org.com.stocknote.domain.comment.dto.MyCommentResponse;
 import org.com.stocknote.domain.comment.service.CommentService;
+import org.com.stocknote.domain.member.entity.Member;
+import org.com.stocknote.domain.post.dto.MyPostResponseDto;
 import org.com.stocknote.global.dto.GlobalResponse;
 
+import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,8 +29,7 @@ public class CommentController {
 
 
     @GetMapping
-    public GlobalResponse<Page<CommentDetailResponse>> getComments(@PathVariable(value = "postId") Long postId, @RequestParam int page, @RequestParam int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public GlobalResponse<Page<CommentDetailResponse>> getComments(@PathVariable(value = "postId") Long postId, Pageable pageable) {
         return GlobalResponse.success(commentService.getComments(postId, pageable));
     }
 
@@ -33,10 +39,13 @@ public class CommentController {
     }
 
     @PostMapping
-    public GlobalResponse<Long> createComment(@PathVariable(value = "postId") Long postId, @RequestBody CommentRequest commentRequest, Authentication authentication) {
+    public GlobalResponse<Long> createComment(@PathVariable(value = "postId") Long postId,
+                                              @RequestBody CommentRequest commentRequest,
+                                              @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
 
-        String userEmail = authentication.getPrincipal().toString();
-        return GlobalResponse.success(commentService.createComment(postId, commentRequest, userEmail));
+        Member member = principalDetails.user();
+        return GlobalResponse.success(commentService.createComment(postId, commentRequest, member.getEmail()));
     }
 
     @PatchMapping("/{commentId}")
@@ -56,5 +65,18 @@ public class CommentController {
         commentService.deleteComment(commentId, userEmail);
 
         return GlobalResponse.success();
+    }
+
+    @GetMapping("/my")
+    @PreAuthorize("isAuthenticated()")
+    @Tag(name = "내가 쓴 글 조회 API", description = "사용자가 작성한 게시글 목록을 조회합니다.")
+    public GlobalResponse<Page<MyCommentResponse>> getMyComments(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            Pageable pageable
+    ) {
+        Member member = principalDetails.user();
+        return GlobalResponse.success(
+                commentService.findCommentsByMember(member, pageable)
+        );
     }
 }
