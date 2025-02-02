@@ -15,6 +15,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -33,13 +34,18 @@ public class WebSocketService {
 
     private WebSocketClient client;
     private volatile StockPriceResponse latestPriceResponse;
-
+    private final Map<String, WebSocketClient> activeClients = new HashMap<>();
     /**
      * 주식 가격 구독 시작
      */
     public void subscribeStockPrice(String stockCode) {
         try {
-            initializeWebSocketConnection(stockCode);
+            // 종목별로 하나의 WebSocket 연결만 유지
+            if (!activeClients.containsKey(stockCode)) {
+                initializeWebSocketConnection(stockCode);
+            } else {
+                log.info("Already connected to stock: {}", stockCode);
+            }
         } catch (Exception e) {
             log.error("❌ Failed to initialize WebSocket connection for {}: {}", stockCode, e.getMessage());
             fallbackToRestApi(stockCode);
@@ -51,11 +57,13 @@ public class WebSocketService {
      */
     private void initializeWebSocketConnection(String stockCode) throws Exception {
         String approvalKey = stockTokenService.getWebSocketApprovalKey();
-        latestPriceResponse = null;
 
-        client = createWebSocketClient(stockCode, approvalKey);
+        // WebSocket 연결 생성
+        WebSocketClient client = createWebSocketClient(stockCode, approvalKey);
+        activeClients.put(stockCode, client);  // 연결을 Map에 저장
         client.connect();
     }
+
 
     /**
      * WebSocket 클라이언트 생성
@@ -76,6 +84,7 @@ public class WebSocketService {
             @Override
             public void onClose(int code, String reason, boolean remote) {
                 log.info("WebSocket Closed for stock {}: {}", stockCode, reason);
+                activeClients.remove(stockCode);  // 연결 종료 시 Map에서 제거
             }
 
             @Override
@@ -88,6 +97,7 @@ public class WebSocketService {
         newClient.addHeader("approval_key", approvalKey);
         return newClient;
     }
+
 
     /**
      * WebSocket 메시지 처리
@@ -144,7 +154,10 @@ public class WebSocketService {
             );
 
             String subscribeMessage = objectMapper.writeValueAsString(message);
-            client.send(subscribeMessage);
+            WebSocketClient client = activeClients.get(stockCode);  // 기존 연결 사용
+            if (client != null) {
+                client.send(subscribeMessage);
+            }
         } catch (Exception e) {
             log.error("❌ Failed to send subscribe message for {}: {}", stockCode, e.getMessage());
         }
@@ -164,8 +177,10 @@ public class WebSocketService {
 
     @PreDestroy
     public void cleanup() {
-        if (client != null && !client.isClosed()) {
-            client.close();
+        for (WebSocketClient client : activeClients.values()) {
+            if (client != null && !client.isClosed()) {
+                client.close();
+            }
         }
     }
 }
