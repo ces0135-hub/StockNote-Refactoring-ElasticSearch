@@ -1,7 +1,9 @@
 package org.com.stocknote.domain.stockApi.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.com.stocknote.domain.stock.type.PeriodType;
 import org.com.stocknote.domain.stockApi.dto.*;
 import org.com.stocknote.domain.stockApi.dto.response.*;
 import org.com.stocknote.domain.stockApi.service.StockApiService;
@@ -17,6 +19,7 @@ import java.time.LocalDate;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/stockApis")
+@Tag(name = "주식 API", description = "주식 API")
 public class StockApiController {
     private final StockApiService stockApiService;
 
@@ -52,7 +55,7 @@ public class StockApiController {
         return stockApiService.getFilteredKOSPI200();
     }
 
-    @GetMapping("/api/volume")
+    @GetMapping("/volume")
     public Mono<VolumeResponse> getVolume() {
         return stockApiService.getVolumeData();
     }
@@ -63,56 +66,19 @@ public class StockApiController {
         return stockApiService.getStockPrice(stockCode);
     }
 
-    @GetMapping("/daily-prices")
-    @Operation(summary = "일별 주식 데이터 조회")
-    public StockDailyResponse getDailyStockPrices(
-            @RequestParam String stockCode,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
-        return stockApiService.getDailyStockPrices(stockCode, startDate, endDate);
-    }
-
-    @GetMapping("/weekly-prices")
-    @Operation(summary = "주별 주식 데이터 조회")
-    public StockDailyResponse getWeeklyStockPrices(
-            @RequestParam String stockCode,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
-        return stockApiService.getWeeklyStockPrices(stockCode, startDate, endDate);
-    }
-
-    @GetMapping("/monthly-prices")
-    @Operation(summary = "월별 주식 데이터 조회")
-    public StockDailyResponse getMonthlyStockPrices(
-            @RequestParam String stockCode,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
-        return stockApiService.getMonthlyStockPrices(stockCode, startDate, endDate);
-    }
-
-    @GetMapping("/yearly-prices")
-    @Operation(summary = "연간 주식 데이터 조회")
-    public StockDailyResponse getYearlyStockPrices(
-            @RequestParam String stockCode,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
-        return stockApiService.getYearlyStockPrices(stockCode, startDate, endDate);
-    }
-
     @GetMapping("/time-prices")
     @Operation(summary = "당일 시간대별 체결 정보 조회")
     public StockTimeResponse getTimeStockPrices(@RequestParam String stockCode) {
         return stockApiService.getTimeStockPrices(stockCode);
     }
 
-//    @GetMapping("/chart")
-//    public ChartResponse getChartData(
-//            @RequestParam String stockCode,
-//            @RequestParam PeriodType periodType,
-//            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-//            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
-//        return stockService.getChartData(stockCode, periodType, startDate, endDate);
-//    }
-
-
+    @GetMapping("/chart")
+    @Operation(summary = "종목별 차트 데이터 조회")
+    public ChartResponse getChartData(
+            @RequestParam String stockCode,
+            @RequestParam PeriodType periodType,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+        return stockApiService.getChartData(stockCode, periodType, startDate, endDate);
+    }
 }

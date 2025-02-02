@@ -9,20 +9,23 @@ import org.com.stocknote.domain.stockApi.dto.response.StockResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class StockPriceProcessor {
+    private static final Set<String> loggedMissingStockCodes = ConcurrentHashMap.newKeySet();
 
-    /**
-     * 주식 가격 정보를 처리하고 StockResponse로 변환
-     */
     public Optional<StockResponse> processStockPriceResponse(StockPriceResponse priceResponse, String stockCode, Stock stock, MemberStock memberStock) {
         if (priceResponse == null || priceResponse.getOutput() == null) {
-            log.warn("⚠️ No price data available for {}", stockCode);
+            if (loggedMissingStockCodes.add(stockCode)) {
+                log.warn("⚠️ No price data available for {}", stockCode);
+            }
             return Optional.empty();
         }
+        loggedMissingStockCodes.remove(stockCode);
 
         try {
             StockPriceResponse.Output output = priceResponse.getOutput();
@@ -68,5 +71,9 @@ public class StockPriceProcessor {
         }
         double changePercent = ((double) (currentPrice - openingPrice) / openingPrice) * 100;
         return String.format("%.2f%%", changePercent);
+    }
+
+    public static void resetLoggedMissingStockCodes () {
+        loggedMissingStockCodes.clear();
     }
 }

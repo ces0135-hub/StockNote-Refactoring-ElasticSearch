@@ -94,7 +94,6 @@ public class WebSocketService {
      */
     private void handleWebSocketMessage(String message, String stockCode) {
         try {
-            log.debug("📩 Received WebSocket Message for {}: {}", stockCode, message);
             StockPriceResponse priceResponse = parseStockPriceResponse(message);
 
             if (priceResponse != null) {
@@ -145,7 +144,6 @@ public class WebSocketService {
             );
 
             String subscribeMessage = objectMapper.writeValueAsString(message);
-            log.debug("📤 Sending subscribe message: {}", subscribeMessage);
             client.send(subscribeMessage);
         } catch (Exception e) {
             log.error("❌ Failed to send subscribe message for {}: {}", stockCode, e.getMessage());

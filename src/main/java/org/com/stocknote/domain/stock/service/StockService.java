@@ -35,7 +35,7 @@ public class StockService {
     private final StockApiService stockApiService;
     private final StockPriceProcessor priceProcessor;
 
-
+    @Transactional(readOnly = true)
     public StockInfoResponse findStock(String name) {
         return stockRepository.findByName(name)
                 .map(StockInfoResponse::of)

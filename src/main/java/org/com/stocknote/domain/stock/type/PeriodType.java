@@ -4,7 +4,8 @@ public enum PeriodType {
     DAILY("D"),
     WEEKLY("W"),
     MONTHLY("M"),
-    YEARLY("Y");
+    YEARLY("Y"),
+    TIME("T");
 
     private final String code;
 

@@ -1,9 +1,11 @@
 package org.com.stocknote.domain.stockApi.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.com.stocknote.domain.stock.repository.StockRepository;
 import org.com.stocknote.domain.stockApi.dto.*;
 import org.com.stocknote.domain.stock.type.PeriodType;
 import org.com.stocknote.domain.stockApi.dto.response.*;
@@ -15,9 +17,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,9 +31,10 @@ public class StockApiService {
 
     private final WebClient.Builder webClientBuilder;
     private final StockTokenService stockTokenService;
+    private final StockRepository stockRepository;
     private final ObjectMapper objectMapper;
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HHmmss");
-
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     public Mono<CurrentIndexResponse> getKOSPI() {
         String accessToken = stockTokenService.getAccessToken();
@@ -191,20 +197,24 @@ public class StockApiService {
                     headers.set("tr_id", "FHKST01010100");
                 })
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, response ->
-                        Mono.error(new RuntimeException("주식 가격 조회 실패: " + response.statusCode()))
-                )
-                .onStatus(HttpStatusCode::is5xxServerError, response ->
-                        Mono.error(new RuntimeException("서버 오류: " + response.statusCode()))
-                )
-                .bodyToMono(StockPriceResponse.class)
-                .onErrorMap(WebClientResponseException.class, e ->
-                        new RuntimeException("주식 가격 조회 실패: " + e.getStatusCode(), e)
-                )
-                .onErrorMap(Exception.class, e ->
-                        new RuntimeException("주식 가격 조회 중 오류 발생", e)
-                );
+                .bodyToMono(String.class)
+                .map(response -> {
+                    try {
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        return objectMapper.readValue(response, StockPriceResponse.class);
+                    } catch (Exception e) {
+                        System.err.println("❌ JSON 매핑 오류: " + e.getMessage());
+                        return null;
+                    }
+                })
+                .onErrorMap(WebClientResponseException.class, e -> {
+                    return new RuntimeException("주식 가격 조회 실패: " + e.getStatusCode(), e);
+                })
+                .onErrorMap(Exception.class, e -> {
+                    return new RuntimeException("주식 가격 조회 중 오류 발생", e);
+                });
     }
+
 
     // 날자별 가격 조회
     public StockDailyResponse getStockPrices(String stockCode, PeriodType periodType, LocalDate startDate, LocalDate endDate) {
@@ -252,33 +262,14 @@ public class StockApiService {
         }
     }
 
-    // 일별 데이터 조회
-    public StockDailyResponse getDailyStockPrices(String stockCode, LocalDate startDate, LocalDate endDate) {
-        return getStockPrices(stockCode, PeriodType.DAILY, startDate, endDate);
-    }
-
-    // 주별 데이터 조회
-    public StockDailyResponse getWeeklyStockPrices(String stockCode, LocalDate startDate, LocalDate endDate) {
-        return getStockPrices(stockCode, PeriodType.WEEKLY, startDate, endDate);
-    }
-
-    // 월별 데이터 조회
-    public StockDailyResponse getMonthlyStockPrices(String stockCode, LocalDate startDate, LocalDate endDate) {
-        return getStockPrices(stockCode, PeriodType.MONTHLY, startDate, endDate);
-    }
-
-    // 연간 데이터 조회
-    public StockDailyResponse getYearlyStockPrices(String stockCode, LocalDate startDate, LocalDate endDate) {
-        return getStockPrices(stockCode, PeriodType.YEARLY, startDate, endDate);
-    }
-
     public StockTimeResponse getTimeStockPrices(String stockCode) {
         String baseUrl = "https://openapivts.koreainvestment.com:29443";
         String endpoint = "/uapi/domestic-stock/v1/quotations/inquire-time-itemconclusion";
 
-        String formattedTime = LocalTime.now().format(TIME_FORMATTER);
-
         try {
+            LocalDate today = LocalDate.now();
+            LocalDate lastTradingDay = getLastTradingDay(today);
+            LocalDate finalLastTradingDay = lastTradingDay;
             String response = webClientBuilder
                     .baseUrl(baseUrl)
                     .build()
@@ -287,7 +278,8 @@ public class StockApiService {
                             .path(endpoint)
                             .queryParam("FID_COND_MRKT_DIV_CODE", "J")
                             .queryParam("FID_INPUT_ISCD", stockCode)
-                            .queryParam("FID_INPUT_HOUR_1", formattedTime)
+                            .queryParam("FID_INPUT_DATE_1", finalLastTradingDay.format(DateTimeFormatter.BASIC_ISO_DATE))
+                            .queryParam("FID_INPUT_HOUR_1", "000000")
                             .build())
                     .headers(headers -> {
                         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -312,6 +304,7 @@ public class StockApiService {
             StockTimeResponse timeResponse = objectMapper.readValue(response, StockTimeResponse.class);
 
             if (timeResponse == null || timeResponse.getOutput2() == null || timeResponse.getOutput2().isEmpty()) {
+                lastTradingDay = lastTradingDay.minusDays(1);
                 log.warn("No time data returned for stockCode: {}", stockCode);
             }
 
@@ -326,6 +319,115 @@ public class StockApiService {
         }
     }
 
+    public ChartResponse getChartData(String stockCode, PeriodType periodType, LocalDate startDate, LocalDate endDate) {
+        if (periodType == PeriodType.TIME) {
+            String stockName = stockRepository.findByCode(stockCode).get().getName();
+            if (stockName == null) stockName = "알 수 없음"; // 기본값 처리
+            // ✅ 시간별 체결 정보 조회 (getTimeStockPrices)
+            StockTimeResponse timeResponse = getTimeStockPrices(stockCode);
+            if (timeResponse == null || timeResponse.getOutput2() == null || timeResponse.getOutput2().isEmpty()) {
+                throw new RuntimeException("시간대별 주식 데이터가 없습니다.");
+            }
 
+            List<ChartResponse.CandleData> candles = new ArrayList<>();
+            for (StockTimeResponse.Output2 node : timeResponse.getOutput2()) {
+                candles.add(ChartResponse.CandleData.builder()
+                        .time(node.getStck_cntg_hour())
+                        .open(Double.parseDouble(node.getStck_prpr())) // 현재가를 open으로 설정
+                        .high(Double.parseDouble(node.getStck_prpr())) // 체결 단위에서는 high/low가 동일
+                        .low(Double.parseDouble(node.getStck_prpr()))
+                        .close(Double.parseDouble(node.getStck_prpr()))
+                        .volume(Long.parseLong(node.getAcml_vol()))
+                        .value(Long.parseLong(node.getCnqn())) // 체결량 사용
+                        .build());
+            }
+
+            return ChartResponse.builder()
+                    .stockCode(stockCode)
+                    .stockName(stockName)
+                    .summary(ChartResponse.StockSummary.builder()
+                            .changePrice(Double.parseDouble(timeResponse.getOutput1().getPrdy_vrss()))
+                            .changeRate(Double.parseDouble(timeResponse.getOutput1().getPrdy_ctrt()))
+                            .volume(Long.parseLong(timeResponse.getOutput1().getAcml_vol()))
+                            .build())
+                    .candles(candles)
+                    .build();
+        }
+        WebClient webClient = webClientBuilder.baseUrl(stockTokenService.getIndexBaseUrl()).build();
+        String endpoint = "/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice";
+
+        try {
+            String finalEndpoint = endpoint;
+            String response = webClient
+                    .get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(finalEndpoint)
+                            .queryParam("FID_COND_MRKT_DIV_CODE", "J")
+                            .queryParam("FID_INPUT_ISCD", stockCode)
+                            .queryParam("FID_INPUT_DATE_1", startDate.toString())
+                            .queryParam("FID_INPUT_DATE_2", endDate.toString())
+                            .queryParam("FID_PERIOD_DIV_CODE", periodType.getCode())
+                            .queryParam("FID_ORG_ADJ_PRC", "0")
+                            .build())
+                    .headers(headers -> {
+                        headers.setContentType(MediaType.APPLICATION_JSON);
+                        headers.set("authorization", "Bearer " + stockTokenService.getAccessToken());
+                        headers.set("appkey", stockTokenService.getAppKey());
+                        headers.set("appsecret", stockTokenService.getAppSecret());
+                        headers.set("tr_id", "FHKST03010100");
+                    })
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+
+            // ✅ JSON을 직접 파싱하여 output1, output2 처리
+            JsonNode root = objectMapper.readTree(response);
+            JsonNode output1 = root.path("output1");
+            JsonNode output2 = root.path("output2");
+
+            // ✅ StockSummary 생성 (output1 기반)
+            ChartResponse.StockSummary summary = ChartResponse.StockSummary.builder()
+                    .changePrice(output1.path("prdy_vrss").asDouble())
+                    .changeRate(output1.path("prdy_ctrt").asDouble())
+                    .volume(output1.path("acml_vol").asLong())
+                    .build();
+
+            // ✅ CandleData 리스트 생성 (output2 기반)
+            List<ChartResponse.CandleData> candles = new ArrayList<>();
+            for (JsonNode node : output2) {
+                candles.add(ChartResponse.CandleData.builder()
+                        .time(node.path("stck_bsop_date").asText()) // 거래일자
+                        .open(node.path("stck_oprc").asDouble())
+                        .high(node.path("stck_hgpr").asDouble())
+                        .low(node.path("stck_lwpr").asDouble())
+                        .close(node.path("stck_clpr").asDouble())
+                        .volume(node.path("acml_vol").asLong())
+                        .value(node.path("acml_tr_pbmn").asLong())
+                        .build());
+            }
+
+            // ✅ 최종 ChartResponse 객체 생성
+            return ChartResponse.builder()
+                    .stockCode(output1.path("stck_shrn_iscd").asText())  // 종목코드
+                    .stockName(output1.path("hts_kor_isnm").asText())    // 종목명
+                    .summary(summary)
+                    .candles(candles)
+                    .build();
+
+        } catch (Exception e) {
+            log.error("❌ 차트 데이터 조회 중 오류 발생: {}", e.getMessage());
+            throw new RuntimeException("차트 데이터 조회 중 오류 발생", e);
+        }
+    }
+    private LocalDate getLastTradingDay(LocalDate date) {
+        // 주말인 경우 금요일로 설정
+        if (date.getDayOfWeek() == DayOfWeek.SATURDAY) {
+            return date.minusDays(1);
+        } else if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
+            return date.minusDays(2);
+        }
+        // TODO: 공휴일 체크 로직 추가
+        return date;
+    }
 
 }

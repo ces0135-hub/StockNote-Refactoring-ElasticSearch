@@ -10,7 +10,7 @@ public class StockVoteRequest {
     private boolean sell;
     private boolean buy;
 
-    public VoteType getVoteType () {
+    public VoteType getVoteType() {
         if (this.buy) {
             return VoteType.BUY;
         } else if (this.sell) {

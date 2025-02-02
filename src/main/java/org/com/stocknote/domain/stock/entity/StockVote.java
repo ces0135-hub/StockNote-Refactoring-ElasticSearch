@@ -35,7 +35,6 @@ public class StockVote {
         this.voteType = voteType;
     }
 
-
     @PrePersist
     public void prePersist() {
         this.voteDate = LocalDate.now();

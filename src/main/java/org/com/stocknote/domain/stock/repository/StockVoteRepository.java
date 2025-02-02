@@ -12,4 +12,5 @@ public interface StockVoteRepository extends JpaRepository<StockVote, Long> {
 
     long countByStockCodeAndVoteDateAndVoteType (String stockCode, LocalDate today, VoteType voteType);
 
+    void deleteAllByVoteDateBefore (LocalDate date);
 }

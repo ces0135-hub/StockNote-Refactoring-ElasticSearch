@@ -1,40 +1,43 @@
 package org.com.stocknote.domain.stockApi.dto.response;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChartResponse {
-    private List<CandleData> candles;
-    private StockSummary summary;
-    private String stockCode;
-    private String stockName;
+    private List<CandleData> candles;  // ✅ output2에서 가져오기
+    private StockSummary summary;      // ✅ output1에서 가져오기
+    private String stockCode;          // ✅ output1의 stck_shrn_iscd 매핑
+    private String stockName;          // ✅ output1의 hts_kor_isnm 매핑
 
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     @Builder
     public static class CandleData {
-        private String time;      // 시간
-        private double open;      // 시가
-        private double high;      // 고가
-        private double low;       // 저가
-        private double close;     // 종가
-        private long volume;      // 거래량
-        private long value;       // 거래대금
+        private String time;
+        private double open;
+        private double high;
+        private double low;
+        private double close;
+        private long volume;
+        private long value;
     }
 
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     @Builder
     public static class StockSummary {
-        private double currentPrice;  // 현재가
-        private double changePrice;   // 변동금액
-        private double changeRate;    // 변동률
-        private long volume;          // 거래량
-        private double high;          // 고가
-        private double low;           // 저가
+        private double changePrice;   // ✅ output1의 prdy_vrss 매핑
+        private double changeRate;    // ✅ output1의 prdy_ctrt 매핑
+        private long volume;          // ✅ output1의 acml_vol 매핑
     }
 }

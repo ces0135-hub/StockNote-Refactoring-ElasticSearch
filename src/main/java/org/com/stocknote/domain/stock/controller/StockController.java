@@ -66,15 +66,13 @@ public class StockController {
             @RequestBody StockVoteRequest request,
             @AuthenticationPrincipal PrincipalDetails principalDetails) {
         String email = principalDetails.getUsername();
-        stockVoteService.vote(stockCode, request.getVoteType());
+        stockVoteService.vote(stockCode, request, email);
         return GlobalResponse.success();
     }
 
     @GetMapping("/{stockCode}/vote-statistics")
     public ResponseEntity<VoteStatistics> getVoteStatistics(
-            @PathVariable String stockCode,
-            @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        String email = principalDetails.getUsername();
+            @PathVariable String stockCode) {
         return ResponseEntity.ok(stockVoteService.getVoteStatistics(stockCode));
     }
 }
