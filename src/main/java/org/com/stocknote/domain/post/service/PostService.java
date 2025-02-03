@@ -92,14 +92,14 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(Long postId) {
-        Post post = postRepository.findById(postId)
+    public void deletePost(Long id) {
+        Post post = postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         post.softDelete();
         postRepository.save(post);
-        commentRepository.deleteByPostId(postId);
-        likeRepository.deleteByPostId(postId);
-        hashtagService.deleteHashtagsByPostId(postId);
+        commentRepository.deleteByPostId(id);
+        likeRepository.deleteByPostId(id);
+        hashtagService.deleteHashtagsByPostId(id);
     }
 
     public Page<MyPostResponseDto> findPostsByMember(Member member, Pageable pageable) {

@@ -12,11 +12,10 @@ public record PostResponseDto(
         String username,
         String profile,
         LocalDateTime createdAt,
-        List<String>hashtags,
-        int likeCount
+        List<String>hashtags
 ) {
     public static PostResponseDto fromPost(Post post, List<String> hashtags) {
-        return new PostResponseDto(post.getId(), post.getTitle(), post.getBody(), post.getMember().getName(), post.getMember().getProfile(), post.getCreatedAt(), hashtags, post.getLikeList().size());
+        return new PostResponseDto(post.getId(), post.getTitle(), post.getBody(), post.getMember().getName(), post.getMember().getProfile(), post.getCreatedAt(), hashtags);
     }
 }
 
