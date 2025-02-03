@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/post")
 @RequiredArgsConstructor
-@Tag(name = "게시글 댓글 API", description = "댓글(Comment)")
+@Tag(name = "게시글 좋아요 API", description = "댓글(Comment)")
 public class LikeController {
 
     private final LikeService likeService;

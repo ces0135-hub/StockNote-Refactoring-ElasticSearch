@@ -26,10 +26,10 @@ import org.com.stocknote.global.base.BaseEntity;
 public class Like extends BaseEntity {
 
         @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "user_id", nullable = false)
+        @JoinColumn(name = "member_id", nullable = false)
         private Member member;
 
         @ManyToOne(fetch = FetchType.LAZY)
-        @Column(name = "post_id", nullable = false)
-        private Post postId;
+        @JoinColumn(name = "post_id", nullable = false)
+        private Post post;
 }

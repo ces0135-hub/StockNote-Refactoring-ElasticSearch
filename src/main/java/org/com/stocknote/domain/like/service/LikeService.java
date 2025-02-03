@@ -28,7 +28,7 @@ public class LikeService {
 
         Like like = Like.builder()
                 .member(member)
-                .postId(post)
+                .post(post)
                 .build();
 
         likeRepository.save(like);
