@@ -70,4 +70,15 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
+    @Transactional
+    public void deleteComment(Long commentId, String userEmail) {
+        Member member = memberRepository.findByEmail(userEmail).orElseThrow(() -> new IllegalArgumentException("user not found"));
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+
+        if (!Objects.equals(member.getId(), comment.getUserId())) {
+            throw new CustomException(ErrorCode.COMMENT_DELETE_DENIED);
+        }
+        commentRepository.delete(comment);
+    }
 }
