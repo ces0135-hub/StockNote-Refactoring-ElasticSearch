@@ -20,7 +20,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/post")
+@RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
 @Tag(name = "커뮤니티 게시글 API", description = "게시글(Post)")
 public class PostController {
