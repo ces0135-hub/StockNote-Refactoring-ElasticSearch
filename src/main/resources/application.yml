@@ -27,6 +27,7 @@ logging:
   level:
     root: INFO
     org.com.stocknote: DEBUG
+
     org.springframework.security: DEBUG
     org.springframework.security.oauth2: DEBUG
     org.springframework.web: DEBUG
