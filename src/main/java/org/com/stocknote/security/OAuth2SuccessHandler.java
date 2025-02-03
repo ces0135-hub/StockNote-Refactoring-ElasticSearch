@@ -21,7 +21,9 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
+        System.out.println("authentication"+authentication);
         String accessToken = handleAuthentication(authentication);
+        System.out.println("accessToken = " + accessToken);
         String redirectUrl = UriComponentsBuilder.fromUriString(URI)
                 .queryParam("accessToken", accessToken)
                 .build().toUriString();

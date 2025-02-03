@@ -15,6 +15,8 @@ import org.com.stocknote.global.dto.GlobalResponse;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -45,8 +47,8 @@ public class PostController {
     @GetMapping
     @Operation(summary = "게시글 목록 조회")
     public GlobalResponse<Page<PostResponseDto>> getPosts(
-            @RequestParam(required = false, name = "category") PostCategory category,
-            Pageable pageable
+            @RequestParam(required = false, name= "category") PostCategory category,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         if (category != null) {
             return GlobalResponse.success(postService.getPostsByCategory(category, pageable));
@@ -66,6 +68,7 @@ public class PostController {
             @PathVariable("id") Long id,
             @Valid @RequestBody PostModifyDto postModifyDto
     ) {
+        System.out.println(postModifyDto);
         postService.updatePost(id, postModifyDto);
         return GlobalResponse.success("Post updated successfully");
     }
@@ -82,7 +85,7 @@ public class PostController {
     @Operation(summary = "내가 작성한 게시글 목록 조회")
     public GlobalResponse<Page<MyPostResponseDto>> getMyPosts(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            Pageable pageable
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         Member member = principalDetails.user();
         return GlobalResponse.success(

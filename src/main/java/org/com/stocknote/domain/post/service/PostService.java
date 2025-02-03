@@ -42,11 +42,10 @@ public class PostService {
     public Page<PostResponseDto> getPosts(Pageable pageable) {
         Page<Post> posts = postRepository.findAll(pageable);
         return posts.map(post -> {
-            List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId()).stream()
-                    .map(Hashtag::getName).toList();
-
-//            Long likeCount = likeRepository.countByPostId(post.getId());
-
+            List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId())
+                    .stream()
+                    .map(Hashtag::getName)
+                    .toList();
             return PostResponseDto.fromPost(post, hashtags);
         });
     }
@@ -86,6 +85,7 @@ public class PostService {
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         existingPost.bodyUpdate(postModifyDto.getBody());
         existingPost.titleUpdate(postModifyDto.getTitle());
+        existingPost.categoryUpdate(PostCategory.valueOf(postModifyDto.getCategory()));
         postRepository.save(existingPost);
 
         hashtagService.updateHashtags(id, postModifyDto.getHashtags());

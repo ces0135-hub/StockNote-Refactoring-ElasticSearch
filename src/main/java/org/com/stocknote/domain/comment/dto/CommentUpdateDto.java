@@ -9,5 +9,4 @@ public class CommentUpdateDto {
     private Long commentId;
     private Long postId;
     private String body;
-    private String userEmail;
 }
