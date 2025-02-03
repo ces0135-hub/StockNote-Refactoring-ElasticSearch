@@ -29,6 +29,11 @@ logging:
     org.com.stocknote: DEBUG
     org.com.stocknote.domain.stock.service.price.StockPriceProcessor: DEBUG
 
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.web: DEBUG
+
+
 #      hibernate:
 #        SQL: DEBUG
 #        type:

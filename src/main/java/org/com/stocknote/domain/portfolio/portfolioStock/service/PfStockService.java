@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.com.stocknote.domain.portfolio.note.entity.Note;
 import org.com.stocknote.domain.portfolio.note.repository.NoteRepository;
+import org.com.stocknote.domain.portfolio.note.service.NoteService;
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
 import org.com.stocknote.domain.portfolio.portfolio.repository.PortfolioRepository;
 import org.com.stocknote.domain.portfolio.portfolio.service.PortfolioService;
@@ -27,29 +28,18 @@ public class PfStockService {
   private final PfStockRepository pfStockRepository;
   private final NoteRepository noteRepository;
   private final PortfolioService portfolioService;
-  private final TempStockService stockService;
-  private final TempStockInfoService stockInfoService;
+  private final NoteService noteService;
 
+
+  private final TempStockService stockService;
   // 임시
   private final StockRepository stockRepository;
   private final PortfolioRepository portfolioRepository;
   private final TempStockInfoService tempStockInfoService;
 
-  public List<PfStock> getStockList(Long portfolioNo) {
-    List<PfStock> pfStockList = pfStockRepository.findByPortfolioId(portfolioNo);
-    pfStockList.forEach(pfStock -> {
-      Stock stock = pfStock.getStock();
-      StockPriceResponse currentPrice = stockService.getStockPrice(stock.getCode());
-      int currentPriceInt = Integer.parseInt(currentPrice.getOutput().getStck_prpr());
-      pfStock.setCurrentPrice(currentPriceInt);
-    });
-    return pfStockList;
-  }
-
   @Transactional
   public PfStock savePfStock(Long portfolioNo, PfStockRequest pfStockRequest) {
     Portfolio portfolio = portfolioService.getPortfolio(portfolioNo);
-
     StockPriceResponse currentPrice = stockService.getStockPrice(pfStockRequest.getStockCode());
     int currentPriceInt = Integer.parseInt(currentPrice.getOutput().getStck_prpr());
 
@@ -64,13 +54,7 @@ public class PfStockService {
         .pfstockTotalPrice(pfStockRequest.getPfstockPrice() * pfStockRequest.getPfstockCount())
         .currentPrice(currentPriceInt).build();
 
-    noteRepository.save(noteStock(portfolio, "주식추가", "주식추가"));
     return pfStockRepository.save(pfStock);
-  }
-
-  @Transactional
-  public void deletePfStock(Long pfStockNo) {
-    pfStockRepository.deleteById(pfStockNo);
   }
 
   @Transactional
@@ -96,7 +80,7 @@ public class PfStockService {
 
     portfolio.setCash(portfolio.getCash() - buyTotalPrice);
 
-    noteRepository.save(noteStock(portfolio, "주식매수", "주식매수"));
+    noteRepository.save(noteService.buyStock(portfolio, pfStock, pfStockPatchRequest));
     portfolioRepository.save(portfolio);
     pfStockRepository.save(pfStock);
   }
@@ -133,10 +117,8 @@ public class PfStockService {
         pfStockRepository.save(pfStock);
       }
 
-      // Portfolio 저장
+      noteRepository.save(noteService.sellStock(portfolio, pfStock, pfStockPatchRequest));
       portfolioRepository.save(portfolio);
-
-      noteRepository.save(noteStock(portfolio, "주식매도", "주식매도"));
 
     } catch (Exception e) {
       log.error("Error in sellPfStock: ", e);
@@ -144,14 +126,44 @@ public class PfStockService {
     }
   }
 
-  public void update(Long pfStockNo, PfStockPatchRequest request) {
+  public void update(Long portfolioNo, Long pfStockNo, PfStockPatchRequest pfStockPatchRequest) {
+    Portfolio portfolio = portfolioService.getPortfolio(portfolioNo);
+
     PfStock pfStock = pfStockRepository.findById(pfStockNo).orElse(null);
-    pfStock.setPfstockCount(request.getPfstockCount());
-    pfStock.setPfstockPrice(request.getPfstockPrice());
-    pfStock.setPfstockTotalPrice(request.getPfstockCount() * request.getPfstockPrice());
+    noteRepository.save(noteService.updateStock(portfolio, pfStock, pfStockPatchRequest));
+
+    pfStock.setPfstockCount(pfStockPatchRequest.getPfstockCount());
+    pfStock.setPfstockPrice(pfStockPatchRequest.getPfstockPrice());
+    pfStock.setPfstockTotalPrice(pfStockPatchRequest.getPfstockCount() * pfStockPatchRequest.getPfstockPrice());
 
     pfStockRepository.save(pfStock);
   }
+
+
+  @Transactional
+  public void deletePfStock(Long portfolioNo, Long pfStockNo) {
+    // Portfolio는 ID로만 조회
+    Portfolio portfolio = portfolioRepository.getReferenceById(portfolioNo);
+    PfStock pfStock = pfStockRepository.getReferenceById(pfStockNo);
+
+    noteRepository.save(noteService.deleteStock(portfolio, pfStock));
+    pfStockRepository.deleteById(pfStockNo);
+  }
+//
+//  @Transactional
+//  public void deletePfStock(Long portfolioNo, Long pfStockNo) {
+//    Portfolio portfolio = portfolioService.getPortfolio(portfolioNo);
+//    PfStock pfStock = pfStockRepository.findById(pfStockNo).orElse(null);
+//
+//    // Portfolio의 편의 메소드를 사용하여 관계 해제
+//    portfolio.removePfStock(pfStock);
+//
+//    // Note 생성 및 저장
+//    noteRepository.save(noteService.deleteStock(portfolio, pfStock));
+//
+//    // 이제 삭제
+//    pfStockRepository.delete(pfStock);
+//  }
 
   // stock service로 이동 예정
   public List<Stock> searchStocks(String keyword) {
@@ -162,15 +174,6 @@ public class PfStockService {
     String searchKeyword = keyword.toLowerCase();
     return stockRepository.findByNameContainingIgnoreCaseOrCodeContainingIgnoreCase(searchKeyword,
         searchKeyword);
-  }
-
-  public Note noteStock(Portfolio portfolio, String title, String content){
-    return Note.builder()
-        .title(title)
-        .content(content)
-        .portfolio(portfolio)
-        .member(portfolio.getMember())
-        .build();
   }
 
   // 임시 데이터

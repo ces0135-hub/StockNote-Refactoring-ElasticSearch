@@ -45,17 +45,20 @@ public class PfStockController {
   }
 
   @PatchMapping("/{pfStock_no}")
-  public GlobalResponse<String> patchPortfolioStock(@PathVariable("pfStock_no") Long pfStockNo,
+  public GlobalResponse<String> patchPortfolioStock(
+      @PathVariable("portfolio_no") Long portfolioNo,
+      @PathVariable("pfStock_no") Long pfStockNo,
       @RequestBody PfStockPatchRequest pfPfStockRequest) {
-    pfStockService.update(pfStockNo, pfPfStockRequest);
+    pfStockService.update(portfolioNo, pfStockNo, pfPfStockRequest);
     return GlobalResponse.success(" Portfolio modify");
   }
 
   @DeleteMapping("/{pfStock_no}")
-  public GlobalResponse<String> deletePortfolioStock(@PathVariable("portfolio_no") Long portfolioNo,
+  public GlobalResponse<String> deletePortfolioStock(
+      @PathVariable("portfolio_no") Long portfolioNo,
       @PathVariable("pfStock_no") Long pfStockNo) {
 
-    pfStockService.deletePfStock(pfStockNo);
+    pfStockService.deletePfStock(portfolioNo, pfStockNo);
     return GlobalResponse.success("Portfolio del");
   }
 
