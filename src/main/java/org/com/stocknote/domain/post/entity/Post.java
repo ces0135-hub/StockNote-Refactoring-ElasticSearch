@@ -1,13 +1,11 @@
 package org.com.stocknote.domain.post.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.global.base.BaseEntity;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -27,8 +25,12 @@ public class Post extends BaseEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String body;
 
-    @Column(nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private Member member;
+
+    @Enumerated(EnumType.STRING)
+    private PostCategory category;
 
     private LocalDateTime deletedAt;
 
