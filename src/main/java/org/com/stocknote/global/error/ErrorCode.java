@@ -27,7 +27,6 @@ public enum ErrorCode {
     // User
     NOT_FOUND_USER(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다"),
     PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
-    MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다"),
 
     // Stock
     STOCK_NOT_FOUND(HttpStatus.BAD_REQUEST,  "해당 종목이 존재하지 않습니다" ),
@@ -41,7 +40,11 @@ public enum ErrorCode {
     TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "토큰이 만료되었습니다."),
 
     // comment
-    COMMENT_UPDATE_DENIED(HttpStatus.FORBIDDEN, "댓글 수정은 댓글 작성자만 할 수 있습니다.");
+    COMMENT_UPDATE_DENIED(HttpStatus.FORBIDDEN, "댓글 수정은 댓글 작성자만 할 수 있습니다."),
+    COMMENT_DELETE_DENIED(HttpStatus.FORBIDDEN, "댓글 삭제는 댓글 작성자만 할 수 있습니다."),
+
+    // member
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다");
 
 
 

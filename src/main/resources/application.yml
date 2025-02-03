@@ -26,10 +26,16 @@ spring:
 logging:
   level:
     root: INFO
+    org.com.stocknote: DEBUG
     org.com.stocknote.domain.stock.service.price.StockPriceProcessor: DEBUG
-#    org.springframework.web.socket: ERROR
-#    org.springframework.messaging: DEBUG
-#    org.com.stocknote: DEBUG
+
+#      hibernate:
+#        SQL: DEBUG
+#        type:
+#          descriptor:
+#            sql:
+#              BasicBinder: TRACE
+
 #    org.springframework.web: DEBUG
 #    org.springdoc: DEBUG
 #    org.com.stocknote.domain.portfolio.portfolioStock.controller: DEBUG

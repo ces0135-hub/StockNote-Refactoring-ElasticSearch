@@ -2,20 +2,25 @@ package org.com.stocknote.domain.portfolio.portfolio.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.com.stocknote.domain.portfolio.portfolio.dto.PortfolioPatchRequest;
-import org.com.stocknote.domain.portfolio.portfolio.dto.PortfolioRequest;
-import org.com.stocknote.domain.portfolio.portfolio.dto.PortfolioResponse;
+import org.com.stocknote.domain.member.entity.Member;
+import org.com.stocknote.domain.member.service.MemberService;
+import org.com.stocknote.domain.portfolio.portfolio.dto.request.PortfolioPatchRequest;
+import org.com.stocknote.domain.portfolio.portfolio.dto.request.PortfolioRequest;
+import org.com.stocknote.domain.portfolio.portfolio.dto.response.PortfolioResponse;
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
 import org.com.stocknote.domain.portfolio.portfolio.service.PortfolioService;
-import org.com.stocknote.domain.portfolio.portfolioStock.dto.PfStockResponse;
-import org.com.stocknote.domain.portfolio.portfolioStock.dto.StockTempResponse;
+import org.com.stocknote.domain.portfolio.portfolioStock.dto.response.PfStockResponse;
+import org.com.stocknote.domain.portfolio.portfolioStock.dto.response.StockTempResponse;
 import org.com.stocknote.domain.portfolio.portfolioStock.entity.PfStock;
 import org.com.stocknote.domain.portfolio.portfolioStock.service.PfStockService;
 import org.com.stocknote.domain.stock.entity.Stock;
 import org.com.stocknote.global.dto.GlobalResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -24,6 +29,7 @@ import java.util.stream.Collectors;
 public class PortfolioController {
   private final PortfolioService portfolioService;
   private final PfStockService pfStockService;
+  private final MemberService memberService;
 
   @GetMapping
   public GlobalResponse<List<PortfolioResponse>> getPortfolioList() {
@@ -34,16 +40,16 @@ public class PortfolioController {
   }
 
   @GetMapping("/{portfolio_no}")
-  public GlobalResponse<List<PfStockResponse>> getPortfolioStock(
+  public GlobalResponse<PortfolioResponse> getPortfolioStock(
       @PathVariable("portfolio_no") Long portfolioNo) {
-    List<PfStock> pfStockList = pfStockService.getStockList(portfolioNo);
-    List<PfStockResponse> response =
-        pfStockList.stream().map(PfStockResponse::from).collect(Collectors.toList());
+    Portfolio portfolio = portfolioService.getPortfolio(portfolioNo);
+    PortfolioResponse response = PortfolioResponse.from(portfolio);
     return GlobalResponse.success(response);
   }
 
   @PostMapping
-  public GlobalResponse<String> addPortfolio(@RequestBody PortfolioRequest portfolioRequest) {
+  public GlobalResponse<String> addPortfolio(@RequestBody PortfolioRequest portfolioRequest)
+  {
     portfolioService.save(portfolioRequest);
     return GlobalResponse.success("PortfolioList post");
   }
@@ -61,9 +67,11 @@ public class PortfolioController {
     return GlobalResponse.success("Portfolio deleted successfully");
   }
 
-  @GetMapping("/tempStock")
-  public GlobalResponse<List<StockTempResponse>> getTempStockList() {
-    List<Stock> stockList = pfStockService.getTempStockList();
+  @PostMapping("/search-stocks")
+  public GlobalResponse<List<StockTempResponse>> searchStocks(
+      @RequestBody Map<String, String> body) {
+    String keyword = body.get("keyword");
+    List<Stock> stockList = pfStockService.searchStocks(keyword);
     List<StockTempResponse> response =
         stockList.stream().map(StockTempResponse::new).collect(Collectors.toList());
     return GlobalResponse.success(response);

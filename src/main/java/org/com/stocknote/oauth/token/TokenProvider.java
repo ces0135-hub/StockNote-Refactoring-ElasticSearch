@@ -38,7 +38,6 @@ public class TokenProvider {
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60L * 24 * 7;
     private static final String KEY_ROLE = "role";
     private final TokenService tokenService;
-    private final MemberRepository memberRepository;
 
     @PostConstruct
     private void setSecretKey() {
@@ -50,9 +49,13 @@ public class TokenProvider {
     }
 
     public Token createTokens(String email) {
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                email, null, Collections.emptyList() // 권한 정보 없이 빈 리스트로 설정
-        );
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList() // 권한
+                                                                                             // 정보
+                                                                                             // 없이 빈
+                                                                                             // 리스트로
+                                                                                             // 설정
+                );
 
         // Access Token 생성
         String accessToken = generateAccessToken(authentication);
@@ -78,37 +81,25 @@ public class TokenProvider {
         Date expiredDate = new Date(now.getTime() + expireTime);
 
         String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining());
+                .map(GrantedAuthority::getAuthority).collect(Collectors.joining());
 
-        return Jwts.builder()
-                .setSubject(authentication.getName())
-                .claim(KEY_ROLE, authorities)
-                .setIssuedAt(now)
-                .setExpiration(expiredDate)
-                .signWith(secretKey, SignatureAlgorithm.HS512)
-                .compact();
+        return Jwts.builder().setSubject(authentication.getName()).claim(KEY_ROLE, authorities)
+                .setIssuedAt(now).setExpiration(expiredDate)
+                .signWith(secretKey, SignatureAlgorithm.HS512).compact();
     }
 
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaims(token);
         List<SimpleGrantedAuthority> authorities = getAuthorities(claims);
 
-        Member member = memberRepository.findByEmail(claims.getSubject())
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-
-        PrincipalDetails principalDetails = new PrincipalDetails(
-                member,
-                Collections.emptyMap(), // OAuth2 인증이 아닌 경우 빈 맵
-                "email"  // 기본 attributeKey
-        );
-
-        return new UsernamePasswordAuthenticationToken(principalDetails, token, authorities);
+        // 2. security의 User 객체 생성
+        User principal = new User(claims.getSubject(), "", authorities);
+        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
     private List<SimpleGrantedAuthority> getAuthorities(Claims claims) {
-        return Collections.singletonList(new SimpleGrantedAuthority(
-                claims.get(KEY_ROLE).toString()));
+        return Collections
+                .singletonList(new SimpleGrantedAuthority(claims.get(KEY_ROLE).toString()));
     }
 
     // 3. accessToken 재발급
@@ -137,8 +128,8 @@ public class TokenProvider {
 
     private Claims parseClaims(String token) {
         try {
-            return Jwts.parser().verifyWith(secretKey).build()
-                    .parseSignedClaims(token).getPayload();
+            return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token)
+                    .getPayload();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         } catch (MalformedJwtException e) {
