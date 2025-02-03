@@ -5,11 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.com.stocknote.domain.comment.entity.Comment;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.global.base.BaseEntity;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -31,6 +34,9 @@ public class Post extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private PostCategory category;
+
+    @OneToMany(mappedBy = "post")
+    private List<Comment> comments = new ArrayList<>();
 
     private LocalDateTime deletedAt;
 

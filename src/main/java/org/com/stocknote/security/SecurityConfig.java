@@ -1,13 +1,14 @@
 package org.com.stocknote.security;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.oauth.service.CustomOAuth2UserService;
 import org.com.stocknote.oauth.token.TokenAuthenticationFilter;
 import org.com.stocknote.oauth.token.TokenExceptionFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,15 +16,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Configuration
@@ -49,37 +48,6 @@ public class SecurityConfig {
                 );
     }
 
-//    @Bean
-//    public ClientRegistrationRepository clientRegistrationRepository() {
-//        ClientRegistration kakaoRegistration = ClientRegistration.withRegistrationId("kakao")
-//                .clientId("246f48e802f02443cf4efc58b10c1279")
-//                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
-//                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-//                .redirectUri("{baseUrl}/auth/{registrationId}/redirect")
-//                .scope("profile_nickname", "profile_image", "account_email")
-//                .authorizationUri("https://kauth.kakao.com/oauth/authorize")
-//                .tokenUri("https://kauth.kakao.com/oauth/token")
-//                .userInfoUri("https://kapi.kakao.com/v2/user/me")
-//                .userNameAttributeName("id")
-//                .clientName("Kakao")
-//                .build();
-//        ClientRegistration googleRegistration = ClientRegistration.withRegistrationId("google")
-//                .clientId("your-google-client-id")
-//                .clientSecret("your-google-client-secret")
-//                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-//                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-//                .redirectUri("{baseUrl}/auth/{registrationId}/redirect")
-//                .scope("email", "profile")
-//                .authorizationUri("https://accounts.google.com/o/oauth2/v2/auth")
-//                .tokenUri("https://www.googleapis.com/oauth2/v4/token")
-//                .userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
-//                .userNameAttributeName("sub")
-//                .clientName("Google")
-//                .build();
-//
-//        return new InMemoryClientRegistrationRepository(kakaoRegistration);
-//    }
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -92,7 +60,8 @@ public class SecurityConfig {
                 .headers(c -> c.frameOptions(
                         FrameOptionsConfig::disable).disable()) // X-Frame-Options 비활성화
                 .sessionManagement(c ->
-                        c.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용하지 않음
+                        c.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))// 세션 사용하지 않음
+
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
 
                 // request 인증, 인가 설정
@@ -108,7 +77,7 @@ public class SecurityConfig {
                                 "/swagger-ui/oauth2-redirect.html",// Swagger UI 경로 허용
                                 "/v3/api-docs/**",
                                 "/auth/kakao/callback",
-                                "/auth/google/redirect",
+                                "/auth/**",
                                 "/auth/google/manual",
                                 "/auth/kakao/manual",
                                 "/auth/google/token",
@@ -121,12 +90,29 @@ public class SecurityConfig {
                 )
 
                 // oauth2 설정
-                .oauth2Login(oauth -> // OAuth2 로그인 기능에 대한 여러 설정의 진입점
-                oauth.userInfoEndpoint(c -> c.userService(oAuth2UserService)) //userInfoEndpoint: OAuth2 로그인 성공 후 사용자 정보를 가져오는 설정. oAuth2UserService를 통해 사용자 정보를 처리합니다.
-                        .successHandler(oAuth2SuccessHandler) //로그인 설정 후 핸들러, oAuth2SuccessHandler에서 후속 작업을 처리
-                        .redirectionEndpoint(e -> e
-                                .baseUri("/auth/{registrationId}/redirect")
-                        )
+                .oauth2Login(oauth ->
+                        oauth.authorizationEndpoint(endpoint -> endpoint
+                                        .authorizationRequestRepository(
+                                                new HttpSessionOAuth2AuthorizationRequestRepository()
+                                        )
+                                        .baseUri("/oauth2/authorization")
+                                )
+                                .userInfoEndpoint(c -> c.userService(oAuth2UserService))
+                                .successHandler(oAuth2SuccessHandler)
+                                .redirectionEndpoint(e -> e
+                                        .baseUri("/auth/{registrationId}/redirect")
+                                )
+                                .failureHandler((request, response, exception) -> {
+                                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                    response.setContentType("application/json;charset=UTF-8");
+
+                                    Map<String, String> errorDetails = new HashMap<>();
+                                    errorDetails.put("error", "Authentication failed");
+                                    errorDetails.put("message", exception.getMessage());
+
+                                    String errorJson = new ObjectMapper().writeValueAsString(errorDetails);
+                                    response.getWriter().write(errorJson);
+                                })
                 )
 
                 // jwt 관련 설정

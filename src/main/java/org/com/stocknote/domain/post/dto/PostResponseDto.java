@@ -1,6 +1,7 @@
 package org.com.stocknote.domain.post.dto;
 
-import org.com.stocknote.domain.member.entity.Member;
+import org.com.stocknote.domain.comment.dto.CommentDetailResponse;
+import org.com.stocknote.domain.comment.entity.Comment;
 import org.com.stocknote.domain.post.entity.Post;
 
 import java.time.LocalDateTime;
@@ -10,13 +11,18 @@ public record PostResponseDto(
         Long id,
         String title,
         String body,
+        Long authorId,
         String username,
         String profile,
+        List<CommentDetailResponse> comments,
         LocalDateTime createdAt,
         List<String>hashtags
 ) {
     public static PostResponseDto fromPost(Post post, List<String> hashtags) {
-        return new PostResponseDto(post.getId(), post.getTitle(), post.getBody(), post.getMember().getName(), post.getMember().getProfile(), post.getCreatedAt(), hashtags);
+        List<CommentDetailResponse> commentResponses = post.getComments().stream()
+                .map(CommentDetailResponse::of)
+                .toList();
+        return new PostResponseDto(post.getId(), post.getTitle(), post.getBody(),post.getMember().getId(), post.getMember().getName(), post.getMember().getProfile(),commentResponses,post.getCreatedAt(), hashtags);
     }
 }
 

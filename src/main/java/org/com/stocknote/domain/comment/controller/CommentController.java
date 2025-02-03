@@ -28,10 +28,10 @@ public class CommentController {
     private final CommentService commentService;
 
 
-    @GetMapping
-    public GlobalResponse<Page<CommentDetailResponse>> getComments(@PathVariable(value = "postId") Long postId, Pageable pageable) {
-        return GlobalResponse.success(commentService.getComments(postId, pageable));
-    }
+//    @GetMapping
+//    public GlobalResponse<Page<CommentDetailResponse>> getComments(@PathVariable(value = "postId") Long postId, Pageable pageable) {
+//        return GlobalResponse.success(commentService.getComments(postId, pageable));
+//    }
 
     @GetMapping("/{commentId}")
     public GlobalResponse<CommentDetailResponse> getComment(@PathVariable(value = "commentId") Long commentId) {
@@ -45,25 +45,30 @@ public class CommentController {
     ) {
 
         Member member = principalDetails.user();
-        return GlobalResponse.success(commentService.createComment(postId, commentRequest, member.getEmail()));
+        return GlobalResponse.success(commentService.createComment(postId, commentRequest, member));
     }
 
     @PatchMapping("/{commentId}")
-    public GlobalResponse<Void> updateComment(@PathVariable(value = "postId") Long postId, @PathVariable(value = "commentId") Long commentId, @RequestBody CommentRequest commentRequest, Authentication authentication) {
-        String userEmail = authentication.getPrincipal().toString();
+    public GlobalResponse<Void> updateComment(@PathVariable(value = "postId") Long postId,
+                                              @PathVariable(value = "commentId") Long commentId,
+                                              @RequestBody CommentRequest commentRequest,
+                                              @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        Member member = principalDetails.user();
 
-        CommentUpdateDto commentUpdateDto = new CommentUpdateDto(postId, commentId, commentRequest.getBody(), userEmail);
+        CommentUpdateDto commentUpdateDto = new CommentUpdateDto(commentId, postId, commentRequest.getBody());
 
-        commentService.updateComment(commentUpdateDto);
+        commentService.updateComment(commentUpdateDto, member);
 
         return GlobalResponse.success();
     }
 
     @DeleteMapping("/{commentId}")
-    public GlobalResponse<Void> deleteComment(@PathVariable(value = "commentId") Long commentId, Authentication authentication) {
-        String userEmail = authentication.getPrincipal().toString();
-        commentService.deleteComment(commentId, userEmail);
-
+    public GlobalResponse<Void> deleteComment(@PathVariable(value = "commentId") Long commentId,
+                                              @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        Member member = principalDetails.user();
+        commentService.deleteComment(commentId, member);
         return GlobalResponse.success();
     }
 

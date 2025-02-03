@@ -16,13 +16,13 @@ import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/post")
@@ -48,7 +48,7 @@ public class PostController {
     @GetMapping
     public GlobalResponse<Page<PostResponseDto>> getPosts(
             @RequestParam(required = false, name= "category") PostCategory category,
-            Pageable pageable
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         if (category != null) {
             return GlobalResponse.success(postService.getPostsByCategory(category, pageable));
@@ -81,7 +81,7 @@ public class PostController {
     @Tag(name = "내가 쓴 글 조회 API", description = "사용자가 작성한 게시글 목록을 조회합니다.")
     public GlobalResponse<Page<MyPostResponseDto>> getMyPosts(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            Pageable pageable
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         Member member = principalDetails.user();
         return GlobalResponse.success(

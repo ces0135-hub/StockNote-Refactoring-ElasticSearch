@@ -41,8 +41,10 @@ public class PostService {
     public Page<PostResponseDto> getPosts(Pageable pageable) {
         Page<Post> posts = postRepository.findAll(pageable);
         return posts.map(post -> {
-            List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId()).stream()
-                    .map(Hashtag::getName).toList();
+            List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId())
+                    .stream()
+                    .map(Hashtag::getName)
+                    .toList();
             return PostResponseDto.fromPost(post, hashtags);
         });
     }
