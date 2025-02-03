@@ -12,9 +12,9 @@ import org.com.stocknote.domain.portfolio.portfolioStock.dto.request.PfStockPatc
 import org.com.stocknote.domain.portfolio.portfolioStock.dto.request.PfStockRequest;
 import org.com.stocknote.domain.portfolio.portfolioStock.entity.PfStock;
 import org.com.stocknote.domain.portfolio.portfolioStock.repository.PfStockRepository;
-import org.com.stocknote.domain.stock.dto.response.StockPriceResponse;
 import org.com.stocknote.domain.stock.entity.Stock;
 import org.com.stocknote.domain.stock.repository.StockRepository;
+import org.com.stocknote.domain.stockApi.dto.response.StockPriceResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

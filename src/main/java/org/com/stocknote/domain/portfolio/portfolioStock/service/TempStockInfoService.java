@@ -3,7 +3,7 @@ package org.com.stocknote.domain.portfolio.portfolioStock.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.com.stocknote.domain.portfolio.portfolioStock.dto.response.SectorTempResponse;
-import org.com.stocknote.domain.stock.token.service.StockTokenService;
+import org.com.stocknote.domain.stockApi.stockToken.service.StockTokenService;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;

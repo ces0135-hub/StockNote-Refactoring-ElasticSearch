@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+
 public record PrincipalDetails(
         Member user,
         Map<String, Object> attributes,

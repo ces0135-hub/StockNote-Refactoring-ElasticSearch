@@ -6,7 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToMany;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.com.stocknote.domain.stock.entity.Stock;
+import org.com.stocknote.domain.memberStock.entity.MemberStock;
 import org.com.stocknote.global.base.BaseEntity;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class Member extends BaseEntity {
     private String providerId;
 
     @OneToMany(mappedBy = "member")
-    private List<Stock> stockList = new ArrayList<>();
+    private List<MemberStock> memberStocks = new ArrayList<>();
 
     public void updateName(String newName) {
         this.name = newName;
