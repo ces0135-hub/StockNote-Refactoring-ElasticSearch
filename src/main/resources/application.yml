@@ -26,7 +26,7 @@ spring:
 logging:
   level:
     root: INFO
-    org.com.stocknote.domain.stock.service.price.StockPriceProcessor: ERROR
+    org.com.stocknote.domain.stock.service.price.StockPriceProcessor: DEBUG
 #    org.springframework.web.socket: ERROR
 #    org.springframework.messaging: DEBUG
 #    org.com.stocknote: DEBUG

@@ -31,7 +31,7 @@ public class StockController {
     private final WebSocketService webSocketService;
 
     @GetMapping
-    @Operation(summary = "종목 조회")
+    @Operation(summary = "종목 이름 조회")
     public GlobalResponse findStock(@RequestParam String name) {
         StockInfoResponse stockInfoResponse = stockService.findStock(name);
         return GlobalResponse.success(stockInfoResponse);
@@ -61,6 +61,7 @@ public class StockController {
     }
 
     @PostMapping("/{stockCode}/vote")
+    @Operation(summary = "종목 투표")
     public GlobalResponse<Void> vote(
             @PathVariable String stockCode,
             @RequestBody StockVoteRequest request,
@@ -71,6 +72,7 @@ public class StockController {
     }
 
     @GetMapping("/{stockCode}/vote-statistics")
+    @Operation(summary = "종목 투표 통계 조회")
     public ResponseEntity<VoteStatistics> getVoteStatistics(
             @PathVariable String stockCode) {
         return ResponseEntity.ok(stockVoteService.getVoteStatistics(stockCode));

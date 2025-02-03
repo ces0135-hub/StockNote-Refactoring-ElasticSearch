@@ -267,6 +267,7 @@ public class StockApiService {
         String endpoint = "/uapi/domestic-stock/v1/quotations/inquire-time-itemconclusion";
 
         try {
+            String stockName = stockRepository.findByCode(stockCode).get().getName();
             LocalDate today = LocalDate.now();
             LocalDate lastTradingDay = getLastTradingDay(today);
             LocalDate finalLastTradingDay = lastTradingDay;
@@ -302,12 +303,13 @@ public class StockApiService {
             log.debug("API Response: {}", response);
 
             StockTimeResponse timeResponse = objectMapper.readValue(response, StockTimeResponse.class);
-
             if (timeResponse == null || timeResponse.getOutput2() == null || timeResponse.getOutput2().isEmpty()) {
                 lastTradingDay = lastTradingDay.minusDays(1);
                 log.warn("No time data returned for stockCode: {}", stockCode);
             }
-
+            if (timeResponse != null) {
+                timeResponse.setStockName(stockName);
+            }
             return timeResponse;
 
         } catch (JsonProcessingException e) {

@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StockTimeResponse {
+    private String stockName;
     private String rt_cd;
     private String msg_cd;
     private String msg1;
