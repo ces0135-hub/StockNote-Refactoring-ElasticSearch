@@ -26,7 +26,6 @@ import java.util.List;
 @Slf4j
 public class PortfolioService {
   private final PortfolioRepository portfolioRepository;
-  private final NoteRepository noteRepository;
   private final SecurityUtils securityUtils;
   private final TempStockService stockService;
 
@@ -71,7 +70,6 @@ public class PortfolioService {
         .member(member)
         .build();
 
-    noteRepository.save(notePortfolio(portfolio, "포트폴리오 생성", "포트폴리오 생성"));
     portfolioRepository.save(portfolio);
   }
 
@@ -87,14 +85,12 @@ public class PortfolioService {
     portfolio.setName(portfolioPatchRequest.getName().orElse(portfolio.getName()));
     portfolio.setDescription(portfolioPatchRequest.getDescription().orElse(portfolio.getDescription()));
 
-    noteRepository.save(notePortfolio(portfolio, "포트폴리오 수정", "포트폴리오 수정"));
   }
 
   @Transactional
   public void delete(Long portfolioNo) {
     Portfolio portfolio = portfolioRepository.findById(portfolioNo)
         .orElseThrow(() -> new RuntimeException("Portfolio not found"));
-    noteRepository.save(notePortfolio(portfolio, "포트폴리오 삭제", "포트폴리오 삭제"));
     portfolioRepository.deleteById(portfolioNo);
   }
 
@@ -106,7 +102,6 @@ public class PortfolioService {
     portfolio.setTotalAsset(portfolio.getTotalAsset() + amount);
 
     portfolioRepository.save(portfolio);
-    noteRepository.save(notePortfolio(portfolio, "현금추가", "현금추가"));
   }
 
   @Transactional
@@ -117,7 +112,6 @@ public class PortfolioService {
     portfolio.setTotalAsset(amount+portfolio.getTotalProfit()+portfolio.getTotalStock());
 
     portfolioRepository.save(portfolio);
-    noteRepository.save(notePortfolio(portfolio, "현금수정", "현금수정"));
   }
 
   @Transactional
@@ -128,15 +122,5 @@ public class PortfolioService {
     portfolio.setTotalAsset(portfolio.getTotalProfit()+portfolio.getTotalStock());
 
     portfolioRepository.save(portfolio);
-    noteRepository.save(notePortfolio(portfolio, "현금삭제", "현금삭제"));
-  }
-
-  public Note notePortfolio(Portfolio portfolio, String title, String content){
-    return Note.builder()
-        .title(title)
-        .content(content)
-        .portfolio(portfolio)
-        .member(portfolio.getMember())
-        .build();
   }
 }
