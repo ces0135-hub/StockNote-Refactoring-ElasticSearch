@@ -2,7 +2,6 @@ package org.com.stocknote.domain.portfolio.note.service;
 
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.member.entity.Member;
-import org.com.stocknote.domain.portfolio.note.dto.NoteRequest;
 import org.com.stocknote.domain.portfolio.note.entity.Note;
 import org.com.stocknote.domain.portfolio.note.repository.NoteRepository;
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
@@ -33,7 +32,7 @@ public class NoteService {
       .type(BUY)
       .stock(stock)
       .amount(pfStockPatchRequest.getPfstockCount())
-      .price(pfStockPatchRequest.getPfstockCount())
+      .price(pfStockPatchRequest.getPfstockPrice())
       .portfolio(portfolio)
       .member(member)
       .build();
@@ -49,7 +48,7 @@ public class NoteService {
       .type(SELL)
       .stock(stock)
       .amount(pfStockPatchRequest.getPfstockCount())
-      .price(pfStockPatchRequest.getPfstockCount())
+      .price(pfStockPatchRequest.getPfstockPrice())
       .portfolio(portfolio)
       .member(member)
       .build();
@@ -64,7 +63,7 @@ public class NoteService {
       .type(UPDATE)
       .stock(stock)
       .amount(pfStockPatchRequest.getPfstockCount())
-      .price(pfStockPatchRequest.getPfstockCount())
+      .price(pfStockPatchRequest.getPfstockPrice())
       .portfolio(portfolio)
       .member(member)
       .build();
@@ -79,7 +78,7 @@ public class NoteService {
       .type(DELETE)
       .stock(stock)
       .amount(pfStock.getPfstockCount())
-      .price(pfStock.getPfstockCount())
+      .price(pfStock.getPfstockPrice())
       .portfolio(portfolio)
       .member(member)
       .build();
@@ -88,6 +87,6 @@ public class NoteService {
   }
 
   public List<Note> getNoteByPortfolioNo(Long portfolioNo) {
-    return noteRepository.findByPortfolioNo(portfolioNo);
+    return noteRepository.findByPortfolioId(portfolioNo);
   }
 }

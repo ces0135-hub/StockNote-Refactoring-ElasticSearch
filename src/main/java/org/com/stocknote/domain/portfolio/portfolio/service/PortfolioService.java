@@ -3,7 +3,6 @@ package org.com.stocknote.domain.portfolio.portfolio.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.com.stocknote.domain.member.entity.Member;
-import org.com.stocknote.domain.portfolio.note.dto.NoteRequest;
 import org.com.stocknote.domain.portfolio.note.entity.Note;
 import org.com.stocknote.domain.portfolio.note.repository.NoteRepository;
 import org.com.stocknote.domain.portfolio.portfolio.dto.request.PortfolioPatchRequest;

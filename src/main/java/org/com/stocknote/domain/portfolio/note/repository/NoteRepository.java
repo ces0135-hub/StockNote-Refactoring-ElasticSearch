@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface NoteRepository extends JpaRepository<Note, Long> {
-  List<Note> findByPortfolioNo(Long portfolioNo);
+  List<Note> findByPortfolioId(Long portfolioId);
 }
