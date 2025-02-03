@@ -80,6 +80,7 @@ public class PostService {
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         existingPost.bodyUpdate(postModifyDto.getBody());
         existingPost.titleUpdate(postModifyDto.getTitle());
+        existingPost.categoryUpdate(PostCategory.valueOf(postModifyDto.getCategory()));
         postRepository.save(existingPost);
 
         hashtagService.updateHashtags(id, postModifyDto.getHashtags());

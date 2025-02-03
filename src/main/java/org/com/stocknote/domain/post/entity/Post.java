@@ -51,4 +51,8 @@ public class Post extends BaseEntity {
     public void bodyUpdate(String body) {
         this.body = body;
     }
+
+    public void categoryUpdate(PostCategory category) {
+        this.category = category;
+    }
 }

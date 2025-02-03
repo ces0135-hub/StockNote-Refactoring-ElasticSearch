@@ -66,6 +66,7 @@ public class PostController {
             @PathVariable("id") Long id,
             @Valid @RequestBody PostModifyDto postModifyDto
     ) {
+        System.out.println(postModifyDto);
         postService.updatePost(id, postModifyDto);
         return GlobalResponse.success("Post updated successfully");
     }

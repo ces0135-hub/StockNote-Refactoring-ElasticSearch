@@ -20,14 +20,15 @@ public class PostCreateDto {
 
     private List<String> hashtags;
 
-    private PostCategory category;
+    private String category;
 
     public Post toEntity(Member member) {
+        PostCategory postCategory = PostCategory.valueOf(category);
         return Post.builder()
                 .member(member)
                 .title(this.title)
                 .body(this.body)
-                .category(this.category)
+                .category(postCategory)
                 .build();
     }
 }
