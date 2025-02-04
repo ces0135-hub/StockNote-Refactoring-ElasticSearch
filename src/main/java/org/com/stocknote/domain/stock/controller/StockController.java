@@ -46,6 +46,15 @@ public class StockController {
         return GlobalResponse.success();
     }
 
+    @DeleteMapping
+    @Operation(summary = "종목 삭제")
+    public GlobalResponse deleteStock(@RequestParam("stockCode") String stockCode,
+                                      @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        String email = principalDetails.getUsername();
+        stockService.deleteStock(stockCode, email);
+        return GlobalResponse.success();
+    }
+
     @GetMapping("/list")
     @Operation(summary = "나의 관심 종목 조회")
     public GlobalResponse getStockList(@AuthenticationPrincipal PrincipalDetails principalDetails) {
@@ -62,7 +71,7 @@ public class StockController {
 
     @PostMapping("/{stockCode}/vote")
     @Operation(summary = "종목 투표")
-    public GlobalResponse<Void> vote(
+    public GlobalResponse vote(
             @PathVariable String stockCode,
             @RequestBody StockVoteRequest request,
             @AuthenticationPrincipal PrincipalDetails principalDetails) {
@@ -73,8 +82,8 @@ public class StockController {
 
     @GetMapping("/{stockCode}/vote-statistics")
     @Operation(summary = "종목 투표 통계 조회")
-    public ResponseEntity<VoteStatistics> getVoteStatistics(
+    public GlobalResponse<VoteStatistics> getVoteStatistics(
             @PathVariable String stockCode) {
-        return ResponseEntity.ok(stockVoteService.getVoteStatistics(stockCode));
+        return GlobalResponse.success(stockVoteService.getVoteStatistics(stockCode));
     }
 }
