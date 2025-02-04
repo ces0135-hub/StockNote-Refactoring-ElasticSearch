@@ -3,16 +3,14 @@ package org.com.stocknote.domain.portfolio.portfolio.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.com.stocknote.domain.member.entity.Member;
-import org.com.stocknote.domain.portfolio.note.entity.Note;
-import org.com.stocknote.domain.portfolio.note.repository.NoteRepository;
 import org.com.stocknote.domain.portfolio.portfolio.dto.request.PortfolioPatchRequest;
 import org.com.stocknote.domain.portfolio.portfolio.dto.request.PortfolioRequest;
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
 import org.com.stocknote.domain.portfolio.portfolio.repository.PortfolioRepository;
 import org.com.stocknote.domain.portfolio.portfolioStock.entity.PfStock;
-import org.com.stocknote.domain.portfolio.portfolioStock.service.TempStockService;
 import org.com.stocknote.domain.stock.entity.Stock;
 import org.com.stocknote.domain.stockApi.dto.response.StockPriceResponse;
+import org.com.stocknote.domain.stockApi.service.StockApiService;
 import org.com.stocknote.security.SecurityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +23,7 @@ import java.util.List;
 public class PortfolioService {
   private final PortfolioRepository portfolioRepository;
   private final SecurityUtils securityUtils;
-  private final TempStockService stockService;
+  private final StockApiService stockApiService;
 
 
   public List<Portfolio> getPortfolioList() {
@@ -44,7 +42,7 @@ public class PortfolioService {
     List<PfStock> pfStockList = portfolio.getPfStockList();
     pfStockList.forEach(pfStock -> {
       Stock stock = pfStock.getStock();
-      StockPriceResponse currentPrice = stockService.getStockPrice(stock.getCode());
+      StockPriceResponse currentPrice = stockApiService.getStockPrice(stock.getCode()).block();
       int currentPriceInt = Integer.parseInt(currentPrice.getOutput().getStck_prpr());
       pfStock.setCurrentPrice(currentPriceInt);
 

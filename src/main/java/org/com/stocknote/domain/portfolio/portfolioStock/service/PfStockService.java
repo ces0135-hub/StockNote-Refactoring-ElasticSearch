@@ -15,6 +15,7 @@ import org.com.stocknote.domain.portfolio.portfolioStock.repository.PfStockRepos
 import org.com.stocknote.domain.stock.entity.Stock;
 import org.com.stocknote.domain.stock.repository.StockRepository;
 import org.com.stocknote.domain.stockApi.dto.response.StockPriceResponse;
+import org.com.stocknote.domain.stockApi.service.StockApiService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,22 +30,18 @@ public class PfStockService {
   private final NoteRepository noteRepository;
   private final PortfolioService portfolioService;
   private final NoteService noteService;
-
-
-  private final TempStockService stockService;
-  // 임시
+  private final StockApiService stockApiService;
   private final StockRepository stockRepository;
   private final PortfolioRepository portfolioRepository;
-  private final TempStockInfoService tempStockInfoService;
 
   @Transactional
   public PfStock savePfStock(Long portfolioNo, PfStockRequest pfStockRequest) {
     Portfolio portfolio = portfolioService.getPortfolio(portfolioNo);
-    StockPriceResponse currentPrice = stockService.getStockPrice(pfStockRequest.getStockCode());
+    StockPriceResponse currentPrice = stockApiService.getStockPrice(pfStockRequest.getStockCode()).block();
     int currentPriceInt = Integer.parseInt(currentPrice.getOutput().getStck_prpr());
 
     Stock stock = stockRepository.findByCode(pfStockRequest.getStockCode()).orElse(null);
-    String idxBztpSclsCdName = tempStockInfoService.getStockInfo(pfStockRequest.getStockCode())
+    String idxBztpSclsCdName = stockApiService.getStockInfo(pfStockRequest.getStockCode())
         .getOutput().getIdx_bztp_scls_cd_name();
 
     PfStock pfStock = PfStock.builder().portfolio(portfolio).stock(stock)
