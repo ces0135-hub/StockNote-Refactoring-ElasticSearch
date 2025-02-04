@@ -162,16 +162,16 @@ public class PfStockService {
 //    pfStockRepository.delete(pfStock);
 //  }
 
-  // stock service로 이동 예정
-  public List<Stock> searchStocks(String keyword) {
-    if (keyword == null || keyword.trim().isEmpty()) {
-      return Collections.emptyList();
-    }
-
-    String searchKeyword = keyword.toLowerCase();
-    return stockRepository.findByNameContainingIgnoreCaseOrCodeContainingIgnoreCase(searchKeyword,
-        searchKeyword);
-  }
+//  // stock service로 이동 예정
+//  public List<Stock> searchStocks(String keyword) {
+//    if (keyword == null || keyword.trim().isEmpty()) {
+//      return Collections.emptyList();
+//    }
+//
+//    String searchKeyword = keyword.toLowerCase();
+//    return stockRepository.findByNameContainingIgnoreCaseOrCodeContainingIgnoreCase(searchKeyword,
+//        searchKeyword);
+//  }
 
   // 임시 데이터
   public Stock saveTempStock(Stock stock) {

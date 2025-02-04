@@ -1,4 +1,4 @@
-package org.com.stocknote.domain.portfolio.portfolioStock.dto.response;
+package org.com.stocknote.domain.stockApi.dto.response;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SectorTempResponse {
+public class SectorResponse {
   private StockOutput output;
   private String rt_cd;
   private String msg_cd;

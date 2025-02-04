@@ -64,20 +64,20 @@ public class StockApiController {
 
     @GetMapping("/price")
     @Operation(summary = "현재 가격 조회")
-    public Mono<StockPriceResponse> getStockPrice(@RequestParam String stockCode) {
+    public Mono<StockPriceResponse> getStockPrice(@RequestParam("stockCode") String stockCode) {
         return stockApiService.getStockPrice(stockCode);
     }
 
     @GetMapping("/time-prices")
     @Operation(summary = "당일 시간대별 체결 정보 조회")
-    public StockTimeResponse getTimeStockPrices(@RequestParam String stockCode) {
+    public StockTimeResponse getTimeStockPrices(@RequestParam("stockCode") String stockCode) {
         return stockApiService.getTimeStockPrices(stockCode);
     }
 
     @GetMapping("/chart")
     @Operation(summary = "종목별 차트 데이터 조회")
     public ChartResponse getChartData(
-            @RequestParam String stockCode,
+            @RequestParam("stockCode") String stockCode,
             @RequestParam PeriodType periodType,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {

@@ -2,7 +2,7 @@ package org.com.stocknote.domain.portfolio.portfolioStock.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.com.stocknote.domain.portfolio.portfolioStock.dto.response.SectorTempResponse;
+import org.com.stocknote.domain.stockApi.dto.response.SectorResponse;
 import org.com.stocknote.domain.stockApi.stockToken.service.StockTokenService;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ public class TempStockInfoService {
   private final StockTokenService stockTokenService;
   private final RestTemplate restTemplate;
 
-  public SectorTempResponse getStockInfo(String pdno) {
+  public SectorResponse getStockInfo(String pdno) {
     log.info("Getting stock info for PDNO: {}", pdno);
     String baseUrl = "https://openapi.koreainvestment.com:9443";
     String endpoint = "/uapi/domestic-stock/v1/quotations/search-stock-info";
@@ -41,11 +41,11 @@ public class TempStockInfoService {
 
     try {
       log.info("Requesting stock info for PDNO: {}", pdno);
-      ResponseEntity<SectorTempResponse> response = restTemplate.exchange(
+      ResponseEntity<SectorResponse> response = restTemplate.exchange(
           url,
           HttpMethod.GET,
           entity,
-          SectorTempResponse.class
+          SectorResponse.class
       );
 
       if (response.getStatusCode() == HttpStatus.OK) {

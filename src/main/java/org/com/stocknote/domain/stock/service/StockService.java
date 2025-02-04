@@ -19,6 +19,7 @@ import org.com.stocknote.websocket.service.WebSocketService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -40,6 +41,17 @@ public class StockService {
         return stockRepository.findByName(name)
                 .map(StockInfoResponse::of)
                 .orElseThrow(() -> new NoSuchElementException(ErrorCode.STOCK_NOT_FOUND.getMessage()));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Stock> searchStocks(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        String searchKeyword = keyword.toLowerCase();
+        return stockRepository.findByNameContainingIgnoreCaseOrCodeContainingIgnoreCase(searchKeyword,
+            searchKeyword);
     }
 
     @Transactional

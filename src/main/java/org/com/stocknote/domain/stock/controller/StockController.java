@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.stock.dto.request.StockAddRequest;
 import org.com.stocknote.domain.stock.dto.request.StockVoteRequest;
+import org.com.stocknote.domain.stock.entity.Stock;
 import org.com.stocknote.domain.stock.entity.VoteStatistics;
 import org.com.stocknote.domain.stock.service.StockService;
 import org.com.stocknote.domain.stock.service.StockVoteService;
@@ -18,6 +19,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -32,9 +35,20 @@ public class StockController {
 
     @GetMapping
     @Operation(summary = "종목 이름 조회")
-    public GlobalResponse findStock(@RequestParam String name) {
+    public GlobalResponse findStock(@RequestParam("name") String name) {
         StockInfoResponse stockInfoResponse = stockService.findStock(name);
         return GlobalResponse.success(stockInfoResponse);
+    }
+
+    @PostMapping("/search-stocks")
+    @Operation(summary = "종목 검색")
+    public GlobalResponse<List<StockInfoResponse>> searchStocks(
+        @RequestBody Map<String, String> body) {
+        String keyword = body.get("keyword");
+        List<Stock> stockList = stockService.searchStocks(keyword);
+        List<StockInfoResponse> response =
+            stockList.stream().map(StockInfoResponse::of).collect(Collectors.toList());
+        return GlobalResponse.success(response);
     }
 
     @PostMapping
