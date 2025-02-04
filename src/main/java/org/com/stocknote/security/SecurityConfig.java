@@ -1,3 +1,4 @@
+
 package org.com.stocknote.security;
 
 
@@ -16,7 +17,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -68,23 +68,26 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(
                                 "/",
-                                "/auth/",
+                                "/auth/**",
+                                "/auth/login",
                                 "/api/v1/stockApis/filtered/*",
                                 "/api/v1/stockApis/kospi",
                                 "/api/v1/stockApis/kosdaq",
                                 "/api/v1/stockApis/kospi200",
                                 "/api/v1/stockApis/volume",
-                                "/auth/google/redirect",
-                                "/swagger-ui/**",
-                                "/api/volume",
-                                "/swagger-ui/oauth2-redirect.html",// Swagger UI 경로 허용
-                                "/v3/api-docs/**",
-                                "/auth/kakao/callback",
-                                "/auth/**",
+                                "/api/v1/stocks/*/vote/",
+                                "/api/v1/stocks/*/vote-statistics",
+                                "/api/v1/stocks/chart",
+                                "/api/v1/stockApis/price", // 주식 가격 API
+                                "/api/v1/stocks/{stockCode}", // 개별 주식 상세 정보
+                                "/api/v1/stockApis/time-prices", // 시간별 가격 API
+                                "/api/v1/stockApis/chart", // 차트 API
                                 "/auth/google/redirect",
                                 "/auth/kakao/redirect",
-                                "/auth/login",
                                 "/auth/kakao/callback",
+                                "/swagger-ui/**",
+                                "/swagger-ui/oauth2-redirect.html",// Swagger UI 경로 허용
+                                "/v3/api-docs/**",
                                 "/ws/**",
                                 "/topic/**",
                                 "/auth/google/manual",
