@@ -106,3 +106,10 @@ tasks {
         }
     }
 }
+tasks.withType<JavaCompile> {
+    options.compilerArgs.add("-parameters")
+    options.encoding = "UTF-8"
+}
+tasks.withType<Test> {
+    systemProperty("file.encoding", "UTF-8")
+}
