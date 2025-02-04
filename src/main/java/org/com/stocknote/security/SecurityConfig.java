@@ -59,8 +59,8 @@ public class SecurityConfig {
                 .logout(AbstractHttpConfigurer::disable) // 기본 logout 비활성화
                 .headers(c -> c.frameOptions(
                         FrameOptionsConfig::disable).disable()) // X-Frame-Options 비활성화
-                .sessionManagement(c ->
-                        c.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))// 세션 사용하지 않음
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
 
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
 
@@ -74,9 +74,9 @@ public class SecurityConfig {
                                 "/api/v1/stockApis/kosdaq",
                                 "/api/v1/stockApis/kospi200",
                                 "/api/v1/stockApis/volume",
-                                "/api/v1/stockApis/*",
                                 "/auth/google/redirect",
                                 "/swagger-ui/**",
+                                "/api/volume",
                                 "/swagger-ui/oauth2-redirect.html",// Swagger UI 경로 허용
                                 "/v3/api-docs/**",
                                 "/auth/kakao/callback",
