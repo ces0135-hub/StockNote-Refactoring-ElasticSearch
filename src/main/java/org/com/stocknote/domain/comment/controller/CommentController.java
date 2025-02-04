@@ -6,15 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.comment.dto.CommentDetailResponse;
 import org.com.stocknote.domain.comment.dto.CommentRequest;
 import org.com.stocknote.domain.comment.dto.CommentUpdateDto;
-import org.com.stocknote.domain.comment.dto.MyCommentResponse;
 import org.com.stocknote.domain.comment.service.CommentService;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.global.dto.GlobalResponse;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -77,16 +72,4 @@ public class CommentController {
         return GlobalResponse.success();
     }
 
-    @GetMapping("/my")
-    @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "내가 작성한 댓글 목록 조회")
-    public GlobalResponse<Page<MyCommentResponse>> getMyComments(
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
-            Pageable pageable
-    ) {
-        Member member = principalDetails.user();
-        return GlobalResponse.success(
-                commentService.findCommentsByMember(member, pageable)
-        );
-    }
 }

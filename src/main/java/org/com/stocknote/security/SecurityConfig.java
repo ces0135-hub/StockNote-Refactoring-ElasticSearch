@@ -94,9 +94,9 @@ public class SecurityConfig {
                                 "/auth/kakao/manual",
                                 "/auth/google/token",
                                 "/oauth2.googleapis.com/token",
-                                "/api/v1/post/*",
-                                "/api/v1/post/**",
-                                "/api/v1/post"
+                                "/api/v1/posts/*",
+                                "/api/v1/posts/**",
+                                "/api/v1/posts"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
