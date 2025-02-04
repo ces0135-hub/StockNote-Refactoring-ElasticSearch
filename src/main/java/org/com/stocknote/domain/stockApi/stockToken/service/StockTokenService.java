@@ -27,7 +27,6 @@ public class StockTokenService {
     private String accessToken;
     private LocalDateTime tokenExpirationTime;
     private String websocketApprovalKey;
-    private String cachedToken;
     private final ReentrantLock lock = new ReentrantLock();
 
     @Value("${kis.app-key}")
@@ -57,10 +56,12 @@ public class StockTokenService {
                 .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .build();
 
-        this.cachedToken = generateNewToken();
+        requestNewAccessToken();
+        log.debug("Getting access token==================================== {} ",accessToken);
     }
 
-    @Cacheable(value = "accessToken", unless = "#result == null")
+    //@Cacheable(value = "accessToken", unless = "#result == null")
+
     public String getAccessToken() {
         if (accessToken == null || isTokenExpired()) {
             requestNewAccessToken();
@@ -105,38 +106,6 @@ public class StockTokenService {
         } catch (Exception e) {
             log.error("Access Token 발급 실패", e);
             throw new RuntimeException("Access Token 발급 실패: " + e.getMessage(), e);
-        }
-    }
-
-    public String generateNewToken() {
-        try {
-            StockTokenRequestDto stockTokenRequestDto = new StockTokenRequestDto("client_credentials", appKey, appSecret);
-
-            StockTokenResponseDto response = tokenWebClient
-                    .post()
-                    .uri("/oauth2/tokenP")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(stockTokenRequestDto)
-                    .retrieve()
-                    .onStatus(HttpStatusCode::is4xxClientError, clientResponse ->
-                            clientResponse.bodyToMono(String.class)
-                                    .flatMap(errorBody -> {
-                                        log.error("Token generation failed: {}", errorBody);
-                                        return Mono.error(new RuntimeException("새로운 토큰 발급 실패: " + errorBody));
-                                    })
-                    )
-                    .bodyToMono(StockTokenResponseDto.class)
-                    .block();
-
-            if (response != null) {
-                log.debug("New token generated successfully");
-                return response.getAccessToken();
-            } else {
-                throw new RuntimeException("토큰 발급 응답이 비어있습니다.");
-            }
-        } catch (Exception e) {
-            log.error("Token generation failed", e);
-            throw new RuntimeException("토큰 발급 실패: " + e.getMessage(), e);
         }
     }
 

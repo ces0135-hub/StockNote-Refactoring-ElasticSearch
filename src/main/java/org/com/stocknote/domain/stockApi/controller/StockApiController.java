@@ -3,6 +3,7 @@ package org.com.stocknote.domain.stockApi.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.com.stocknote.domain.stock.type.PeriodType;
 import org.com.stocknote.domain.stockApi.dto.*;
 import org.com.stocknote.domain.stockApi.dto.response.*;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/stockApis")
+@Slf4j
 @Tag(name = "주식 API", description = "주식 API")
 public class StockApiController {
     private final StockApiService stockApiService;
