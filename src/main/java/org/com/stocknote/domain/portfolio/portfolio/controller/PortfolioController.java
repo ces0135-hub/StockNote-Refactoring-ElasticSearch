@@ -10,7 +10,6 @@ import org.com.stocknote.domain.portfolio.portfolio.dto.response.PortfolioRespon
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
 import org.com.stocknote.domain.portfolio.portfolio.service.PortfolioService;
 import org.com.stocknote.domain.portfolio.portfolioStock.dto.response.PfStockResponse;
-import org.com.stocknote.domain.portfolio.portfolioStock.dto.response.StockTempResponse;
 import org.com.stocknote.domain.portfolio.portfolioStock.entity.PfStock;
 import org.com.stocknote.domain.portfolio.portfolioStock.service.PfStockService;
 import org.com.stocknote.domain.stock.entity.Stock;
@@ -67,13 +66,13 @@ public class PortfolioController {
     return GlobalResponse.success("Portfolio deleted successfully");
   }
 
-  @PostMapping("/search-stocks")
-  public GlobalResponse<List<StockTempResponse>> searchStocks(
-      @RequestBody Map<String, String> body) {
-    String keyword = body.get("keyword");
-    List<Stock> stockList = pfStockService.searchStocks(keyword);
-    List<StockTempResponse> response =
-        stockList.stream().map(StockTempResponse::new).collect(Collectors.toList());
-    return GlobalResponse.success(response);
-  }
+//  @PostMapping("/search-stocks")
+//  public GlobalResponse<List<StockTempResponse>> searchStocks(
+//      @RequestBody Map<String, String> body) {
+//    String keyword = body.get("keyword");
+//    List<Stock> stockList = pfStockService.searchStocks(keyword);
+//    List<StockTempResponse> response =
+//        stockList.stream().map(StockTempResponse::new).collect(Collectors.toList());
+//    return GlobalResponse.success(response);
+//  }
 }
