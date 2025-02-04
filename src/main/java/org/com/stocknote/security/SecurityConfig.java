@@ -60,7 +60,7 @@ public class SecurityConfig {
                 .headers(c -> c.frameOptions(
                         FrameOptionsConfig::disable).disable()) // X-Frame-Options 비활성화
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
 
@@ -101,9 +101,6 @@ public class SecurityConfig {
                 // oauth2 설정
                 .oauth2Login(oauth ->
                         oauth.authorizationEndpoint(endpoint -> endpoint
-                                        .authorizationRequestRepository(
-                                                new HttpSessionOAuth2AuthorizationRequestRepository()
-                                        )
                                         .baseUri("/oauth2/authorization")
                                 )
                                 .userInfoEndpoint(c -> c.userService(oAuth2UserService))
