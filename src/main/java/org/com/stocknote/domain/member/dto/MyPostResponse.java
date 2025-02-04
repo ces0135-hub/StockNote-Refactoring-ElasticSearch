@@ -1,23 +1,24 @@
-package org.com.stocknote.domain.post.dto;
+package org.com.stocknote.domain.member.dto;
 
+import org.com.stocknote.domain.like.repository.LikeRepository;
 import org.com.stocknote.domain.post.entity.Post;
 
 import java.time.LocalDateTime;
 
-public record MyPostResponseDto(
+public record MyPostResponse(
         Long id,
         String title,
         String body,
         LocalDateTime createdAt
 ) {
 
-    public static MyPostResponseDto of(Post post) {
-        return new MyPostResponseDto(
+    public static MyPostResponse of(Post post) {
+        return new MyPostResponse(
                 post.getId(),
                 post.getTitle(),
                 post.getBody(),
                 post.getCreatedAt()
         );
     }
-}
 
+}

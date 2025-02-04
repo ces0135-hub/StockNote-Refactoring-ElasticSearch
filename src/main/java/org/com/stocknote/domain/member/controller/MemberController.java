@@ -1,15 +1,20 @@
 package org.com.stocknote.domain.member.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.com.stocknote.domain.member.dto.MyCommentResponse;
 import org.com.stocknote.domain.member.dto.ChangeNameRequest;
 import org.com.stocknote.domain.member.dto.MemberDto;
+import org.com.stocknote.domain.member.dto.MyPostResponse;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.member.service.MemberService;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
-import org.com.stocknote.oauth.service.CustomOAuth2UserService;
-import org.com.stocknote.oauth.token.TokenProvider;
 import org.com.stocknote.global.globalDto.GlobalResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -48,5 +53,30 @@ public class MemberController {
         Member updatedMember = memberService.updateProfile(member.getId(), request);
 
         return GlobalResponse.success(MemberDto.of(updatedMember));
+    }
+
+    @GetMapping("/comments")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "내가 작성한 댓글 목록 조회")
+    public org.com.stocknote.global.dto.GlobalResponse<Page<MyCommentResponse>> getMyComments(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            Pageable pageable
+    ) {
+        Member member = principalDetails.user();
+        return org.com.stocknote.global.dto.GlobalResponse.success(
+                memberService.findCommentsByMember(member, pageable)
+        );
+    }
+
+    @GetMapping("/posts")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "내가 작성한 게시글 목록 조회")
+    public org.com.stocknote.global.dto.GlobalResponse<Page<MyPostResponse>> getMyPosts(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        Member member = principalDetails.user();
+        return org.com.stocknote.global.dto.GlobalResponse.success(
+                memberService.findPostsByMember(member, pageable));
     }
 }

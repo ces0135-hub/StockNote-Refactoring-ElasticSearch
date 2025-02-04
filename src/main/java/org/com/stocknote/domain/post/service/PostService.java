@@ -5,8 +5,8 @@ import org.com.stocknote.domain.comment.repository.CommentRepository;
 import org.com.stocknote.domain.hashtag.entity.Hashtag;
 import org.com.stocknote.domain.hashtag.service.HashtagService;
 import org.com.stocknote.domain.like.repository.LikeRepository;
+import org.com.stocknote.domain.member.dto.MyPostResponse;
 import org.com.stocknote.domain.member.entity.Member;
-import org.com.stocknote.domain.post.dto.MyPostResponseDto;
 import org.com.stocknote.domain.post.dto.PostCreateDto;
 import org.com.stocknote.domain.post.dto.PostModifyDto;
 import org.com.stocknote.domain.post.dto.PostResponseDto;
@@ -95,14 +95,10 @@ public class PostService {
     public void deletePost(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
-        post.softDelete();
-        postRepository.save(post);
-        commentRepository.deleteByPostId(id);
         likeRepository.deleteByPostId(id);
         hashtagService.deleteHashtagsByPostId(id);
+        //댓글은 CASCADE로 삭제됨
+        postRepository.delete(post);
     }
 
-    public Page<MyPostResponseDto> findPostsByMember(Member member, Pageable pageable) {
-        return postRepository.findByMember(member, pageable).map(MyPostResponseDto::of);
-    }
 }

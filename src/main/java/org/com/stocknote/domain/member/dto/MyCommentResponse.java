@@ -1,6 +1,7 @@
-package org.com.stocknote.domain.comment.dto;
+package org.com.stocknote.domain.member.dto;
 
 import org.com.stocknote.domain.comment.entity.Comment;
+import org.com.stocknote.domain.post.entity.Post;
 
 import java.time.LocalDateTime;
 
@@ -17,4 +18,5 @@ public record MyCommentResponse(
                 comment.getCreatedAt()
         );
     }
+
 }

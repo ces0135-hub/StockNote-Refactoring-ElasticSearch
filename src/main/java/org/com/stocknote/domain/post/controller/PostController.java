@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.com.stocknote.domain.member.dto.MyPostResponse;
 import org.com.stocknote.domain.member.entity.Member;
-import org.com.stocknote.domain.post.dto.MyPostResponseDto;
 import org.com.stocknote.domain.post.dto.PostCreateDto;
 import org.com.stocknote.domain.post.dto.PostModifyDto;
 import org.com.stocknote.domain.post.dto.PostResponseDto;
@@ -80,15 +80,4 @@ public class PostController {
         return GlobalResponse.success("Post deleted successfully");
     }
 
-    @GetMapping("/my")
-    @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "내가 작성한 게시글 목록 조회")
-    public GlobalResponse<Page<MyPostResponseDto>> getMyPosts(
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
-        Member member = principalDetails.user();
-        return GlobalResponse.success(
-                postService.findPostsByMember(member, pageable));
-    }
 }

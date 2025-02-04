@@ -5,13 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.comment.dto.CommentDetailResponse;
 import org.com.stocknote.domain.comment.dto.CommentRequest;
 import org.com.stocknote.domain.comment.dto.CommentUpdateDto;
-import org.com.stocknote.domain.comment.dto.MyCommentResponse;
+import org.com.stocknote.domain.member.dto.MyCommentResponse;
 import org.com.stocknote.domain.comment.entity.Comment;
 import org.com.stocknote.domain.comment.repository.CommentRepository;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.member.repository.MemberRepository;
 
-import org.com.stocknote.domain.post.dto.MyPostResponseDto;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.repository.PostRepository;
 import org.com.stocknote.global.error.ErrorCode;
@@ -83,9 +82,5 @@ public class CommentService {
             throw new CustomException(ErrorCode.COMMENT_DELETE_DENIED);
         }
         commentRepository.delete(comment);
-    }
-
-    public Page<MyCommentResponse> findCommentsByMember(Member member, Pageable pageable) {
-        return commentRepository.findByMember(member, pageable).map(MyCommentResponse::of);
     }
 }
