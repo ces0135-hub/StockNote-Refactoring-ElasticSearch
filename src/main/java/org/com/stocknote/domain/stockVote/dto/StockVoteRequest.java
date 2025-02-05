@@ -2,7 +2,7 @@ package org.com.stocknote.domain.stockVote.dto;
 
 import lombok.Data;
 import lombok.Getter;
-import org.com.stocknote.domain.stock.type.VoteType;
+import org.com.stocknote.domain.stockVote.service.StockVoteService;
 
 @Getter
 @Data
@@ -10,11 +10,11 @@ public class StockVoteRequest {
     private boolean sell;
     private boolean buy;
 
-    public VoteType getVoteType() {
+    public StockVoteService.VoteType getVoteType() {
         if (this.buy) {
-            return VoteType.BUY;
+            return StockVoteService.VoteType.BUY;
         } else if (this.sell) {
-            return VoteType.SELL;
+            return StockVoteService.VoteType.SELL;
         } else {
             return null;
         }

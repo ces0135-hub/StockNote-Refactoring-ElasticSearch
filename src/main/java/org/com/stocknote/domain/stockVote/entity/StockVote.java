@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.com.stocknote.domain.stock.entity.Stock;
-import org.com.stocknote.domain.stock.type.VoteType;
+import org.com.stocknote.domain.stockVote.service.StockVoteService;
 
 import java.time.LocalDate;
 
@@ -26,11 +26,11 @@ public class StockVote {
 
     private String userId;    // 투표한 사용자 ID
     private LocalDate voteDate;  // 투표 날짜
-    private VoteType voteType;   // 매수/매도
+    private StockVoteService.VoteType voteType;   // 매수/매도
 
 
     @Builder
-    public StockVote(Stock stock, String userId, VoteType voteType) {
+    public StockVote(Stock stock, String userId, StockVoteService.VoteType voteType) {
         this.stock = stock;
         this.userId = userId;
         this.voteType = voteType;

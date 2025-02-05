@@ -79,6 +79,4 @@ public class StockController {
         });
         return GlobalResponse.success(myStocks);
     }
-
-
 }
