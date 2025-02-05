@@ -103,6 +103,7 @@ tasks {
     
     bootJar {
         archiveFileName.set("app.jar")
+        mainClass.set("org.com.stocknote.StockNoteApplication")
     }
     
     processResources {
@@ -119,3 +120,4 @@ tasks.withType<JavaCompile> {
 tasks.withType<Test> {
     systemProperty("file.encoding", "UTF-8")
 }
+
