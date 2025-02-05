@@ -196,3 +196,5 @@ build/
 /bin/**
 /bin/
 bin/
+out/
+/out/**
