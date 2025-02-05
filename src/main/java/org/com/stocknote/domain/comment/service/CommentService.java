@@ -11,6 +11,7 @@ import org.com.stocknote.domain.comment.repository.CommentRepository;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.member.repository.MemberRepository;
 
+import org.com.stocknote.domain.notification.repository.NotificationRepository;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.repository.PostRepository;
 import org.com.stocknote.global.error.ErrorCode;
@@ -30,6 +31,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final NotificationRepository notificationRepository;
 
 
     @Transactional(readOnly = true)
@@ -53,11 +55,11 @@ public class CommentService {
     }
 
     @Transactional
-    public Long createComment(Long postId, CommentRequest commentRequest, Member member) {
+    public Comment createComment(Long postId, CommentRequest commentRequest, Member member) {
         Post post= postRepository.findById(postId).orElseThrow();
         Comment comment = new Comment(post, commentRequest.getBody(), member);
-
-        return commentRepository.save(comment).getId();
+        commentRepository.save(comment);
+        return comment;
     }
 
     @Transactional
@@ -81,6 +83,7 @@ public class CommentService {
         if (!Objects.equals(member.getId(), comment.getMember().getId())) {
             throw new CustomException(ErrorCode.COMMENT_DELETE_DENIED);
         }
+        notificationRepository.deleteByRelatedCommentId(commentId);
         commentRepository.delete(comment);
     }
 }

@@ -7,6 +7,7 @@ import org.com.stocknote.domain.hashtag.service.HashtagService;
 import org.com.stocknote.domain.like.repository.LikeRepository;
 import org.com.stocknote.domain.member.dto.MyPostResponse;
 import org.com.stocknote.domain.member.entity.Member;
+import org.com.stocknote.domain.notification.repository.NotificationRepository;
 import org.com.stocknote.domain.post.dto.PostCreateDto;
 import org.com.stocknote.domain.post.dto.PostModifyDto;
 import org.com.stocknote.domain.post.dto.PostResponseDto;
@@ -25,7 +26,7 @@ import java.util.List;
 public class PostService {
     private final PostRepository postRepository;
     private final HashtagService hashtagService;
-    private final CommentRepository commentRepository;
+    private final NotificationRepository notificationRepository;
     private final LikeRepository likeRepository;
 
     @Transactional
@@ -97,6 +98,7 @@ public class PostService {
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         likeRepository.deleteByPostId(id);
         hashtagService.deleteHashtagsByPostId(id);
+        notificationRepository.deleteByRelatedPostId(id);
         //댓글은 CASCADE로 삭제됨
         postRepository.delete(post);
     }

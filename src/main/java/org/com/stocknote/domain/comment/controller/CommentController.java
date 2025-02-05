@@ -6,8 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.comment.dto.CommentDetailResponse;
 import org.com.stocknote.domain.comment.dto.CommentRequest;
 import org.com.stocknote.domain.comment.dto.CommentUpdateDto;
+import org.com.stocknote.domain.comment.entity.Comment;
 import org.com.stocknote.domain.comment.service.CommentService;
 import org.com.stocknote.domain.member.entity.Member;
+import org.com.stocknote.domain.notification.controller.NotificationController;
+import org.com.stocknote.domain.notification.service.NotificationService;
 import org.com.stocknote.global.dto.GlobalResponse;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,8 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommentService commentService;
-
-
+    private final NotificationService notificationService;
 
 //    @GetMapping
 //    public GlobalResponse<Page<CommentDetailResponse>> getComments(@PathVariable(value = "postId") Long postId, Pageable pageable) {
@@ -43,7 +45,10 @@ public class CommentController {
     ) {
 
         Member member = principalDetails.user();
-        return GlobalResponse.success(commentService.createComment(postId, commentRequest, member));
+        Comment comment= commentService.createComment(postId, commentRequest, member);
+        notificationService.createCommentNotification(postId,comment);
+
+        return GlobalResponse.success(comment.getId());
     }
   
     @Operation(summary = "댓글 수정")

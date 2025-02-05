@@ -22,8 +22,15 @@ configurations {
 repositories {
     mavenCentral()
 }
+val querydslVersion = "5.0.0"
 
 dependencies {
+
+    //querydsl
+    implementation("com.querydsl:querydsl-jpa:$querydslVersion:jakarta")
+    annotationProcessor("com.querydsl:querydsl-apt:$querydslVersion:jakarta")
+    annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+    annotationProcessor("jakarta.persistence:jakarta.persistence-api")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
