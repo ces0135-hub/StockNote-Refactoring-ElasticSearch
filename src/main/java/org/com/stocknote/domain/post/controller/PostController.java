@@ -4,12 +4,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.com.stocknote.domain.member.dto.MyPostResponse;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.post.dto.PostCreateDto;
 import org.com.stocknote.domain.post.dto.PostModifyDto;
 import org.com.stocknote.domain.post.dto.PostResponseDto;
 import org.com.stocknote.domain.post.entity.PostCategory;
+import org.com.stocknote.domain.post.dto.PostSearchConditionDto;
 import org.com.stocknote.domain.post.service.PostService;
 import org.com.stocknote.global.dto.GlobalResponse;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
@@ -17,7 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -78,6 +77,16 @@ public class PostController {
     public GlobalResponse<String> deletePost(@PathVariable("id") Long id) {
         postService.deletePost(id);
         return GlobalResponse.success("Post deleted successfully");
+    }
+
+    // 게시글 검색
+    @GetMapping("/search")
+    @Operation(summary = "게시글 검색")
+    public GlobalResponse<Page<PostResponseDto>> searchPosts(
+            @ModelAttribute PostSearchConditionDto condition,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return GlobalResponse.success(postService.searchPosts(condition, pageable));
     }
 
 }
