@@ -89,4 +89,8 @@ public class NoteService {
   public List<Note> getNoteByPortfolioNo(Long portfolioNo) {
     return noteRepository.findByPortfolioId(portfolioNo);
   }
+
+  public List<Note> getNoteList() {
+    return noteRepository.findAll();
+  }
 }

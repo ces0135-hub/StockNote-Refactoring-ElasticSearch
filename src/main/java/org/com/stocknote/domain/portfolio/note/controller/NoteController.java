@@ -13,15 +13,22 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/portfolios/{portfolio_no}/note")
+@RequestMapping("/api/v1/portfolios")
 public class NoteController {
   private final NoteService noteService;
   private final PortfolioService portfolioService;
 
-  @GetMapping
+  @GetMapping("/{portfolio_no}/note")
   public GlobalResponse<List<NoteResponse>> getNote(@PathVariable("portfolio_no") Long portfolioNo) {
     List<Note> noteList = noteService.getNoteByPortfolioNo(portfolioNo);
     List<NoteResponse> response = noteList.stream().map(NoteResponse::from).collect(Collectors.toList());
     return GlobalResponse.success(response);
+  }
+
+  @GetMapping("/allNote")
+  public GlobalResponse<List<NoteResponse>> getNoteList() {
+      List<Note> noteList = noteService.getNoteList();
+      List<NoteResponse> response = noteList.stream().map(NoteResponse::from).collect(Collectors.toList());
+      return GlobalResponse.success(response);
   }
 }
