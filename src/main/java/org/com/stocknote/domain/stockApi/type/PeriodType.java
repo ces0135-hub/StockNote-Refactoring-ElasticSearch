@@ -1,4 +1,4 @@
-package org.com.stocknote.domain.stock.type;
+package org.com.stocknote.domain.stockApi.type;
 
 public enum PeriodType {
     DAILY("D"),

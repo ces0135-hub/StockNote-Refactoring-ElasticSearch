@@ -4,17 +4,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.stock.dto.request.StockAddRequest;
-import org.com.stocknote.domain.stock.dto.request.StockVoteRequest;
 import org.com.stocknote.domain.stock.entity.Stock;
-import org.com.stocknote.domain.stock.entity.VoteStatistics;
 import org.com.stocknote.domain.stock.service.StockService;
-import org.com.stocknote.domain.stock.service.StockVoteService;
+import org.com.stocknote.domain.stockVote.service.StockVoteService;
 import org.com.stocknote.domain.stockApi.dto.response.StockInfoResponse;
 import org.com.stocknote.domain.stockApi.dto.response.StockResponse;
 import org.com.stocknote.global.globalDto.GlobalResponse;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.com.stocknote.websocket.service.WebSocketService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -81,23 +78,5 @@ public class StockController {
             }
         });
         return GlobalResponse.success(myStocks);
-    }
-
-    @PostMapping("/{stockCode}/vote")
-    @Operation(summary = "종목 투표")
-    public GlobalResponse vote(
-            @PathVariable String stockCode,
-            @RequestBody StockVoteRequest request,
-            @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        String email = principalDetails.getUsername();
-        stockVoteService.vote(stockCode, request, email);
-        return GlobalResponse.success();
-    }
-
-    @GetMapping("/{stockCode}/vote-statistics")
-    @Operation(summary = "종목 투표 통계 조회")
-    public GlobalResponse<VoteStatistics> getVoteStatistics(
-            @PathVariable String stockCode) {
-        return GlobalResponse.success(stockVoteService.getVoteStatistics(stockCode));
     }
 }

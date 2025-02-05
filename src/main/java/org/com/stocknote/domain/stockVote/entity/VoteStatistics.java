@@ -1,4 +1,4 @@
-package org.com.stocknote.domain.stock.entity;
+package org.com.stocknote.domain.stockVote.entity;
 
 import lombok.Builder;
 import lombok.Getter;

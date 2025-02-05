@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.com.stocknote.domain.stockApi.dto.response.SectorResponse;
 import org.com.stocknote.domain.stock.repository.StockRepository;
 import org.com.stocknote.domain.stockApi.dto.*;
-import org.com.stocknote.domain.stock.type.PeriodType;
+import org.com.stocknote.domain.stockApi.type.PeriodType;
 import org.com.stocknote.domain.stockApi.dto.response.*;
 import org.com.stocknote.domain.stockApi.stockToken.service.StockTokenService;
 import org.springframework.http.*;
@@ -35,8 +35,6 @@ public class StockApiService {
     private final StockTokenService stockTokenService;
     private final StockRepository stockRepository;
     private final ObjectMapper objectMapper;
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HHmmss");
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     //임시 추가
     private final RestTemplate restTemplate;
@@ -484,5 +482,4 @@ public class StockApiService {
             throw new RuntimeException("주식 정보 조회 중 오류 발생", e);
         }
     }
-
 }
