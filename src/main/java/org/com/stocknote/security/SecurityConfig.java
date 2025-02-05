@@ -70,6 +70,7 @@ public class SecurityConfig {
                                 "/",
                                 "/auth/**",
                                 "/auth/login",
+                                "/api/volume",
                                 "/api/v1/stockApis/filtered/*",
                                 "/api/v1/stockApis/kospi",
                                 "/api/v1/stockApis/kosdaq",
@@ -96,7 +97,8 @@ public class SecurityConfig {
                                 "/oauth2.googleapis.com/token",
                                 "/api/v1/posts/*",
                                 "/api/v1/posts/**",
-                                "/api/v1/posts"
+                                "/api/v1/posts",
+                                "sse/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
