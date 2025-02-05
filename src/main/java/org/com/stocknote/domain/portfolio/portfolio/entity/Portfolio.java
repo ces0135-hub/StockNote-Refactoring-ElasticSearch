@@ -35,7 +35,7 @@ public class Portfolio extends BaseEntity {
   private Member member;
 
   @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<PfStock> pfStockList = new ArrayList<>();  // 초기화 추가
+  private List<PfStock> pfStockList = new ArrayList<>(); // 초기화 추가
 
   // 연관관계 편의 메소드 추가
   public void addPfStock(PfStock pfStock) {
