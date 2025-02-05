@@ -48,10 +48,10 @@ public class NotificationService {
         }
     }
 
-    public List<NotificationResponse> getNotificationsByMember(Member member) {
+    public List<NotificationResponse> getNotificationsByMember(Long memberId) {
         LocalDateTime startDate = LocalDateTime.now().minusDays(30);
         return notificationRepository.findByMemberIdAndIsReadFalseAndCreatedAtAfterOrderByCreatedAtDesc(
-                        member,
+                        memberId,
                         startDate
                 ).stream()
                 .map(notification -> NotificationResponse.from(notification))

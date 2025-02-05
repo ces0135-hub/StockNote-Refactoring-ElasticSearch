@@ -22,8 +22,8 @@ public class NotificationController {
     public List<NotificationResponse> getNotificationsByMember(
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
-        Member member = principalDetails.user();
-        return notificationService.getNotificationsByMember(member);
+        Long memberId = principalDetails.user().getId();
+        return notificationService.getNotificationsByMember(memberId);
     }
 
     @PatchMapping("/{notificationId}/read")
