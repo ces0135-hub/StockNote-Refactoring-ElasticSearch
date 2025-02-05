@@ -1,6 +1,6 @@
-package org.com.stocknote.domain.stock.repository;
+package org.com.stocknote.domain.stockVote.repository;
 
-import org.com.stocknote.domain.stock.entity.StockVote;
+import org.com.stocknote.domain.stockVote.entity.StockVote;
 import org.com.stocknote.domain.stock.type.VoteType;
 import org.springframework.data.jpa.repository.JpaRepository;
 

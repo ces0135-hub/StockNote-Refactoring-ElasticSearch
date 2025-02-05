@@ -1,4 +1,4 @@
-package org.com.stocknote.domain.stock.dto.request;
+package org.com.stocknote.domain.stockVote.dto;
 
 import lombok.Data;
 import lombok.Getter;

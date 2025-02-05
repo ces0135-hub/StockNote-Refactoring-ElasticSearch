@@ -1,9 +1,10 @@
-package org.com.stocknote.domain.stock.entity;
+package org.com.stocknote.domain.stockVote.entity;
 
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.com.stocknote.domain.stock.entity.Stock;
 import org.com.stocknote.domain.stock.type.VoteType;
 
 import java.time.LocalDate;

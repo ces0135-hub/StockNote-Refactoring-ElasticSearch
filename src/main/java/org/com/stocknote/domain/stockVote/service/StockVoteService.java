@@ -1,15 +1,15 @@
-package org.com.stocknote.domain.stock.service;
+package org.com.stocknote.domain.stockVote.service;
 
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.member.repository.MemberRepository;
-import org.com.stocknote.domain.stock.dto.request.StockVoteRequest;
+import org.com.stocknote.domain.stockVote.dto.StockVoteRequest;
 import org.com.stocknote.domain.stock.entity.Stock;
-import org.com.stocknote.domain.stock.entity.StockVote;
-import org.com.stocknote.domain.stock.entity.VoteStatistics;
+import org.com.stocknote.domain.stockVote.entity.StockVote;
+import org.com.stocknote.domain.stockVote.entity.VoteStatistics;
 import org.com.stocknote.domain.stock.type.VoteType;
 import org.com.stocknote.domain.stock.repository.StockRepository;
-import org.com.stocknote.domain.stock.repository.StockVoteRepository;
+import org.com.stocknote.domain.stockVote.repository.StockVoteRepository;
 import org.com.stocknote.global.error.ErrorCode;
 import org.com.stocknote.global.exception.CustomException;
 import org.springframework.scheduling.annotation.Scheduled;
