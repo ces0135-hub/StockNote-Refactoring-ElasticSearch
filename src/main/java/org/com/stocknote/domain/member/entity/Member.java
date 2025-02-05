@@ -7,12 +7,10 @@ import jakarta.persistence.OneToMany;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.com.stocknote.domain.comment.entity.Comment;
+import org.com.stocknote.domain.like.entity.Like;
 import org.com.stocknote.domain.memberStock.entity.MemberStock;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.global.base.BaseEntity;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +43,9 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member")
     private List<MemberStock> memberStocks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<Like> likes = new ArrayList<>();
 
     public void updateName(String newName) {
         this.name = newName;
