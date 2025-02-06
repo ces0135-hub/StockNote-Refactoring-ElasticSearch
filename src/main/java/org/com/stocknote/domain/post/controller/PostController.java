@@ -79,6 +79,14 @@ public class PostController {
         return GlobalResponse.success("Post deleted successfully");
     }
 
+    @GetMapping("/popular")
+    @Operation(summary = "인기글 조회")
+    public GlobalResponse<Page<PostResponseDto>> getPopularPosts(
+            @PageableDefault(size = 5, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return GlobalResponse.success(postService.getPopularPosts(pageable));
+    }
+
     // 게시글 검색
     @GetMapping("/search")
     @Operation(summary = "게시글 검색")

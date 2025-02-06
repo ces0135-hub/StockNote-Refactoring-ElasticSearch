@@ -17,12 +17,14 @@ import org.com.stocknote.domain.post.repository.PostSearchRepository;
 import org.com.stocknote.domain.post.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Qualifier;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -109,6 +111,22 @@ public class PostService {
         postRepository.delete(post);
     }
 
+    @Transactional(readOnly = true)
+    public Page<PostResponseDto> getPopularPosts(Pageable pageable) {
+        Page<Post> popularPosts = postRepository.findPopularPosts(pageable);
+
+        List<PostResponseDto> sortedPosts = popularPosts.stream()
+                .map(post -> {
+                    List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId())
+                            .stream()
+                            .map(Hashtag::getName)
+                            .toList();
+                    return PostResponseDto.fromPost(post, hashtags);
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(sortedPosts, pageable, popularPosts.getTotalElements());
+    }
 
     // 검색 기능
     @Transactional(readOnly = true)
@@ -125,4 +143,5 @@ public class PostService {
             return PostResponseDto.fromPost(post, hashtags);
         });
     }
+
 }
