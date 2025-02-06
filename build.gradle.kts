@@ -85,6 +85,9 @@ dependencies {
     //fileUtil
     implementation("commons-io:commons-io:2.13.0")
 
+    //ElasitcSearch
+    implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
+
 }
 
 tasks.withType<Test> {
