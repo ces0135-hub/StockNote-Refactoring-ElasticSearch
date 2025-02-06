@@ -50,10 +50,10 @@ public class PostController {
             @RequestParam(required = false, name= "category") PostCategory category,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        if (category != null) {
-            return GlobalResponse.success(postService.getPostsByCategory(category, pageable));
+        if (category == PostCategory.ALL) {
+            return GlobalResponse.success(postService.getPosts(pageable));
         }
-        return GlobalResponse.success(postService.getPosts(pageable));
+        return GlobalResponse.success(postService.getPostsByCategory(category, pageable));
     }
 
     @GetMapping("/{id}")

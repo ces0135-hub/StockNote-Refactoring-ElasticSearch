@@ -15,8 +15,8 @@ public class PostCreateDto {
     @NotBlank(message = "Title is required")
     private String title;
 
-    @NotBlank(message = "Body is required")
-    private String body;
+    @NotBlank(message = "Content is required")
+    private String content;
 
     private List<String> hashtags;
 
@@ -27,7 +27,7 @@ public class PostCreateDto {
         return Post.builder()
                 .member(member)
                 .title(this.title)
-                .body(this.body)
+                .body(this.content)
                 .category(postCategory)
                 .build();
     }

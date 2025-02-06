@@ -1,15 +1,9 @@
 package org.com.stocknote.domain.notification.entity;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.com.stocknote.domain.comment.entity.Comment;
-import org.com.stocknote.domain.member.entity.Member;
-import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.global.base.BaseEntity;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,7 +11,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Entity
 @Getter
 @Setter
-public class Notification  extends BaseEntity {
+public class CommentNotification extends BaseEntity {
 
     private Long memberId; // 알림 받는 사람
 

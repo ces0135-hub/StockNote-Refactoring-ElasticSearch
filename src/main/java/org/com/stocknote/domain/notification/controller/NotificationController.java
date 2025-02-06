@@ -1,9 +1,7 @@
 package org.com.stocknote.domain.notification.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.com.stocknote.domain.member.entity.Member;
-import org.com.stocknote.domain.notification.dto.NotificationResponse;
-import org.com.stocknote.domain.notification.entity.Notification;
+import org.com.stocknote.domain.notification.dto.CommentNotificationResponse;
 import org.com.stocknote.domain.notification.service.NotificationService;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +17,7 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping("/user")
-    public List<NotificationResponse> getNotificationsByMember(
+    public List<CommentNotificationResponse> getNotificationsByMember(
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
         Long memberId = principalDetails.user().getId();

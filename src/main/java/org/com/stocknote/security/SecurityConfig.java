@@ -100,7 +100,8 @@ public class SecurityConfig {
                                 "/api/v1/posts/*",
                                 "/api/v1/posts/**",
                                 "/api/v1/posts",
-                                "sse/**"
+                                "sse/**",
+                                "/hashtag/search/*"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

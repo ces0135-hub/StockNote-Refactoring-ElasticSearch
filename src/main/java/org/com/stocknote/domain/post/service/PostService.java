@@ -1,13 +1,11 @@
 package org.com.stocknote.domain.post.service;
 
 import lombok.RequiredArgsConstructor;
-import org.com.stocknote.domain.comment.repository.CommentRepository;
 import org.com.stocknote.domain.hashtag.entity.Hashtag;
 import org.com.stocknote.domain.hashtag.service.HashtagService;
 import org.com.stocknote.domain.like.repository.LikeRepository;
-import org.com.stocknote.domain.member.dto.MyPostResponse;
 import org.com.stocknote.domain.member.entity.Member;
-import org.com.stocknote.domain.notification.repository.NotificationRepository;
+import org.com.stocknote.domain.notification.repository.CommentNotificationRepository;
 import org.com.stocknote.domain.post.dto.PostCreateDto;
 import org.com.stocknote.domain.post.dto.PostModifyDto;
 import org.com.stocknote.domain.post.dto.PostResponseDto;
@@ -26,7 +24,7 @@ import java.util.List;
 public class PostService {
     private final PostRepository postRepository;
     private final HashtagService hashtagService;
-    private final NotificationRepository notificationRepository;
+    private final CommentNotificationRepository commentNotificationRepository;
     private final LikeRepository likeRepository;
 
     @Transactional
@@ -84,7 +82,7 @@ public class PostService {
     public void updatePost(Long id, PostModifyDto postModifyDto) {
         Post existingPost = postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
-        existingPost.bodyUpdate(postModifyDto.getBody());
+        existingPost.bodyUpdate(postModifyDto.getContent());
         existingPost.titleUpdate(postModifyDto.getTitle());
         existingPost.categoryUpdate(PostCategory.valueOf(postModifyDto.getCategory()));
         postRepository.save(existingPost);
@@ -98,7 +96,7 @@ public class PostService {
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         likeRepository.deleteByPostId(id);
         hashtagService.deleteHashtagsByPostId(id);
-        notificationRepository.deleteByRelatedPostId(id);
+        commentNotificationRepository.deleteByRelatedPostId(id);
         //댓글은 CASCADE로 삭제됨
         postRepository.delete(post);
     }

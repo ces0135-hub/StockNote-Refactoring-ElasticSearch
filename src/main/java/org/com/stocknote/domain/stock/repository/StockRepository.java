@@ -19,4 +19,7 @@ public interface StockRepository extends JpaRepository<Stock, String> {
   String findStockNameByCode(@Param("stockCode") String stockCode);
 
   List<Stock> findByNameContainingIgnoreCaseOrCodeContainingIgnoreCase(String name, String code);
+
+  @Query("SELECT s.name FROM Stock s")
+  List<String> findAllName();
 }
