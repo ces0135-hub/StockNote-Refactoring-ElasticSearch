@@ -6,18 +6,23 @@ import org.com.stocknote.domain.hashtag.entity.Hashtag;
 import org.com.stocknote.domain.hashtag.service.HashtagService;
 import org.com.stocknote.domain.like.repository.LikeRepository;
 import org.com.stocknote.domain.member.entity.Member;
+import org.com.stocknote.domain.notification.repository.NotificationRepository;
 import org.com.stocknote.domain.post.dto.PostCreateDto;
 import org.com.stocknote.domain.post.dto.PostModifyDto;
 import org.com.stocknote.domain.post.dto.PostResponseDto;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.entity.PostCategory;
+import org.com.stocknote.domain.post.dto.PostSearchConditionDto;
+import org.com.stocknote.domain.post.repository.PostSearchRepository;
 import org.com.stocknote.domain.post.repository.PostRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Qualifier;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,8 +31,11 @@ import java.util.stream.Collectors;
 public class PostService {
     private final PostRepository postRepository;
     private final HashtagService hashtagService;
-    private final CommentRepository commentRepository;
+    private final NotificationRepository notificationRepository;
     private final LikeRepository likeRepository;
+    @Autowired
+    private final PostSearchRepository postSearchRepository;
+
 
     @Transactional
     public Long createPost(PostCreateDto postCreateDto, Member member) {
@@ -98,6 +106,7 @@ public class PostService {
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         likeRepository.deleteByPostId(id);
         hashtagService.deleteHashtagsByPostId(id);
+        notificationRepository.deleteByRelatedPostId(id);
         //댓글은 CASCADE로 삭제됨
         postRepository.delete(post);
     }
@@ -117,6 +126,22 @@ public class PostService {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(sortedPosts, pageable, popularPosts.getTotalElements());
+    }
+
+    // 검색 기능
+    @Transactional(readOnly = true)
+    public Page<PostResponseDto> searchPosts(PostSearchConditionDto condition, Pageable pageable) {
+        // 검색 실행
+        Page<Post> searchResults = postSearchRepository.search(condition, pageable);  // postRepositoryCustom -> postSearchRepository
+
+        // PostResponseDto로 변환
+        return searchResults.map(post -> {
+            List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId())
+                    .stream()
+                    .map(Hashtag::getName)
+                    .toList();
+            return PostResponseDto.fromPost(post, hashtags);
+        });
     }
 
 }

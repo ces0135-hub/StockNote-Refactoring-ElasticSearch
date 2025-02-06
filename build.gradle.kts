@@ -22,8 +22,15 @@ configurations {
 repositories {
     mavenCentral()
 }
+val querydslVersion = "5.0.0"
 
 dependencies {
+
+    //querydsl
+    implementation("com.querydsl:querydsl-jpa:$querydslVersion:jakarta")
+    annotationProcessor("com.querydsl:querydsl-apt:$querydslVersion:jakarta")
+    annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+    annotationProcessor("jakarta.persistence:jakarta.persistence-api")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -46,7 +53,6 @@ dependencies {
 
     //redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
-
 
     // JWT
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
@@ -79,6 +85,12 @@ dependencies {
     //fileUtil
     implementation("commons-io:commons-io:2.13.0")
 
+    // QueryDSL 설정
+    implementation ("com.querydsl:querydsl-jpa:5.0.0:jakarta")
+    annotationProcessor ("com.querydsl:querydsl-apt:5.0.0:jakarta")
+    annotationProcessor ("jakarta.annotation:jakarta.annotation-api")
+    annotationProcessor ("jakarta.persistence:jakarta.persistence-api")
+
 }
 
 tasks.withType<Test> {
@@ -97,6 +109,7 @@ tasks {
     
     bootJar {
         archiveFileName.set("app.jar")
+        mainClass.set("org.com.stocknote.StockNoteApplication")
     }
     
     processResources {
@@ -113,3 +126,4 @@ tasks.withType<JavaCompile> {
 tasks.withType<Test> {
     systemProperty("file.encoding", "UTF-8")
 }
+

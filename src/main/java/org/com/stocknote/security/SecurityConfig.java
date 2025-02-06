@@ -70,6 +70,7 @@ public class SecurityConfig {
                                 "/",
                                 "/auth/**",
                                 "/auth/login",
+                                "/api/volume",
                                 "/api/v1/stockApis/filtered/*",
                                 "/api/v1/stockApis/kospi",
                                 "/api/v1/stockApis/kosdaq",
@@ -81,7 +82,9 @@ public class SecurityConfig {
                                 "/api/v1/stockApis/price", // 주식 가격 API
                                 "/api/v1/stocks/{stockCode}", // 개별 주식 상세 정보
                                 "/api/v1/stockApis/time-prices", // 시간별 가격 API
-                                "/api/v1/stockApis/chart", // 차트 API
+                                "/api/v1/stockApis/chart",
+                                "/api/v1/votes/*",
+                                "/api/v1/votes/{stockCode}/*",
                                 "/auth/google/redirect",
                                 "/auth/kakao/redirect",
                                 "/auth/kakao/callback",
@@ -97,9 +100,8 @@ public class SecurityConfig {
                                 "/api/v1/posts/*",
                                 "/api/v1/posts/**",
                                 "/api/v1/posts",
-                                "/api/v1/votes/popular",
                                 "/api/v1/posts/popular"
-
+                                "sse/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
