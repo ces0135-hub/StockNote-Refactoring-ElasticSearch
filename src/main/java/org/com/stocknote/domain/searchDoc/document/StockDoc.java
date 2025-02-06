@@ -1,4 +1,4 @@
-package org.com.stocknote.domain.stockDoc.document;
+package org.com.stocknote.domain.searchDoc.document;
 
 
 import lombok.*;
