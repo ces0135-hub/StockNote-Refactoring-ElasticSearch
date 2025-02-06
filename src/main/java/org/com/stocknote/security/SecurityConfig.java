@@ -100,6 +100,8 @@ public class SecurityConfig {
                                 "/api/v1/posts/*",
                                 "/api/v1/posts/**",
                                 "/api/v1/posts",
+                                "/api/v1/posts/popular",
+                                "sse/**"
                                 "sse/**",
                                 "/api/v1/searchDocs/**"
 
