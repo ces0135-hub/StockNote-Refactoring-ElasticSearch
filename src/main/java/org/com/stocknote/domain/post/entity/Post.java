@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.com.stocknote.domain.comment.entity.Comment;
+import org.com.stocknote.domain.like.entity.Like;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.global.base.BaseEntity;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -37,6 +38,9 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<Like> likes = new ArrayList<>();
 
     private LocalDateTime deletedAt;
 

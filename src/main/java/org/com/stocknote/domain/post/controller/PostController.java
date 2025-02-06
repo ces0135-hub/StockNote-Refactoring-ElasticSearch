@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.com.stocknote.domain.member.dto.MyPostResponse;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.post.dto.PostCreateDto;
 import org.com.stocknote.domain.post.dto.PostModifyDto;
@@ -17,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -79,5 +77,14 @@ public class PostController {
         postService.deletePost(id);
         return GlobalResponse.success("Post deleted successfully");
     }
+
+    @GetMapping("/popular")
+    @Operation(summary = "인기글 조회")
+    public GlobalResponse<Page<PostResponseDto>> getPopularPosts(
+            @PageableDefault(size = 5, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return GlobalResponse.success(postService.getPopularPosts(pageable));
+    }
+
 
 }
