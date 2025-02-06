@@ -96,7 +96,10 @@ public class SecurityConfig {
                                 "/oauth2.googleapis.com/token",
                                 "/api/v1/posts/*",
                                 "/api/v1/posts/**",
-                                "/api/v1/posts"
+                                "/api/v1/posts",
+                                "/api/v1/votes/popular",
+                                "/api/v1/posts/popular"
+
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
