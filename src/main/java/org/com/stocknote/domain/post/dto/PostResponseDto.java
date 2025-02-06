@@ -17,7 +17,9 @@ public record PostResponseDto(
         List<CommentDetailResponse> comments,
         LocalDateTime createdAt,
         PostCategory category,
-        List<String>hashtags
+        List<String>hashtags,
+        int likeCount,
+        int commentCount
 ) {
     public static PostResponseDto fromPost(Post post, List<String> hashtags) {
         List<CommentDetailResponse> commentResponses = post.getComments().stream()
@@ -33,8 +35,9 @@ public record PostResponseDto(
                 commentResponses,
                 post.getCreatedAt(),
                 post.getCategory(),
-                hashtags
+                hashtags,
+                post.getLikes().size(),
+                post.getComments().size()
         );
     }
 }
-

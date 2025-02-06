@@ -11,13 +11,19 @@ import org.com.stocknote.domain.post.dto.PostModifyDto;
 import org.com.stocknote.domain.post.dto.PostResponseDto;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.entity.PostCategory;
+import org.com.stocknote.domain.post.dto.PostSearchConditionDto;
+import org.com.stocknote.domain.post.repository.PostSearchRepository;
 import org.com.stocknote.domain.post.repository.PostRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Qualifier;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +32,9 @@ public class PostService {
     private final HashtagService hashtagService;
     private final CommentNotificationRepository commentNotificationRepository;
     private final LikeRepository likeRepository;
+    @Autowired
+    private final PostSearchRepository postSearchRepository;
+
 
     @Transactional
     public Long createPost(PostCreateDto postCreateDto, Member member) {
@@ -99,6 +108,39 @@ public class PostService {
         commentNotificationRepository.deleteByRelatedPostId(id);
         //댓글은 CASCADE로 삭제됨
         postRepository.delete(post);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostResponseDto> getPopularPosts(Pageable pageable) {
+        Page<Post> popularPosts = postRepository.findPopularPosts(pageable);
+
+        List<PostResponseDto> sortedPosts = popularPosts.stream()
+                .map(post -> {
+                    List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId())
+                            .stream()
+                            .map(Hashtag::getName)
+                            .toList();
+                    return PostResponseDto.fromPost(post, hashtags);
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(sortedPosts, pageable, popularPosts.getTotalElements());
+    }
+
+    // 검색 기능
+    @Transactional(readOnly = true)
+    public Page<PostResponseDto> searchPosts(PostSearchConditionDto condition, Pageable pageable) {
+        // 검색 실행
+        Page<Post> searchResults = postSearchRepository.search(condition, pageable);  // postRepositoryCustom -> postSearchRepository
+
+        // PostResponseDto로 변환
+        return searchResults.map(post -> {
+            List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId())
+                    .stream()
+                    .map(Hashtag::getName)
+                    .toList();
+            return PostResponseDto.fromPost(post, hashtags);
+        });
     }
 
 }
