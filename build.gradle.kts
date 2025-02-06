@@ -21,6 +21,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven("https://repo.spring.io/milestone")
 }
 val querydslVersion = "5.0.0"
 

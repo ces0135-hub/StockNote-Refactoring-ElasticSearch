@@ -5,13 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.comment.dto.CommentDetailResponse;
 import org.com.stocknote.domain.comment.dto.CommentRequest;
 import org.com.stocknote.domain.comment.dto.CommentUpdateDto;
-import org.com.stocknote.domain.member.dto.MyCommentResponse;
 import org.com.stocknote.domain.comment.entity.Comment;
 import org.com.stocknote.domain.comment.repository.CommentRepository;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.member.repository.MemberRepository;
 
-import org.com.stocknote.domain.notification.repository.NotificationRepository;
+import org.com.stocknote.domain.notification.repository.CommentNotificationRepository;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.repository.PostRepository;
 import org.com.stocknote.global.error.ErrorCode;
@@ -31,7 +30,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
-    private final NotificationRepository notificationRepository;
+    private final CommentNotificationRepository commentNotificationRepository;
 
 
     @Transactional(readOnly = true)
@@ -83,7 +82,7 @@ public class CommentService {
         if (!Objects.equals(member.getId(), comment.getMember().getId())) {
             throw new CustomException(ErrorCode.COMMENT_DELETE_DENIED);
         }
-        notificationRepository.deleteByRelatedCommentId(commentId);
+        commentNotificationRepository.deleteByRelatedCommentId(commentId);
         commentRepository.delete(comment);
     }
 }

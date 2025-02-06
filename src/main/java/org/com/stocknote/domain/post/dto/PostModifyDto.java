@@ -16,7 +16,7 @@ public class PostModifyDto {
     private String title;
 
     @NotBlank(message = "Body is required")
-    private String body;
+    private String content;
 
     private List<String> hashtags;
 
@@ -29,7 +29,7 @@ public class PostModifyDto {
         return Post.builder()
                 .id(id)
                 .title(this.title)
-                .body(this.body)
+                .body(this.content)
                 .category(postCategory)
                 .member(member)
                 .build();
