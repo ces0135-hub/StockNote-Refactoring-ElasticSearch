@@ -12,12 +12,11 @@ import org.com.stocknote.domain.post.dto.PostResponseDto;
 import org.com.stocknote.domain.post.dto.PostSearchConditionDto;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.entity.PostCategory;
+import org.com.stocknote.domain.post.dto.*;
 import org.com.stocknote.domain.post.repository.PostRepository;
 import org.com.stocknote.domain.post.repository.PostSearchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -178,4 +177,10 @@ public class PostService {
         });
     }
 
+    public Page<PostStockResponse> getPostsByStockName(String sName, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        return postRepository.findByHashtagNameOrderByCreatedAtDesc(sName, pageRequest)
+                .map(PostStockResponse::from);
+    }
 }

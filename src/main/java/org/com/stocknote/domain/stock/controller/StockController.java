@@ -3,6 +3,7 @@ package org.com.stocknote.domain.stock.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.com.stocknote.domain.post.service.PostService;
 import org.com.stocknote.domain.stock.dto.request.StockAddRequest;
 import org.com.stocknote.domain.stock.entity.Stock;
 import org.com.stocknote.domain.stock.service.StockService;
@@ -27,8 +28,8 @@ import java.util.stream.Collectors;
 public class StockController {
 
     private final StockService stockService;
-    private final StockVoteService stockVoteService;
     private final WebSocketService webSocketService;
+    private final PostService postService;
 
     @GetMapping
     @Operation(summary = "종목 이름 조회")
@@ -78,5 +79,12 @@ public class StockController {
             }
         });
         return GlobalResponse.success(myStocks);
+    }
+    @GetMapping("/posts")
+    @Operation(summary = "종목 관련 게시글 조회")
+    public GlobalResponse getPosts(@RequestParam("sName") String sName,
+                                   @RequestParam(value = "page", defaultValue = "0") int page,
+                                   @RequestParam(value = "size", defaultValue = "3") int size) {
+        return GlobalResponse.success(postService.getPostsByStockName(sName, page, size));
     }
 }
