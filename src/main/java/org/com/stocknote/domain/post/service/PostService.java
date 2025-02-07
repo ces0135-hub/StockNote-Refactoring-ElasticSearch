@@ -20,6 +20,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -110,7 +111,8 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public Page<PostResponseDto> getPopularPosts(Pageable pageable) {
-        Page<Post> popularPosts = postRepository.findPopularPosts(pageable);
+        LocalDateTime threeDaysAgo = LocalDateTime.now().minusDays(3);
+        Page<Post> popularPosts = postRepository.findPopularPosts(threeDaysAgo, pageable);
 
         List<PostResponseDto> sortedPosts = popularPosts.stream()
                 .map(post -> {
@@ -128,7 +130,8 @@ public class PostService {
     // 좋아요 순 조회
     @Transactional(readOnly = true)
     public Page<PostResponseDto> getPopularPostsByLikes(Pageable pageable) {
-        Page<Post> popularPosts = postRepository.findPopularPostsByLikes(pageable);
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        Page<Post> popularPosts = postRepository.findPopularPostsByLikes(sevenDaysAgo, pageable);
 
         List<PostResponseDto> sortedPosts = popularPosts.stream()
                 .map(post -> {
@@ -146,7 +149,8 @@ public class PostService {
     // 댓글 순 조회
     @Transactional(readOnly = true)
     public Page<PostResponseDto> getPopularPostsByComments(Pageable pageable) {
-        Page<Post> popularPosts = postRepository.findPopularPostsByComments(pageable);
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        Page<Post> popularPosts = postRepository.findPopularPostsByComments(sevenDaysAgo, pageable);
 
         List<PostResponseDto> sortedPosts = popularPosts.stream()
                 .map(post -> {
