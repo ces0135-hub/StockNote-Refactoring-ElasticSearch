@@ -6,6 +6,7 @@ import org.com.stocknote.domain.hashtag.service.HashtagService;
 import org.com.stocknote.domain.like.repository.LikeRepository;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.notification.repository.CommentNotificationRepository;
+import org.com.stocknote.domain.notification.repository.KeywordNotificationRepository;
 import org.com.stocknote.domain.post.dto.PostCreateDto;
 import org.com.stocknote.domain.post.dto.PostModifyDto;
 import org.com.stocknote.domain.post.dto.PostResponseDto;
@@ -25,16 +26,17 @@ public class PostService {
     private final PostRepository postRepository;
     private final HashtagService hashtagService;
     private final CommentNotificationRepository commentNotificationRepository;
+    private final KeywordNotificationRepository keywordNotificationRepository;
     private final LikeRepository likeRepository;
 
     @Transactional
-    public Long createPost(PostCreateDto postCreateDto, Member member) {
+    public Post createPost(PostCreateDto postCreateDto, Member member) {
 
         Post post = postCreateDto.toEntity(member);
         Post savedPost = postRepository.save(post);
 
         hashtagService.createHashtags(savedPost.getId(), postCreateDto.getHashtags());
-        return savedPost.getId();
+        return post;
     }
 
     @Transactional(readOnly = true)
@@ -97,6 +99,7 @@ public class PostService {
         likeRepository.deleteByPostId(id);
         hashtagService.deleteHashtagsByPostId(id);
         commentNotificationRepository.deleteByRelatedPostId(id);
+        keywordNotificationRepository.deleteByRelatedPostId(id);
         //댓글은 CASCADE로 삭제됨
         postRepository.delete(post);
     }

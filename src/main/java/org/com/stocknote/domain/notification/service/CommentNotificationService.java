@@ -2,6 +2,7 @@ package org.com.stocknote.domain.notification.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.com.stocknote.domain.notification.repository.KeywordNotificationRepository;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.comment.entity.Comment;
 import org.com.stocknote.domain.notification.dto.CommentNotificationResponse;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class NotificationService {
+public class CommentNotificationService {
     private final CommentNotificationRepository commentNotificationRepository;
     private final PostRepository postRepository;
     private final SseEmitterService sseEmitterService;
@@ -40,7 +41,7 @@ public class NotificationService {
             commentNotificationRepository.save(commentNotification);
 
             // SSE로 실시간 알림 전송
-            sseEmitterService.sendNotification(
+            sseEmitterService.sendCommentNotification(
                     post.getMember().getId().toString(),
                     CommentNotificationResponse.from(commentNotification)
             );
@@ -57,6 +58,7 @@ public class NotificationService {
                 // 또는 메서드 레퍼런스를 사용: .map(NotificationResponse::from)
                 .collect(Collectors.toList());
     }
+
 
     public void markAsRead(Long notificationId) {
         CommentNotification commentNotification = commentNotificationRepository.findById(notificationId)
