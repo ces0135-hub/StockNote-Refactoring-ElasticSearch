@@ -8,8 +8,8 @@ import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.post.dto.PostCreateDto;
 import org.com.stocknote.domain.post.dto.PostModifyDto;
 import org.com.stocknote.domain.post.dto.PostResponseDto;
-import org.com.stocknote.domain.post.entity.PostCategory;
 import org.com.stocknote.domain.post.dto.PostSearchConditionDto;
+import org.com.stocknote.domain.post.entity.PostCategory;
 import org.com.stocknote.domain.post.service.PostService;
 import org.com.stocknote.global.dto.GlobalResponse;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
@@ -82,9 +82,27 @@ public class PostController {
     @GetMapping("/popular")
     @Operation(summary = "인기글 조회")
     public GlobalResponse<Page<PostResponseDto>> getPopularPosts(
-            @PageableDefault(size = 5, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(size = 5) Pageable pageable
     ) {
         return GlobalResponse.success(postService.getPopularPosts(pageable));
+    }
+
+    // 좋아요 순 조회
+    @GetMapping("/popular/likes")
+    @Operation(summary = "좋아요 순 인기글 조회")
+    public GlobalResponse<Page<PostResponseDto>> getPopularPostsByLikes(
+            @PageableDefault(size = 5) Pageable pageable
+    ) {
+        return GlobalResponse.success(postService.getPopularPostsByLikes(pageable));
+    }
+
+    // 댓글 순 조회
+    @GetMapping("/popular/comments")
+    @Operation(summary = "댓글 순 인기글 조회")
+    public GlobalResponse<Page<PostResponseDto>> getPopularPostsByComments(
+            @PageableDefault(size = 5) Pageable pageable
+    ) {
+        return GlobalResponse.success(postService.getPopularPostsByComments(pageable));
     }
 
     // 게시글 검색
