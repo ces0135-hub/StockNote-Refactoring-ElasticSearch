@@ -203,3 +203,31 @@ build/
 bin/
 out/
 /out/**
+
+# Terraform
+*.tfvars
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+crash.log
+
+# Local .terraform directories
+**/.terraform/*
+
+# Crash log files
+crash.*.log
+
+# Sensitive variables files
+*.auto.tfvars
+*.auto.tfvars.json
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration files
+.terraformrc
+terraform.rc

@@ -92,6 +92,9 @@ dependencies {
     annotationProcessor ("jakarta.annotation:jakarta.annotation-api")
     annotationProcessor ("jakarta.persistence:jakarta.persistence-api")
 
+    //ElasitcSearch
+    implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
+
 }
 
 tasks.withType<Test> {
