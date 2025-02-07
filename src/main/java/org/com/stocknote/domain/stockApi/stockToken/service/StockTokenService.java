@@ -3,11 +3,9 @@ package org.com.stocknote.domain.stockApi.stockToken.service;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.com.stocknote.domain.stockApi.stockToken.dto.StockTokenRequestDto;
-import org.com.stocknote.domain.stockApi.stockToken.dto.StockTokenResponseDto;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -16,12 +14,14 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
 @Getter
 @Component
 public class StockTokenService {
+    private final StringRedisTemplate redisTemplate;
     private WebClient tokenWebClient;
     private WebClient websocketWebClient;
     private String accessToken;
@@ -44,6 +44,11 @@ public class StockTokenService {
     @Value("${kis.volume-base-url}")
     private String volumeBaseUrl;
 
+    public StockTokenService (StringRedisTemplate redisTemplate, WebClient.Builder webClientBuilder) {
+        this.redisTemplate = redisTemplate;
+        this.tokenWebClient = webClientBuilder.baseUrl("https://openapi.koreainvestment.com:9443").build();
+    }
+
     @PostConstruct
     public void initWebClient() {
         this.tokenWebClient = WebClient.builder()
@@ -55,57 +60,58 @@ public class StockTokenService {
                 .baseUrl("https://openapi.koreainvestment.com:9443")
                 .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .build();
-
-        requestNewAccessToken();
-        log.debug("Getting access token==================================== {} ",accessToken);
     }
 
     //@Cacheable(value = "accessToken", unless = "#result == null")
 
     public String getAccessToken() {
-        if (accessToken == null || isTokenExpired()) {
-            requestNewAccessToken();
+        String cachedToken = redisTemplate.opsForValue().get("stocknote:access-token");
+
+        if (cachedToken != null) {
+            return cachedToken;  // ✅ Redis에서 저장된 토큰 사용
         }
-        return accessToken;
+
+        if (!lock.tryLock()) {
+            return accessToken;  // ✅ 다른 요청이 토큰을 갱신 중이면 기존 토큰 사용
+        }
+
+        try {
+            return refreshAccessToken();  // ✅ 새 토큰 요청 후 반환
+        } finally {
+            lock.unlock();
+        }
     }
+
 
     private boolean isTokenExpired() {
         return tokenExpirationTime == null || LocalDateTime.now().isAfter(tokenExpirationTime);
     }
 
-    private void requestNewAccessToken() {
-        try {
-            Map<String, Object> response = tokenWebClient
-                    .post()
-                    .uri("/oauth2/tokenP")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(Map.of(
-                            "grant_type", "client_credentials",
-                            "appkey", appKey,
-                            "appsecret", appSecret
-                    ))
-                    .retrieve()
-                    .onStatus(HttpStatusCode::is4xxClientError, clientResponse ->
-                            clientResponse.bodyToMono(String.class)
-                                    .flatMap(errorBody -> {
-                                        log.error("Token request failed: {}", errorBody);
-                                        return Mono.error(new RuntimeException("토큰 발급 실패: " + errorBody));
-                                    })
-                    )
-                    .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
-                    .block();
+    private String refreshAccessToken() {
+        Map<String, Object> response = tokenWebClient
+                .post()
+                .uri("/oauth2/tokenP")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of(
+                        "grant_type", "client_credentials",
+                        "appkey", appKey,
+                        "appsecret", appSecret
+                ))
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                .block();  // ✅ 동기 호출로 변경 (즉시 토큰 적용)
 
-            if (response != null) {
-                this.accessToken = (String) response.get("access_token");
-                long expiresIn = ((Number) response.get("expires_in")).longValue();
-                this.tokenExpirationTime = LocalDateTime.now().plusSeconds(expiresIn);
-                log.debug("New access token generated, expires in {} seconds", expiresIn);
-            } else {
-                throw new RuntimeException("토큰 발급 응답이 비어있습니다.");
-            }
-        } catch (Exception e) {
-            log.error("Access Token 발급 실패", e);
-            throw new RuntimeException("Access Token 발급 실패: " + e.getMessage(), e);
+        if (response != null && response.get("access_token") != null) {
+            this.accessToken = (String) response.get("access_token");
+            long expiresIn = ((Number) response.get("expires_in")).longValue();
+            this.tokenExpirationTime = LocalDateTime.now().plusSeconds(expiresIn);
+
+            // ✅ Redis에 저장하여 캐싱
+            redisTemplate.opsForValue().set("stocknote:access-token", accessToken, expiresIn - 10, TimeUnit.SECONDS);
+
+            return accessToken;
+        } else {
+            throw new RuntimeException("Access Token 발급 응답이 비어있습니다.");
         }
     }
 
