@@ -49,6 +49,16 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT p FROM Post p WHERE p.deletedAt IS NULL ORDER BY size(p.likes) DESC, size(p.comments) DESC")
     Page<Post> findPopularPosts(Pageable pageable);
 
+
+    // 좋아요 순으로 정렬
+    @Query("SELECT p FROM Post p WHERE p.deletedAt IS NULL ORDER BY size(p.likes) DESC")
+    Page<Post> findPopularPostsByLikes(Pageable pageable);
+
+    // 댓글 순으로 정렬
+    @Query("SELECT p FROM Post p WHERE p.deletedAt IS NULL ORDER BY size(p.comments) DESC")
+    Page<Post> findPopularPostsByComments(Pageable pageable);
+}
+
     @Query("SELECT DISTINCT p FROM Post p " +
             "JOIN Hashtag h ON h.postId = p.id " +
             "WHERE h.name = :sName " +
