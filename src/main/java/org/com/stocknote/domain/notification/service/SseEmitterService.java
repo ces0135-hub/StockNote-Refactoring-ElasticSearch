@@ -27,12 +27,25 @@ public class SseEmitterService {
     }
 
     // 알림 전송
-    public void sendNotification(String memberId, Object data) {
+    public void sendCommentNotification(String memberId, Object data) {
         SseEmitter emitter = emitters.get(memberId);
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
-                        .name("notification")
+                        .name("commentNotification")
+                        .data(data));
+            } catch (IOException e) {
+                emitters.remove(memberId);
+            }
+        }
+    }
+
+    public void sendKeywordNotification(String memberId, Object data) {
+        SseEmitter emitter = emitters.get(memberId);
+        if (emitter != null) {
+            try {
+                emitter.send(SseEmitter.event()
+                        .name("keywordNotification")
                         .data(data));
             } catch (IOException e) {
                 emitters.remove(memberId);

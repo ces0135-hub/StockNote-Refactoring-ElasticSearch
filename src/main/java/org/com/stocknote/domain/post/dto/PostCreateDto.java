@@ -24,6 +24,7 @@ public class PostCreateDto {
 
     public Post toEntity(Member member) {
         PostCategory postCategory = PostCategory.valueOf(category);
+
         return Post.builder()
                 .member(member)
                 .title(this.title)
