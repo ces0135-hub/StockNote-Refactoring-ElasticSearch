@@ -23,6 +23,8 @@ spring:
   sql:
     init:
       mode: never
+  elasticsearch:
+    uris: http://211.188.54.177:9200
 logging:
   level:
     root: INFO

@@ -10,15 +10,20 @@ import org.com.stocknote.domain.notification.repository.KeywordNotificationRepos
 import org.com.stocknote.domain.post.dto.PostCreateDto;
 import org.com.stocknote.domain.post.dto.PostModifyDto;
 import org.com.stocknote.domain.post.dto.PostResponseDto;
+import org.com.stocknote.domain.post.dto.PostSearchConditionDto;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.entity.PostCategory;
+import org.com.stocknote.domain.post.dto.*;
 import org.com.stocknote.domain.post.repository.PostRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.com.stocknote.domain.post.repository.PostSearchRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +33,9 @@ public class PostService {
     private final CommentNotificationRepository commentNotificationRepository;
     private final KeywordNotificationRepository keywordNotificationRepository;
     private final LikeRepository likeRepository;
+    @Autowired
+    private final PostSearchRepository postSearchRepository;
+
 
     @Transactional
     public Post createPost(PostCreateDto postCreateDto, Member member) {
@@ -104,4 +112,82 @@ public class PostService {
         postRepository.delete(post);
     }
 
+    @Transactional(readOnly = true)
+    public Page<PostResponseDto> getPopularPosts(Pageable pageable) {
+        LocalDateTime threeDaysAgo = LocalDateTime.now().minusDays(3);
+        Page<Post> popularPosts = postRepository.findPopularPosts(threeDaysAgo, pageable);
+
+        List<PostResponseDto> sortedPosts = popularPosts.stream()
+                .map(post -> {
+                    List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId())
+                            .stream()
+                            .map(Hashtag::getName)
+                            .toList();
+                    return PostResponseDto.fromPost(post, hashtags);
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(sortedPosts, pageable, popularPosts.getTotalElements());
+    }
+
+    // 좋아요 순 조회
+    @Transactional(readOnly = true)
+    public Page<PostResponseDto> getPopularPostsByLikes(Pageable pageable) {
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        Page<Post> popularPosts = postRepository.findPopularPostsByLikes(sevenDaysAgo, pageable);
+
+        List<PostResponseDto> sortedPosts = popularPosts.stream()
+                .map(post -> {
+                    List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId())
+                            .stream()
+                            .map(Hashtag::getName)
+                            .toList();
+                    return PostResponseDto.fromPost(post, hashtags);
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(sortedPosts, pageable, popularPosts.getTotalElements());
+    }
+
+    // 댓글 순 조회
+    @Transactional(readOnly = true)
+    public Page<PostResponseDto> getPopularPostsByComments(Pageable pageable) {
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        Page<Post> popularPosts = postRepository.findPopularPostsByComments(sevenDaysAgo, pageable);
+
+        List<PostResponseDto> sortedPosts = popularPosts.stream()
+                .map(post -> {
+                    List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId())
+                            .stream()
+                            .map(Hashtag::getName)
+                            .toList();
+                    return PostResponseDto.fromPost(post, hashtags);
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(sortedPosts, pageable, popularPosts.getTotalElements());
+    }
+
+    // 검색 기능
+    @Transactional(readOnly = true)
+    public Page<PostResponseDto> searchPosts(PostSearchConditionDto condition, Pageable pageable) {
+        // 검색 실행
+        Page<Post> searchResults = postSearchRepository.search(condition, pageable);  // postRepositoryCustom -> postSearchRepository
+
+        // PostResponseDto로 변환
+        return searchResults.map(post -> {
+            List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId())
+                    .stream()
+                    .map(Hashtag::getName)
+                    .toList();
+            return PostResponseDto.fromPost(post, hashtags);
+        });
+    }
+
+    public Page<PostStockResponse> getPostsByStockName(String sName, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        return postRepository.findByHashtagNameOrderByCreatedAtDesc(sName, pageRequest)
+                .map(PostStockResponse::from);
+    }
 }

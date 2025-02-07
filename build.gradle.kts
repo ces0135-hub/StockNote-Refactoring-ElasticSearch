@@ -86,6 +86,15 @@ dependencies {
     //fileUtil
     implementation("commons-io:commons-io:2.13.0")
 
+    // QueryDSL 설정
+    implementation ("com.querydsl:querydsl-jpa:5.0.0:jakarta")
+    annotationProcessor ("com.querydsl:querydsl-apt:5.0.0:jakarta")
+    annotationProcessor ("jakarta.annotation:jakarta.annotation-api")
+    annotationProcessor ("jakarta.persistence:jakarta.persistence-api")
+
+    //ElasitcSearch
+    implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
+
 }
 
 tasks.withType<Test> {
@@ -104,6 +113,7 @@ tasks {
     
     bootJar {
         archiveFileName.set("app.jar")
+        mainClass.set("org.com.stocknote.StockNoteApplication")
     }
     
     processResources {
@@ -120,3 +130,4 @@ tasks.withType<JavaCompile> {
 tasks.withType<Test> {
     systemProperty("file.encoding", "UTF-8")
 }
+

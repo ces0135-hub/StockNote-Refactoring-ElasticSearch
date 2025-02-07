@@ -10,6 +10,7 @@ import org.com.stocknote.domain.post.dto.PostCreateDto;
 import org.com.stocknote.domain.post.dto.PostModifyDto;
 import org.com.stocknote.domain.post.dto.PostResponseDto;
 import org.com.stocknote.domain.post.entity.Post;
+import org.com.stocknote.domain.post.dto.PostSearchConditionDto;
 import org.com.stocknote.domain.post.entity.PostCategory;
 import org.com.stocknote.domain.post.service.PostService;
 import org.com.stocknote.global.dto.GlobalResponse;
@@ -18,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -79,6 +79,42 @@ public class PostController {
     public GlobalResponse<String> deletePost(@PathVariable("id") Long id) {
         postService.deletePost(id);
         return GlobalResponse.success("Post deleted successfully");
+    }
+
+    @GetMapping("/popular")
+    @Operation(summary = "인기글 조회")
+    public GlobalResponse<Page<PostResponseDto>> getPopularPosts(
+            @PageableDefault(size = 5) Pageable pageable
+    ) {
+        return GlobalResponse.success(postService.getPopularPosts(pageable));
+    }
+
+    // 좋아요 순 조회
+    @GetMapping("/popular/likes")
+    @Operation(summary = "좋아요 순 인기글 조회")
+    public GlobalResponse<Page<PostResponseDto>> getPopularPostsByLikes(
+            @PageableDefault(size = 5) Pageable pageable
+    ) {
+        return GlobalResponse.success(postService.getPopularPostsByLikes(pageable));
+    }
+
+    // 댓글 순 조회
+    @GetMapping("/popular/comments")
+    @Operation(summary = "댓글 순 인기글 조회")
+    public GlobalResponse<Page<PostResponseDto>> getPopularPostsByComments(
+            @PageableDefault(size = 5) Pageable pageable
+    ) {
+        return GlobalResponse.success(postService.getPopularPostsByComments(pageable));
+    }
+
+    // 게시글 검색
+    @GetMapping("/search")
+    @Operation(summary = "게시글 검색")
+    public GlobalResponse<Page<PostResponseDto>> searchPosts(
+            @ModelAttribute PostSearchConditionDto condition,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return GlobalResponse.success(postService.searchPosts(condition, pageable));
     }
 
 }
