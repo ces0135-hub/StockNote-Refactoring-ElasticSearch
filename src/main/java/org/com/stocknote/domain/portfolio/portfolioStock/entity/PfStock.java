@@ -47,4 +47,6 @@ public class PfStock extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "stock_code") // stock_code를 외래 키로 사용
   private Stock stock;
+
+
 }
