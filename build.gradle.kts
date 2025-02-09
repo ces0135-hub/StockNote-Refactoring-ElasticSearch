@@ -95,6 +95,11 @@ dependencies {
     //ElasitcSearch
     implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
 
+    implementation("com.github.javafaker:javafaker:1.0.2") {
+        exclude(group = "org.yaml", module = "snakeyaml")
+    }
+    implementation("org.yaml:snakeyaml:2.0")
+
 }
 
 tasks.withType<Test> {
@@ -130,4 +135,3 @@ tasks.withType<JavaCompile> {
 tasks.withType<Test> {
     systemProperty("file.encoding", "UTF-8")
 }
-
