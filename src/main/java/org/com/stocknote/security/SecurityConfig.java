@@ -140,7 +140,11 @@ public class SecurityConfig {
                 // 인증/인가 예외 핸들링
                 .exceptionHandling((exceptions) -> exceptions
                         .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 인증 실패 시 처리
-                        .accessDeniedHandler(new CustomAccessDeniedHandler())); //인가 실패 시 처리
+                        .accessDeniedHandler(new CustomAccessDeniedHandler())) //인가 실패 시 처리
+
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new TokenExceptionFilter(), tokenAuthenticationFilter.getClass())
+                .addFilterBefore(new SaveRequestFilter(), UsernamePasswordAuthenticationFilter.class); // 이 줄 추가
 
         return http.build();
     }
