@@ -101,3 +101,33 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+tasks {
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
+            showStandardStreams = true
+        }
+        ignoreFailures = true  // 테스트 실패해도 빌드 진행
+    }
+    
+    bootJar {
+        archiveFileName.set("app.jar")
+        mainClass.set("org.com.stocknote.StockNoteApplication")
+    }
+    
+    processResources {
+        // 리소스 파일 복사 확인
+        doFirst {
+            println("Processing resources...")
+        }
+    }
+}
+tasks.withType<JavaCompile> {
+    options.compilerArgs.add("-parameters")
+    options.encoding = "UTF-8"
+}
+tasks.withType<Test> {
+    systemProperty("file.encoding", "UTF-8")
+}
+

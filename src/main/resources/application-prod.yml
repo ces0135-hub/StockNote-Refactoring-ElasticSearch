@@ -10,7 +10,7 @@ spring:
       - org.springframework.boot.autoconfigure.session.SessionAutoConfiguration
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         default_batch_fetch_size: 100

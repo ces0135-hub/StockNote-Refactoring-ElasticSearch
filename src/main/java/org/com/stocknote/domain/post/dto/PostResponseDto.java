@@ -3,6 +3,7 @@ package org.com.stocknote.domain.post.dto;
 import org.com.stocknote.domain.comment.dto.CommentDetailResponse;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.entity.PostCategory;
+import org.com.stocknote.domain.searchDoc.document.PostDoc;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,7 +18,7 @@ public record PostResponseDto(
         List<CommentDetailResponse> comments,
         LocalDateTime createdAt,
         PostCategory category,
-        List<String>hashtags,
+        List<String> hashtags,
         int likeCount,
         int commentCount
 ) {
@@ -38,6 +39,23 @@ public record PostResponseDto(
                 hashtags,
                 post.getLikes().size(),
                 post.getComments().size()
+        );
+    }
+
+    public static PostResponseDto fromPost(PostDoc postDoc) {
+        return new PostResponseDto(
+            Long.valueOf(postDoc.getId()),
+            postDoc.getTitle(),
+            postDoc.getBody(),
+            Long.valueOf(postDoc.getMemberDoc().getId()),
+            postDoc.getMemberDoc().getName(),
+            postDoc.getMemberDoc().getProfile(),
+                null,
+            postDoc.getCreatedAt(),
+            postDoc.getCategory(),
+                null,
+            postDoc.getLikeCount(),
+            postDoc.getCommentCount()
         );
     }
 }

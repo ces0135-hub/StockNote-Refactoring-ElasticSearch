@@ -1,0 +1,19 @@
+- pipeline.id: member
+  path.config: "/usr/share/logstash/pipeline/member.conf"
+  pipeline.workers: 1
+
+- pipeline.id: portfolio
+  path.config: "/usr/share/logstash/pipeline/portfolio.conf"
+  pipeline.workers: 1
+
+- pipeline.id: stock
+  path.config: "/usr/share/logstash/pipeline/stock.conf"
+  pipeline.workers: 1
+
+- pipeline.id: pfstock
+  path.config: "/usr/share/logstash/pipeline/pfstock.conf"
+  pipeline.workers: 1
+
+- pipeline.id: post
+  path.config: "/usr/share/logstash/pipeline/post.conf"
+  pipeline.workers: 1

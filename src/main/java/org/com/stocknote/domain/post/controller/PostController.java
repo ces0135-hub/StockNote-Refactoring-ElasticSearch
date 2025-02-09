@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.member.entity.Member;
+import org.com.stocknote.domain.notification.service.KeywordNotificationElasticService;
 import org.com.stocknote.domain.notification.service.KeywordNotificationService;
 import org.com.stocknote.domain.post.dto.PostCreateDto;
 import org.com.stocknote.domain.post.dto.PostModifyDto;
@@ -32,6 +33,7 @@ public class PostController {
 
     private final PostService postService;
     private final KeywordNotificationService keywordNotificationService;
+    private final KeywordNotificationElasticService keywordNotificationElasticService;
 
     @PostMapping
     @Operation(summary = "게시글 작성")
