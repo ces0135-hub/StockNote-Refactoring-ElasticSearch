@@ -36,11 +36,7 @@ public class SecurityConfig {
     private final CorsConfigurationSource corsConfigurationSource;
     private final SaveRequestFilter saveRequestFilter;
     private final TokenProvider tokenProvider;
-
-    @Bean
-    public OAuth2SuccessHandler oAuth2SuccessHandler() {
-        return new OAuth2SuccessHandler(tokenProvider);
-    }
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -117,7 +113,7 @@ public class SecurityConfig {
                                         .baseUri("/oauth2/authorization")
                                 )
                                 .userInfoEndpoint(c -> c.userService(oAuth2UserService))
-                                .successHandler(oAuth2SuccessHandler())
+                                .successHandler(oAuth2SuccessHandler)
                                 .redirectionEndpoint(e -> e
                                         .baseUri("/auth/{registrationId}/redirect")
                                 )

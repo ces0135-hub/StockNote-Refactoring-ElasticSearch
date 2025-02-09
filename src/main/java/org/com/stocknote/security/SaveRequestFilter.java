@@ -17,6 +17,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 
 @Component
@@ -27,7 +28,8 @@ public class SaveRequestFilter extends OncePerRequestFilter {
             "/portfolio",
             "/portfolio/total",
             "/community/articles",
-            "/stocks"
+            "/stocks",
+            "/board"
     );
 
     @Override
@@ -38,20 +40,46 @@ public class SaveRequestFilter extends OncePerRequestFilter {
             String currentPath = request.getRequestURI();
             String queryString = request.getQueryString();
 
-            // OAuth2 로그인 관련 요청인지 확인
+            logger.debug("Request URI: {}", currentPath);
+            logger.debug("Query String: {}", queryString);
+
+            // OAuth2 로그인 요청 확인 (확장된 조건)
             if (currentPath.contains("/oauth2/authorization") ||
-                    currentPath.contains("/auth/") && currentPath.contains("redirect")) {
+                    (currentPath.contains("/auth/") && currentPath.contains("redirect"))) {
 
-                // 리다이렉트 URI 추출 시도
-                String redirectUri = extractRedirectUri(request);
+                // 세션에서 리다이렉트 URI 확인
+                HttpSession session = request.getSession(false);
+                String redirectUriFromSession = session != null ?
+                        (String) session.getAttribute("REDIRECT_URI") : null;
 
-                logger.info("Detected potential redirect URI: {}", redirectUri);
+                // 쿼리 파라미터에서 리다이렉트 URI 확인
+                String redirectUriFromParam = request.getParameter("redirect_uri");
 
-                // 리다이렉트 URI 유효성 검사 및 세션 저장
-                if (redirectUri != null && isAllowedRedirectPath(redirectUri)) {
-                    HttpSession session = request.getSession(true);
+                // 우선순위: 쿼리 파라미터 > 세션
+                String redirectUri = redirectUriFromParam != null ?
+                        redirectUriFromParam : redirectUriFromSession;
+
+                logger.debug("OAuth2 LOGIN - Detected potential redirect URI: {}", redirectUri);
+                logger.debug("Session attributes: {}", getSessionAttributesAsString(request.getSession(false)));
+
+                // 알림, SSE 관련 경로 제외
+                boolean isNotificationPath = redirectUri != null && (
+                        redirectUri.startsWith("/notifications/") ||
+                                redirectUri.startsWith("/sse/")
+                );
+
+                // 커뮤니티 등 허용된 경로만 세션에 저장
+                if (!isNotificationPath &&
+                        redirectUri != null &&
+                        !"/".equals(redirectUri) &&
+                        isAllowedRedirectPath(redirectUri)) {
+
+                    // 세션 생성 및 리다이렉트 URI 저장
+                    if (session == null) {
+                        session = request.getSession(true);
+                    }
                     session.setAttribute("REDIRECT_URI", redirectUri);
-                    logger.info("Saved redirect URI to session: {}", redirectUri);
+                    logger.debug("Saved redirect URI to session: {}", redirectUri);
                 }
             }
         } catch (Exception e) {
@@ -61,26 +89,40 @@ public class SaveRequestFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    private String getSessionAttributesAsString(HttpSession session) {
+        if (session == null) return "No session";
+
+        StringBuilder sb = new StringBuilder();
+        Enumeration<String> attributeNames = session.getAttributeNames();
+        while (attributeNames.hasMoreElements()) {
+            String attributeName = attributeNames.nextElement();
+            sb.append(attributeName).append(": ").append(session.getAttribute(attributeName)).append("; ");
+        }
+        return sb.toString();
+    }
+
     private String extractRedirectUri(HttpServletRequest request) {
-        // 1. 쿼리 파라미터에서 redirect_uri 추출
+        // Extract from query parameters
         String redirectUriParam = request.getParameter("redirect_uri");
         if (redirectUriParam != null && !redirectUriParam.isEmpty()) {
             try {
-                return URLDecoder.decode(redirectUriParam, StandardCharsets.UTF_8.toString());
+                String decodedUri = URLDecoder.decode(redirectUriParam, StandardCharsets.UTF_8.toString());
+                logger.debug("Extracted redirect_uri from query param: {}", decodedUri);
+                return decodedUri;
             } catch (UnsupportedEncodingException e) {
                 logger.error("Error decoding redirect_uri", e);
             }
         }
 
-        // 2. Referer 헤더에서 경로 추출
+        // Extract from Referer header
         String referer = request.getHeader("Referer");
         if (referer != null) {
             try {
                 URL url = new URL(referer);
                 String path = url.getPath();
 
-                // 루트 경로가 아닌 경우에만 반환
                 if (path != null && !path.isEmpty() && !"/".equals(path)) {
+                    logger.debug("Extracted redirect_uri from Referer: {}", path);
                     return path;
                 }
             } catch (MalformedURLException e) {
@@ -88,14 +130,25 @@ public class SaveRequestFilter extends OncePerRequestFilter {
             }
         }
 
-        // 3. 기본값 반환
+        // Check session for redirect URI
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            Object storedUri = session.getAttribute("REDIRECT_URI");
+            if (storedUri != null) {
+                logger.debug("Retrieved redirect_uri from session: {}", storedUri);
+                return storedUri.toString();
+            }
+        }
+
+        // Default to root
+        logger.debug("No valid redirect URI found. Using default: /");
         return "/";
     }
 
     private boolean isAllowedRedirectPath(String path) {
         boolean isAllowed = ALLOWED_REDIRECT_PATHS.stream()
                 .anyMatch(allowedPath -> path.startsWith(allowedPath));
-        logger.info("Checking path: {} - Allowed: {}", path, isAllowed);
+        logger.debug("Checking path: {} - Allowed: {}", path, isAllowed);
         return isAllowed;
     }
 }

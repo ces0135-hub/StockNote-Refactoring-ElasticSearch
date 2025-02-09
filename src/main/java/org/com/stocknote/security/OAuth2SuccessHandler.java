@@ -13,6 +13,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 
 @Component
@@ -27,7 +28,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             "/portfolio",
             "/portfolio/total",
             "/community/articles",
-            "/stocks"
+            "/stocks",
+            "/board"
     );
 
     public OAuth2SuccessHandler(TokenProvider tokenProvider) {
@@ -37,6 +39,27 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
+        // Enhanced logging for debugging
+        logger.debug("Full Request URI: {}", request.getRequestURI());
+        logger.debug("Full Query String: {}", request.getQueryString());
+
+        // Log all parameters
+        request.getParameterMap().forEach((key, values) ->
+                logger.debug("Parameter - {}: {}", key, Arrays.toString(values))
+        );
+
+        // Log session attributes
+        if (request.getSession() != null) {
+            Enumeration<String> attributeNames = request.getSession().getAttributeNames();
+            while (attributeNames.hasMoreElements()) {
+                String attributeName = attributeNames.nextElement();
+                logger.debug("Session Attribute - {}: {}",
+                        attributeName,
+                        request.getSession().getAttribute(attributeName)
+                );
+            }
+        }
+
         String accessToken = handleAuthentication(authentication);
         String targetUrl = determineTargetUrl(request);
         logger.info("Authentication success. Target URL: {}", targetUrl);
@@ -53,26 +76,42 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String redirectUri = request.getParameter("redirect_uri");
         logger.info("Checking redirect_uri parameter: {}", redirectUri);
 
-        // 세션에서 리다이렉트 URI 확인
+        // Exclude notification and SSE paths
+        if (redirectUri != null && (
+                redirectUri.contains("/notifications") ||
+                        redirectUri.contains("/sse") ||
+                        redirectUri.equals("/")
+        )) {
+            logger.info("Notification or SSE-related redirect, using default URL");
+            return URI + DEFAULT_SUCCESS_URL;
+        }
+
+        // Check session for redirect URI
         if (redirectUri == null && request.getSession() != null) {
             redirectUri = (String) request.getSession().getAttribute("REDIRECT_URI");
             logger.info("Retrieved redirect URI from session: {}", redirectUri);
+
+            // Remove URI from session after use
             request.getSession().removeAttribute("REDIRECT_URI");
         }
 
-        // 리다이렉트 URI가 null이거나 비어있지 않고, 허용된 경로인지 확인
-        if (redirectUri != null && !redirectUri.isEmpty() && isAllowedRedirectPath(redirectUri)) {
-            return URI + redirectUri;
+        // Validate redirect URI
+        if (redirectUri != null && !redirectUri.isEmpty() && !"/".equals(redirectUri) && isAllowedRedirectPath(redirectUri)) {
+            String fullRedirectUrl = URI + redirectUri;
+            logger.info("Using redirect URL: {}", fullRedirectUrl);
+            return fullRedirectUrl;
         }
 
-        // 디버그 로그 추가
+        // Default to main page
         logger.warn("No valid redirect URI found. Using default success URL.");
         return URI + DEFAULT_SUCCESS_URL;
     }
 
     private boolean isAllowedRedirectPath(String path) {
-        return ALLOWED_REDIRECT_PATHS.stream()
+        boolean isAllowed = ALLOWED_REDIRECT_PATHS.stream()
                 .anyMatch(allowedPath -> path.startsWith(allowedPath));
+        logger.info("Checking path: {} - Allowed: {}", path, isAllowed);
+        return isAllowed;
     }
 
     private String handleAuthentication(Authentication authentication) {
