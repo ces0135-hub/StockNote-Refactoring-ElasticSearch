@@ -19,9 +19,10 @@ public class SaveRequestFilter extends OncePerRequestFilter {
     private static final Logger logger = LoggerFactory.getLogger(SaveRequestFilter.class);
 
     private static final List<String> ALLOWED_REDIRECT_PATHS = Arrays.asList(
-            "/community/articles",
-            "/portfolio",
-            "/interests"
+            "/portfolio",           // 포트폴리오 메인
+            "/portfolio/total",     // 포트폴리오 전체 보기
+            "/community/articles",  // 커뮤니티 글 목록
+            "/stocks"              // 주식 메인
     );
 
     @Override

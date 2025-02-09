@@ -29,9 +29,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private static final String DEFAULT_SUCCESS_URL = "/";
 
     private static final List<String> ALLOWED_REDIRECT_PATHS = Arrays.asList(
-            "/community/articles",
-            "/portfolio",
-            "/interests"
+            "/portfolio",           // 포트폴리오 메인
+            "/portfolio/total",     // 포트폴리오 전체 보기
+            "/community/articles",  // 커뮤니티 글 목록
+            "/stocks"              // 주식 메인
     );
 
     public OAuth2SuccessHandler(TokenProvider tokenProvider) {
