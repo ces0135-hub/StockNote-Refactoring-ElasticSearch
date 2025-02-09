@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.com.stocknote.oauth.service.CustomOAuth2UserService;
 import org.com.stocknote.oauth.token.TokenAuthenticationFilter;
 import org.com.stocknote.oauth.token.TokenExceptionFilter;
+import org.com.stocknote.oauth.token.TokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -31,12 +32,18 @@ import java.util.Map;
 public class SecurityConfig {
 
     private final CustomOAuth2UserService oAuth2UserService;
-    private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
     private final CorsConfigurationSource corsConfigurationSource;
+    private final SaveRequestFilter saveRequestFilter;
+    private final TokenProvider tokenProvider;
 
     @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() { // security를 적용하지 않을 리소스
+    public OAuth2SuccessHandler oAuth2SuccessHandler() {
+        return new OAuth2SuccessHandler(tokenProvider);
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring()
                 .requestMatchers(
                         "/v3/api-docs/**",
@@ -48,26 +55,23 @@ public class SecurityConfig {
                 );
     }
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // rest api 설정
-                .csrf(AbstractHttpConfigurer::disable) // csrf 비활성화 -> cookie를 사용하지 않으면 꺼도 된다. (cookie를 사용할 경우 httpOnly(XSS 방어), sameSite(CSRF 방어)로 방어해야 한다.)
-                .httpBasic(AbstractHttpConfigurer::disable) // 기본 인증 로그인 비활성화
-                .formLogin(AbstractHttpConfigurer::disable) // 기본 login form 비활성화
-                .logout(AbstractHttpConfigurer::disable) // 기본 logout 비활성화
-                .headers(c -> c.frameOptions(
-                        FrameOptionsConfig::disable).disable()) // X-Frame-Options 비활성화
+                .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
+                .headers(c -> c.frameOptions(FrameOptionsConfig::disable).disable())
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
 
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
 
-                // request 인증, 인가 설정
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(
                                 "/",
+                                "/oauth2/**",
                                 "/auth/**",
                                 "/auth/login",
                                 "/api/volume",
@@ -79,9 +83,9 @@ public class SecurityConfig {
                                 "/api/v1/stocks/*/vote/",
                                 "/api/v1/stocks/*/vote-statistics",
                                 "/api/v1/stocks/chart",
-                                "/api/v1/stockApis/price", // 주식 가격 API
-                                "/api/v1/stocks/{stockCode}", // 개별 주식 상세 정보
-                                "/api/v1/stockApis/time-prices", // 시간별 가격 API
+                                "/api/v1/stockApis/price",
+                                "/api/v1/stocks/{stockCode}",
+                                "/api/v1/stockApis/time-prices",
                                 "/api/v1/stockApis/chart",
                                 "/api/v1/votes/*",
                                 "/api/v1/votes/{stockCode}/*",
@@ -89,7 +93,7 @@ public class SecurityConfig {
                                 "/auth/kakao/redirect",
                                 "/auth/kakao/callback",
                                 "/swagger-ui/**",
-                                "/swagger-ui/oauth2-redirect.html",// Swagger UI 경로 허용
+                                "/swagger-ui/oauth2-redirect.html",
                                 "/v3/api-docs/**",
                                 "/ws/**",
                                 "/topic/**",
@@ -104,47 +108,37 @@ public class SecurityConfig {
                                 "/api/v1/posts/popular",
                                 "sse/**",
                                 "/api/v1/searchDocs/**"
-
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
 
-                // oauth2 설정
                 .oauth2Login(oauth ->
                         oauth.authorizationEndpoint(endpoint -> endpoint
                                         .baseUri("/oauth2/authorization")
                                 )
                                 .userInfoEndpoint(c -> c.userService(oAuth2UserService))
-                                .successHandler(oAuth2SuccessHandler)
+                                .successHandler(oAuth2SuccessHandler())
                                 .redirectionEndpoint(e -> e
                                         .baseUri("/auth/{registrationId}/redirect")
                                 )
                                 .failureHandler((request, response, exception) -> {
                                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                                     response.setContentType("application/json;charset=UTF-8");
-
                                     Map<String, String> errorDetails = new HashMap<>();
                                     errorDetails.put("error", "Authentication failed");
                                     errorDetails.put("message", exception.getMessage());
-
                                     String errorJson = new ObjectMapper().writeValueAsString(errorDetails);
                                     response.getWriter().write(errorJson);
                                 })
                 )
 
-                // jwt 관련 설정
-                .addFilterBefore(tokenAuthenticationFilter, //tokenAuthenticationFilter: JWT 인증을 처리하는 커스텀 필터, 모든 요청에서 토큰을 검사하고 인증 여부를 결정
-                        UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new TokenExceptionFilter(), tokenAuthenticationFilter.getClass()) // 토큰 예외 핸들링
-
-                // 인증/인가 예외 핸들링
-                .exceptionHandling((exceptions) -> exceptions
-                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 인증 실패 시 처리
-                        .accessDeniedHandler(new CustomAccessDeniedHandler())) //인가 실패 시 처리
-
+                .addFilterBefore(saveRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new TokenExceptionFilter(), tokenAuthenticationFilter.getClass())
-                .addFilterBefore(new SaveRequestFilter(), UsernamePasswordAuthenticationFilter.class); // 이 줄 추가
+
+                .exceptionHandling((exceptions) -> exceptions
+                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                        .accessDeniedHandler(new CustomAccessDeniedHandler()));
 
         return http.build();
     }
