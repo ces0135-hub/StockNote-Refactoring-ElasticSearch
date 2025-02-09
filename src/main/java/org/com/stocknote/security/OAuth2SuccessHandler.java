@@ -1,11 +1,7 @@
 package org.com.stocknote.security;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import lombok.RequiredArgsConstructor;
 import org.com.stocknote.config.AppConfig;
 import org.com.stocknote.oauth.token.TokenProvider;
 import org.slf4j.Logger;
@@ -13,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
@@ -29,10 +24,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private static final String DEFAULT_SUCCESS_URL = "/";
 
     private static final List<String> ALLOWED_REDIRECT_PATHS = Arrays.asList(
-            "/portfolio",           // 포트폴리오 메인
-            "/portfolio/total",     // 포트폴리오 전체 보기
-            "/community/articles",  // 커뮤니티 글 목록
-            "/stocks"              // 주식 메인
+            "/portfolio",
+            "/portfolio/total",
+            "/community/articles",
+            "/stocks"
     );
 
     public OAuth2SuccessHandler(TokenProvider tokenProvider) {
@@ -42,35 +37,36 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
-        logger.info("Authentication success. Processing redirect...");
         String accessToken = handleAuthentication(authentication);
         String targetUrl = determineTargetUrl(request);
-        logger.info("Target URL determined: {}", targetUrl);
+        logger.info("Authentication success. Target URL: {}", targetUrl);
 
         String redirectUrl = UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("accessToken", accessToken)
                 .build().toUriString();
-        logger.info("Final redirect URL: {}", redirectUrl);
 
+        logger.info("Redirecting to: {}", redirectUrl);
         response.sendRedirect(redirectUrl);
     }
 
     protected String determineTargetUrl(HttpServletRequest request) {
         String redirectUri = request.getParameter("redirect_uri");
-        logger.info("Redirect URI from parameter: {}", redirectUri);
+        logger.info("Checking redirect_uri parameter: {}", redirectUri);
 
+        // 세션에서 리다이렉트 URI 확인
         if (redirectUri == null && request.getSession() != null) {
             redirectUri = (String) request.getSession().getAttribute("REDIRECT_URI");
-            logger.info("Redirect URI from session: {}", redirectUri);
+            logger.info("Retrieved redirect URI from session: {}", redirectUri);
             request.getSession().removeAttribute("REDIRECT_URI");
         }
 
+        // 리다이렉트 URI가 null이거나 비어있지 않고, 허용된 경로인지 확인
         if (redirectUri != null && !redirectUri.isEmpty() && isAllowedRedirectPath(redirectUri)) {
-            logger.info("Using redirect URI: {}", redirectUri);
             return URI + redirectUri;
         }
 
-        logger.info("Using default success URL");
+        // 디버그 로그 추가
+        logger.warn("No valid redirect URI found. Using default success URL.");
         return URI + DEFAULT_SUCCESS_URL;
     }
 
@@ -79,7 +75,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 .anyMatch(allowedPath -> path.startsWith(allowedPath));
     }
 
-    public String handleAuthentication(Authentication authentication) {
+    private String handleAuthentication(Authentication authentication) {
         String accessToken = tokenProvider.generateAccessToken(authentication);
         tokenProvider.generateRefreshToken(authentication, accessToken);
         return accessToken;
