@@ -76,4 +76,15 @@ public class CommentController {
         return GlobalResponse.success();
     }
 
+    @GetMapping("/check")
+    @Operation(summary = "사용자의 게시글 댓글 작성 여부 확인")
+    public GlobalResponse<Boolean> hasUserCommentedOnPost(
+            @PathVariable(value = "postId") Long postId,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        Member member = principalDetails.user();
+        boolean hasCommented = commentService.hasUserCommentedOnPost(postId, member);
+        return GlobalResponse.success(hasCommented);
+    }
+
 }
