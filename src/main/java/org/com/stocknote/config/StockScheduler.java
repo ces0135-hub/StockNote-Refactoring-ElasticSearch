@@ -36,7 +36,7 @@ public class StockScheduler {
     return scheduler;
   }
 
-//   @PostConstruct /*대신 Scheduled 사용*/
+  @PostConstruct /*대신 Scheduled 사용*/
 //  @Scheduled(cron = "0 30 8 * * *", zone = "Asia/Seoul") // 매일 오전 8:30 KST
   public void downloadStockData() {
     log.info("Starting scheduled stock data download at {}", LocalDateTime.now());
