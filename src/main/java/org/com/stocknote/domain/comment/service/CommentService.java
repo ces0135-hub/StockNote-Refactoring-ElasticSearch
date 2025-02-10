@@ -83,8 +83,8 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
-//    public boolean hasUserCommentedOnPost(Long postId, Member member) {
-//        return commentRepository.existsByPostIdAndMember(postId, member);
-//    }
+    public boolean hasUserCommentedOnPost(Long postId, Member member) {
+        return commentRepository.existsByPostIdAndMember(postId, member);
+    }
 
 }
