@@ -5,9 +5,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.member.entity.Member;
+import org.com.stocknote.domain.notification.service.KeywordNotificationService;
 import org.com.stocknote.domain.post.dto.PostCreateDto;
 import org.com.stocknote.domain.post.dto.PostModifyDto;
 import org.com.stocknote.domain.post.dto.PostResponseDto;
+import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.dto.PostSearchConditionDto;
 import org.com.stocknote.domain.post.entity.PostCategory;
 import org.com.stocknote.domain.post.service.PostService;
@@ -20,6 +22,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import static org.com.stocknote.domain.post.entity.QPost.post;
+
 @RestController
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
@@ -27,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
 
     private final PostService postService;
+    private final KeywordNotificationService keywordNotificationService;
 
     @PostMapping
     @Operation(summary = "게시글 작성")
@@ -35,13 +40,10 @@ public class PostController {
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
         Member member = principalDetails.user();
-        return GlobalResponse.success(postService.createPost(postCreateDto, member));
+        Post post = postService.createPost(postCreateDto, member);
+        keywordNotificationService.createKeywordNotification(post);
+        return GlobalResponse.success(post.getId());
     }
-
-//    @GetMapping
-//    public GlobalResponse<Page<PostResponseDto>> getAllPosts(Pageable pageable) {
-//        return GlobalResponse.success(postService.getPosts(pageable));
-//    }
 
     @GetMapping
     @Operation(summary = "게시글 목록 조회")

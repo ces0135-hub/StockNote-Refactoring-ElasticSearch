@@ -4,20 +4,15 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.comment.entity.Comment;
 import org.com.stocknote.domain.comment.repository.CommentRepository;
-import org.com.stocknote.domain.member.dto.MyCommentResponse;
-import org.com.stocknote.domain.member.dto.ChangeNameRequest;
-import org.com.stocknote.domain.member.dto.MyPostResponse;
+import org.com.stocknote.domain.member.dto.*;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.member.repository.MemberRepository;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.repository.PostRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -47,4 +42,5 @@ public class MemberService {
         Page<Comment> memberComments = commentRepository.findByMember(member, pageable);
         return memberComments.map(MyCommentResponse::of);
     }
+
 }

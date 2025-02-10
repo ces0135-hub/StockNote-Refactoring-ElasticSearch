@@ -18,8 +18,8 @@ public class SseController {
         return sseEmitterService.createEmitter(memberId);
     }
 
-    @PostMapping("/send")
-    public void sendNotification(@RequestParam String memberId, @RequestBody Object data) {
-        sseEmitterService.sendNotification(memberId, data);
-    }
+//    @PostMapping("/send")
+//    public void sendNotification(@RequestParam String memberId, @RequestBody Object data) {
+//        sseEmitterService.sendNotification(memberId, data);
+//    }
 }

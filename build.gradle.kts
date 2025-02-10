@@ -116,11 +116,6 @@ tasks {
         ignoreFailures = true  // 테스트 실패해도 빌드 진행
     }
     
-    bootJar {
-        archiveFileName.set("app.jar")
-        mainClass.set("org.com.stocknote.StockNoteApplication")
-    }
-    
     processResources {
         // 리소스 파일 복사 확인
         doFirst {

@@ -7,6 +7,7 @@ import jakarta.persistence.OneToMany;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.com.stocknote.domain.comment.entity.Comment;
+import org.com.stocknote.domain.keyword.entity.Keyword;
 import org.com.stocknote.domain.like.entity.Like;
 import org.com.stocknote.domain.memberStock.entity.MemberStock;
 import org.com.stocknote.domain.post.entity.Post;
@@ -26,7 +27,6 @@ public class Member extends BaseEntity {
     private String account; // 아이디
     private String email; // 이메일
     private String profile; // 프로필 사진
-    private String introduction; // 자기소개(한줄소개)
 
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
