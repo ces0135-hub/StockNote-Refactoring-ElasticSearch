@@ -60,7 +60,7 @@ public class SecurityConfig {
                 .logout(AbstractHttpConfigurer::disable)
                 .headers(c -> c.frameOptions(FrameOptionsConfig::disable).disable())
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
 

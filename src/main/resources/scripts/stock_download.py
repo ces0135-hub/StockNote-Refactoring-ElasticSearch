@@ -128,7 +128,7 @@ class StockDownloader:
     def __init__(self, base_dir):
         self.base_dir = base_dir
         self.engine = create_engine(
-            'mysql+mysqlconnector://root:1234@localhost/default_db',
+            'mysql+mysqlconnector://root:1234@43.203.126.129/default_db',
             connect_args={
                 'connect_timeout': 30,
                 'auth_plugin': 'mysql_native_password'

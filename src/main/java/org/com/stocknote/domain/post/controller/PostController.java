@@ -116,6 +116,7 @@ public class PostController {
             @ModelAttribute PostSearchConditionDto condition,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
+        //sql 검색결과
         return GlobalResponse.success(postService.searchPosts(condition, pageable));
     }
 
