@@ -67,5 +67,4 @@ public class SearchDocController {
     Page<PostResponseDto> response = postDocs.map(PostResponseDto::fromPost);
     return GlobalResponse.success(response);
   }
-
 }
