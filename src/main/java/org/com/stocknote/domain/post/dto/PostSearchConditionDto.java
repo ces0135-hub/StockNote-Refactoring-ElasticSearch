@@ -8,9 +8,12 @@ import org.com.stocknote.domain.post.entity.PostCategory;
 @Setter
 public class PostSearchConditionDto {
     private String keyword;
-    private SearchType searchType;
-    private PostCategory category;
+    private SearchType searchType = SearchType.ALL;
+    private String category; // enum 문자열로 받음
 
+    public String getCategory() {
+        return category != null ? category.toUpperCase() : null;
+    }
 
     public enum SearchType {
         TITLE, CONTENT, HASHTAG, USERNAME, ALL

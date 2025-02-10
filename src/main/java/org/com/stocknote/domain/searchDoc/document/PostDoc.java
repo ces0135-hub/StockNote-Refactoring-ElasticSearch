@@ -22,11 +22,11 @@ public class PostDoc {
   @Id
   private String id;
 
-  @Field(type = FieldType.Date, name = "created_at")
-  private LocalDateTime createdAt;
+  @Field(type = FieldType.Text, name = "created_at")
+  private String createdAt;
 
-  @Field(type = FieldType.Date, name = "modified_at")
-  private LocalDateTime modifiedAt;
+  @Field(type = FieldType.Text, name = "modified_at")
+  private String modifiedAt;
 
   @Field(type = FieldType.Text)
   private String title;

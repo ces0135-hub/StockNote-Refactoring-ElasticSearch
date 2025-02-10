@@ -28,9 +28,28 @@ public interface PostDocRepository extends ElasticsearchRepository<PostDoc, Stri
   @Query("{\"bool\": {\"should\": [{\"match\": {\"title\": \"?0\"}}, {\"match\": {\"hashtags\": \"?0\"}}]}}")
   PostDoc searchByTitleOrHashtag(String keyword);
 
-  @Query("{\"bool\": {\"should\": [" +
-      "{\"match\": {\"title\": \"?0\"}}," +
-      "{\"match\": {\"hashtags\": \"?0\"}}" +
-      "]}}")
+  @Query("{\"bool\": {\"should\": [" + "{\"match\": {\"title\": \"?0\"}},"
+      + "{\"match\": {\"hashtags\": \"?0\"}}" + "]}}")
   boolean existsByTitleOrHashtagsContaining(String keyword);
+
+  @Query("{\"bool\": {\"must\": [" + "{\"match\": {\"title\": \"?0\"}},"
+      + "{\"term\": {\"category.keyword\": \"?1\"}}" + "]}}")
+  Page<PostDoc> searchByTitleAndCategory(String keyword, String category, Pageable pageable);
+
+  @Query("{\"bool\": {\"must\": [" + "{\"match\": {\"body\": \"?0\"}},"
+      + "{\"term\": {\"category.keyword\": \"?1\"}}" + "]}}")
+  Page<PostDoc> searchByContentAndCategory(String keyword, String category, Pageable pageable);
+
+  @Query("{\"bool\": {\"must\": [" + "{\"match\": {\"member_doc.name\": \"?0\"}},"
+      + "{\"term\": {\"category.keyword\": \"?1\"}}" + "]}}")
+  Page<PostDoc> searchByUsernameAndCategory(String keyword, String category, Pageable pageable);
+
+  @Query("{\"bool\": {\"must\": [" + "{\"match\": {\"hashtags\": \"?0\"}},"
+      + "{\"term\": {\"category.keyword\": \"?1\"}}" + "]}}")
+  Page<PostDoc> searchByHashtagAndCategory(String keyword, String category, Pageable pageable);
+
+  @Query("{\"bool\": {\"must\": [" + "{\"multi_match\": {" + "\"query\": \"?0\","
+      + "\"fields\": [\"title^3\", \"body\", \"member_doc.name^2\", \"hashtags^2\"]" + "}},"
+      + "{\"term\": {\"category.keyword\": \"?1\"}}" + "]}}")
+  Page<PostDoc> searchByAllAndCategory(String keyword, String category, Pageable pageable);
 }

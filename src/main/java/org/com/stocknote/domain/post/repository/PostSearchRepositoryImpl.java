@@ -28,9 +28,9 @@ public class PostSearchRepositoryImpl implements PostSearchRepository {
 
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (condition.getCategory() != null) {
-            builder.and(post.category.eq(condition.getCategory()));
-        }
+//        if (condition.getCategory() != null) {
+//            builder.and(post.category.eq(condition.getCategory()));
+//        }
 
         if (StringUtils.hasText(condition.getKeyword())) {
             switch (condition.getSearchType()) {
