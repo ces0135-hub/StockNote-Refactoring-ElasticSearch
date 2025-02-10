@@ -32,6 +32,7 @@ public enum ErrorCode {
     STOCK_NOT_FOUND(HttpStatus.BAD_REQUEST,  "해당 종목이 존재하지 않습니다" ),
     ALREADY_EXIST_STOCK(HttpStatus.BAD_REQUEST,"이미 존재하는 종목입니다" ),
     MEMBER_STOCK_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자의 관심 종목을 찾을 수 없습니다"),
+
     // Auth
     ACCESS_DENIED(HttpStatus.UNAUTHORIZED, "인증되지 않은 유저입니다."),
     SC_FORBIDDEN(HttpStatus.UNAUTHORIZED, "권한이 없는 유저입니다."),
@@ -45,7 +46,10 @@ public enum ErrorCode {
     COMMENT_DELETE_DENIED(HttpStatus.FORBIDDEN, "댓글 삭제는 댓글 작성자만 할 수 있습니다."),
 
     // member
-    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다");
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다"),
+
+    // portfolio
+    PORTFOLIO_NOT_FOUND(HttpStatus.NOT_FOUND, "포트폴리오를 찾을 수 없습니다");
 
 
 

@@ -231,3 +231,9 @@ override.tf.json
 # CLI configuration files
 .terraformrc
 terraform.rc
+
+DDl.sql
+logstash.conf
+**/logstash/config/*.yml
+**/logstash/pipeline/*.conf
+
