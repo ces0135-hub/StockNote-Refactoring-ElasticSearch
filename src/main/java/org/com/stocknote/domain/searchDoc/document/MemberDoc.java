@@ -22,6 +22,9 @@ public class MemberDoc {
   private String name;
 
   @Field(type = FieldType.Keyword)
+  private String profile;
+
+  @Field(type = FieldType.Keyword)
   private String provider;
 
   @Field(type = FieldType.Keyword, name = "provider_id")

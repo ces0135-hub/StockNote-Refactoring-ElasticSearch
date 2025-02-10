@@ -115,7 +115,7 @@ tasks {
         }
         ignoreFailures = true  // 테스트 실패해도 빌드 진행
     }
-    
+
     processResources {
         // 리소스 파일 복사 확인
         doFirst {

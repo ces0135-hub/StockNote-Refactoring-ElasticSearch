@@ -11,6 +11,7 @@ public class PostSearchConditionDto {
     private SearchType searchType;
     private PostCategory category;
 
+
     public enum SearchType {
         TITLE, CONTENT, HASHTAG, USERNAME, ALL
     }
