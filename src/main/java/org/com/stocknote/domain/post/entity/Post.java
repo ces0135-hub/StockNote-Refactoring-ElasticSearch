@@ -34,6 +34,7 @@ public class Post extends BaseEntity {
     private Member member;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private PostCategory category;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
