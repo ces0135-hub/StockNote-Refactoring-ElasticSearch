@@ -2,14 +2,14 @@ package org.com.stocknote.domain.searchDoc.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.com.stocknote.domain.hashtag.entity.Hashtag;
+import org.com.stocknote.domain.hashtag.repository.HashtagRepository;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.member.repository.MemberRepository;
 import org.com.stocknote.domain.post.dto.PostSearchConditionDto;
+import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.entity.PostCategory;
-import org.com.stocknote.domain.searchDoc.document.PortfolioDoc;
-import org.com.stocknote.domain.searchDoc.document.PortfolioStockDoc;
-import org.com.stocknote.domain.searchDoc.document.PostDoc;
-import org.com.stocknote.domain.searchDoc.document.StockDoc;
+import org.com.stocknote.domain.searchDoc.document.*;
 import org.com.stocknote.domain.searchDoc.repository.PortfolioDocRepository;
 import org.com.stocknote.domain.searchDoc.repository.PortfolioStockDocRepository;
 import org.com.stocknote.domain.searchDoc.repository.PostDocRepository;
@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -32,6 +33,7 @@ public class SearchDocService {
   private final PortfolioStockDocRepository portfolioStockDocRepository;
   private final MemberRepository memberRepository;
   private final PostDocRepository postDocRepository;
+  private final HashtagRepository hashtagRepository;
 
   public List<StockDoc> searchStocks(String keyword) {
     return stockDocRepository.searchByKeyword(keyword);
@@ -44,6 +46,32 @@ public class SearchDocService {
     PortfolioDoc portfolioDoc = portfolioDocRepository.findByMemberId(member.getId());
 
     return portfolioDoc;
+  }
+
+  public PostDoc savePostDoc(Post post) {
+    List<Hashtag> hashtags = hashtagRepository.findByPostId(post.getId());
+
+    List<String> hashtagList = hashtags.stream()
+            .map(Hashtag::getName)
+            .collect(Collectors.toList());
+
+    PostDoc postDoc = PostDoc.builder()
+            .id(post.getId().toString())
+            .createdAt(post.getCreatedAt().toString())
+            .modifiedAt(post.getModifiedAt().toString())
+            .title(post.getTitle())
+            .body(post.getBody())
+            .category(post.getCategory())
+            .hashtags(hashtagList) // 본문에서 해시태그 추출하는 메소드 필요
+            .memberDoc(convertToMemberDoc(post.getMember())) // Member를 MemberDoc으로 변환하는 메소드 필요
+            .build();
+
+    return postDocRepository.save(postDoc);
+  }
+
+
+  private MemberDoc convertToMemberDoc(Member member) {
+    return MemberDoc.of(member);
   }
 
   public List<PortfolioStockDoc> getMyPortfolioStockList(String email) {

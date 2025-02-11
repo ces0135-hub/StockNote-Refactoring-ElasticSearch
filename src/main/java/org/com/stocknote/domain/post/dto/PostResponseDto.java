@@ -1,11 +1,13 @@
 package org.com.stocknote.domain.post.dto;
 
 import org.com.stocknote.domain.comment.dto.CommentDetailResponse;
+import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.entity.PostCategory;
 import org.com.stocknote.domain.searchDoc.document.PostDoc;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public record PostResponseDto(
@@ -59,4 +61,16 @@ public record PostResponseDto(
             postDoc.getCommentCount()
         );
     }
+
+    public Post toEntity(Member member) {
+        return Post.builder()
+                .title(this.title)
+                .body(this.body)
+                .category(this.category)
+                .member(member)       // 연관관계 설정
+                .comments(new ArrayList<>())  // 빈 리스트로 초기화
+                .likes(new ArrayList<>())     // 빈 리스트로 초기화
+                .build();
+    }
+
 }

@@ -1,20 +1,18 @@
 package org.com.stocknote.domain.notification.service;
 
 import lombok.RequiredArgsConstructor;
-import org.com.stocknote.domain.hashtag.service.HashtagService;
 import org.com.stocknote.domain.keyword.entity.Keyword;
 import org.com.stocknote.domain.keyword.repository.KeywordRepository;
 import org.com.stocknote.domain.notification.dto.KeywordNotificationResponse;
 import org.com.stocknote.domain.notification.entity.KeywordNotification;
 import org.com.stocknote.domain.notification.repository.KeywordNotificationRepository;
-import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.entity.PostCategory;
+import org.com.stocknote.domain.searchDoc.document.KeywordDoc;
 import org.com.stocknote.domain.searchDoc.document.PostDoc;
+import org.com.stocknote.domain.searchDoc.repository.KeywordDocRepository;
 import org.com.stocknote.domain.searchDoc.repository.PostDocRepository;
 import org.com.stocknote.global.error.ErrorCode;
 import org.com.stocknote.global.exception.CustomException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,64 +24,52 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class KeywordNotificationElasticService {
     private final KeywordRepository keywordRepository;
+    private final KeywordDocRepository keywordDocRepository;
     private final KeywordNotificationRepository keywordNotificationRepository;
     private final SseEmitterService sseEmitterService;
     private final PostDocRepository postDocRepository;
 
     @Transactional
     public void createKeywordNotification(PostDoc postDoc) {
-        // 카테고리에 맞는 키워드 구독자 조회
-        List<Keyword> keywords;
-        if (postDoc.getCategory() == PostCategory.ALL) {
-            keywords = keywordRepository.findAll();
-        } else {
-            keywords = keywordRepository.findAllByPostCategory(postDoc.getCategory());
-        }
+        // Elasticsearch로 매칭되는 키워드 한 번에 조회
+        System.out.println("postDoc = " + postDoc);
+        System.out.println("postCategory = " + postDoc.getCategory());
+        System.out.println("postDoc = " + postDoc.getHashtags());
 
-        // 각 키워드별로 매칭 확인
-        keywords.forEach(keyword -> {
-            if (postDocRepository.existsByTitleOrHashtagsContaining(keyword.getKeyword())) {
-                KeywordNotification keywordNotification = KeywordNotification.builder()
-                    .memberId(keyword.getMemberId())
+        List<KeywordDoc> matchingKeywords = keywordDocRepository.findMatchingKeywords(
+                postDoc.getCategory(),
+                postDoc.getTitle(),
+                String.join(" ", postDoc.getHashtags())
+        );
+
+        System.out.println("matchingKeywords = " + matchingKeywords);
+
+        // 매칭된 키워드에 대해 알림 생성
+        matchingKeywords.forEach(keywordDoc -> {
+            KeywordNotification notification = KeywordNotification.builder()
+                    .memberId(keywordDoc.getMemberId())
                     .relatedPostId(Long.valueOf(postDoc.getId()))
-                    .keyword(keyword.getKeyword())
-                    .postCategory(keyword.getPostCategory())
+                    .keyword(keywordDoc.getKeyword())
+                    .postCategory(keywordDoc.getPostCategory())
                     .isRead(false)
-                    .content(createNotificationContent(postDoc, keyword.getKeyword()))
+                    .content(createNotificationContent(postDoc, keywordDoc.getKeyword()))
                     .build();
 
-                keywordNotificationRepository.save(keywordNotification);
+            keywordNotificationRepository.save(notification);
 
-                // SSE로 실시간 알림 전송
-                sseEmitterService.sendKeywordNotification(
-                    keyword.getMemberId().toString(),
-                    KeywordNotificationResponse.from(keywordNotification)
-                );
-            }
+            // SSE로 실시간 알림 전송
+            sseEmitterService.sendKeywordNotification(
+                    keywordDoc.getMemberId().toString(),
+                    KeywordNotificationResponse.from(notification)
+            );
         });
     }
 
     private String createNotificationContent(PostDoc postDoc, String keyword) {
         return String.format("'%s' 키워드와 관련된 게시글이 등록되었습니다: %s",
-            keyword,
-            postDoc.getTitle()
+                keyword,
+                postDoc.getTitle()
         );
     }
 
-    public List<KeywordNotificationResponse> getNotificationsByMember(Long memberId) {
-        LocalDateTime startDate = LocalDateTime.now().minusDays(30);
-        return keywordNotificationRepository.findByMemberIdAndIsReadFalseAndCreatedAtAfterOrderByCreatedAtDesc(
-                memberId,
-                startDate
-            )
-            .stream()
-            .map(KeywordNotificationResponse::from)
-            .collect(Collectors.toList());
-    }
-
-    public void markAsRead(Long notificationId) {
-        KeywordNotification keywordNotification = keywordNotificationRepository.findById(notificationId)
-            .orElseThrow(() -> new CustomException(ErrorCode.ENTITY_NOT_FOUND));
-        keywordNotification.markAsRead();
-    }
 }

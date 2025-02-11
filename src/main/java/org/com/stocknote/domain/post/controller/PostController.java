@@ -2,18 +2,20 @@ package org.com.stocknote.domain.post.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.notification.service.KeywordNotificationElasticService;
 import org.com.stocknote.domain.notification.service.KeywordNotificationService;
-import org.com.stocknote.domain.post.dto.PostCreateDto;
 import org.com.stocknote.domain.post.dto.PostModifyDto;
 import org.com.stocknote.domain.post.dto.PostResponseDto;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.dto.PostSearchConditionDto;
 import org.com.stocknote.domain.post.entity.PostCategory;
 import org.com.stocknote.domain.post.service.PostService;
+import org.com.stocknote.domain.searchDoc.document.PostDoc;
+import org.com.stocknote.domain.searchDoc.service.SearchDocService;
 import org.com.stocknote.global.dto.GlobalResponse;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.springframework.data.domain.Page;
@@ -23,7 +25,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import static org.com.stocknote.domain.post.entity.QPost.post;
 
 @RestController
 @RequestMapping("/api/v1/posts")
@@ -32,18 +33,21 @@ import static org.com.stocknote.domain.post.entity.QPost.post;
 public class PostController {
 
     private final PostService postService;
+    private final SearchDocService searchDocService;
     private final KeywordNotificationService keywordNotificationService;
     private final KeywordNotificationElasticService keywordNotificationElasticService;
 
+    @Transactional
     @PostMapping
     @Operation(summary = "게시글 작성")
     public GlobalResponse<Long> createPost(
-            @Valid @RequestBody PostCreateDto postCreateDto,
+            @Valid @RequestBody PostResponseDto postResponseDto,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
         Member member = principalDetails.user();
-        Post post = postService.createPost(postCreateDto, member);
-        keywordNotificationService.createKeywordNotification(post);
+        Post post = postService.createPost(postResponseDto, member);
+        PostDoc postDoc= searchDocService.savePostDoc(post);
+        keywordNotificationElasticService.createKeywordNotification(postDoc);
         return GlobalResponse.success(post.getId());
     }
 
