@@ -8,12 +8,15 @@ import org.com.stocknote.domain.hashtag.entity.QHashtag;
 import org.com.stocknote.domain.member.entity.QMember;
 import org.com.stocknote.domain.post.dto.PostSearchConditionDto;
 import org.com.stocknote.domain.post.entity.Post;
+import org.com.stocknote.domain.post.entity.PostCategory;
 import org.com.stocknote.domain.post.entity.QPost;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
+
+import java.util.Locale;
 
 @Repository
 @RequiredArgsConstructor
@@ -28,9 +31,17 @@ public class PostSearchRepositoryImpl implements PostSearchRepository {
 
         BooleanBuilder builder = new BooleanBuilder();
 
-//        if (condition.getCategory() != null) {
-//            builder.and(post.category.eq(condition.getCategory()));
-//        }
+        if (condition.getCategory() != null) {
+            try {
+                PostCategory categoryEnum = PostCategory.valueOf(condition.getCategory());
+                builder.and(post.category.eq(categoryEnum));
+            } catch (IllegalArgumentException e) {
+                // 잘못된 카테고리 문자열이 들어온 경우의 처리
+                // 1. 무시하고 지나가거나
+                // 2. 예외를 던지거나
+                // 3. 기본 카테고리로 설정하는 등의 처리가 가능
+            }
+        }
 
         if (StringUtils.hasText(condition.getKeyword())) {
             switch (condition.getSearchType()) {

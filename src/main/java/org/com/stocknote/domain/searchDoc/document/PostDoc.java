@@ -5,14 +5,14 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.*;
 import org.com.stocknote.domain.post.entity.PostCategory;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Document(indexName = "stocknote_post", createIndex = true)
+@Setting(settingPath = "/elasticsearch/settings.json")
+@Mapping(mappingPath = "/elasticsearch/mappings.json")
 @Getter
 @Setter
 @Builder

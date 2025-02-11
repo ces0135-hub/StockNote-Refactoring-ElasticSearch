@@ -236,4 +236,5 @@ DDl.sql
 logstash.conf
 **/logstash/config/*.yml
 **/logstash/pipeline/*.conf
+elasticsearch/logstash/
 

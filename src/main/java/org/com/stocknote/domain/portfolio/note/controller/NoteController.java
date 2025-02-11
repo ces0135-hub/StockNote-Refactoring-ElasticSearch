@@ -26,7 +26,17 @@ public class NoteController {
   }
 
   @GetMapping("/allNote")
-  public GlobalResponse<List<NoteResponse>> getNoteList() {
+  public GlobalResponse<List<NoteResponse>> getNoteList(
+
+  ) {
+    List<Note> noteList = noteService.getNoteList();
+    List<NoteResponse> response = noteList.stream().map(NoteResponse::from).collect(Collectors.toList());
+    return GlobalResponse.success(response);
+  }
+
+  @GetMapping("/allNote/forTest")
+  public GlobalResponse<List<NoteResponse>> getAllNoteList(
+  ) {
     List<Note> noteList = noteService.getNoteList();
     List<NoteResponse> response = noteList.stream().map(NoteResponse::from).collect(Collectors.toList());
     return GlobalResponse.success(response);
