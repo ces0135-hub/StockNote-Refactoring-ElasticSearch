@@ -2,6 +2,7 @@ package org.com.stocknote.domain.portfolio.note.service;
 
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.member.entity.Member;
+import org.com.stocknote.domain.member.repository.MemberRepository;
 import org.com.stocknote.domain.portfolio.note.entity.Note;
 import org.com.stocknote.domain.portfolio.note.repository.NoteRepository;
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
@@ -9,6 +10,8 @@ import org.com.stocknote.domain.portfolio.portfolio.repository.PortfolioReposito
 import org.com.stocknote.domain.portfolio.portfolioStock.dto.request.PfStockPatchRequest;
 import org.com.stocknote.domain.portfolio.portfolioStock.entity.PfStock;
 import org.com.stocknote.domain.stock.entity.Stock;
+import org.com.stocknote.global.error.ErrorCode;
+import org.com.stocknote.global.exception.CustomException;
 import org.com.stocknote.security.SecurityUtils;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +27,7 @@ public class NoteService {
 
   private final NoteRepository noteRepository;
   private final SecurityUtils securityUtils;
+  private final MemberRepository memberRepository;
 
   public Note buyStock(Portfolio portfolio, PfStock pfStock, PfStockPatchRequest pfStockPatchRequest) {
     Stock stock = pfStock.getStock();
@@ -90,7 +94,13 @@ public class NoteService {
     return noteRepository.findByPortfolioId(portfolioNo);
   }
 
-  public List<Note> getNoteList() {
+  public List<Note> getNoteList(String email) {
+    Member member = memberRepository.findByEmail(email)
+        .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+    List<Note> noteList = noteRepository.findByMemberId(member.getId());
+    return noteRepository.findAll();
+  }
+  public List<Note> getAllNoteList() {
     return noteRepository.findAll();
   }
 }

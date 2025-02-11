@@ -42,15 +42,15 @@ public class PortfolioController {
   }
 
 // 엘라스틱으로 대체 (Test용 코드)
-//  @GetMapping("/my")
-//  public GlobalResponse<PortfolioResponse> getMyPortfolioList(
-//      @AuthenticationPrincipal PrincipalDetails principalDetails
-//  ) {
-//    String email = principalDetails.getUsername();
-//    Portfolio portfolio = portfolioService.getMyPortfolioList(email);
-//    PortfolioResponse response = PortfolioResponse.from(portfolio);
-//    return GlobalResponse.success(response);
-//  }
+  @GetMapping("/my")
+  public GlobalResponse<PortfolioResponse> getMyPortfolioList(
+      @AuthenticationPrincipal PrincipalDetails principalDetails
+  ) {
+    String email = principalDetails.getUsername();
+    Portfolio portfolio = portfolioService.getMyPortfolioList(email);
+    PortfolioResponse response = PortfolioResponse.from(portfolio);
+    return GlobalResponse.success(response);
+  }
 
   @GetMapping("/{portfolio_no}")
   public GlobalResponse<PortfolioResponse> getPortfolioStock(

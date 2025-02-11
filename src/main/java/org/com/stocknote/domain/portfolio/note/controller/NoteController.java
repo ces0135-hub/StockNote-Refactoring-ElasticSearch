@@ -5,6 +5,8 @@ import org.com.stocknote.domain.portfolio.note.dto.NoteResponse;
 import org.com.stocknote.domain.portfolio.note.entity.Note;
 import org.com.stocknote.domain.portfolio.note.service.NoteService;
 import org.com.stocknote.domain.portfolio.portfolio.service.PortfolioService;
+import org.com.stocknote.oauth.entity.PrincipalDetails;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.com.stocknote.global.dto.GlobalResponse;
 
@@ -27,9 +29,10 @@ public class NoteController {
 
   @GetMapping("/allNote")
   public GlobalResponse<List<NoteResponse>> getNoteList(
-
+      @AuthenticationPrincipal PrincipalDetails principalDetails
   ) {
-    List<Note> noteList = noteService.getNoteList();
+    String email = principalDetails.getUsername();
+    List<Note> noteList = noteService.getNoteList(email);
     List<NoteResponse> response = noteList.stream().map(NoteResponse::from).collect(Collectors.toList());
     return GlobalResponse.success(response);
   }
@@ -37,7 +40,7 @@ public class NoteController {
   @GetMapping("/allNote/forTest")
   public GlobalResponse<List<NoteResponse>> getAllNoteList(
   ) {
-    List<Note> noteList = noteService.getNoteList();
+    List<Note> noteList = noteService.getAllNoteList();
     List<NoteResponse> response = noteList.stream().map(NoteResponse::from).collect(Collectors.toList());
     return GlobalResponse.success(response);
   }
