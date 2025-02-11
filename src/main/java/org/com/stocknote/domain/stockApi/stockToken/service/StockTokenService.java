@@ -62,7 +62,6 @@ public class StockTokenService {
                 .build();
     }
 
-    //@Cacheable(value = "accessToken", unless = "#result == null")
 
     public String getAccessToken() {
         String cachedToken = redisTemplate.opsForValue().get("stocknote:access-token");
@@ -82,38 +81,6 @@ public class StockTokenService {
         }
     }
 
-
-    private boolean isTokenExpired() {
-        return tokenExpirationTime == null || LocalDateTime.now().isAfter(tokenExpirationTime);
-    }
-
-    private String refreshAccessToken() {
-        Map<String, Object> response = tokenWebClient
-                .post()
-                .uri("/oauth2/tokenP")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(Map.of(
-                        "grant_type", "client_credentials",
-                        "appkey", appKey,
-                        "appsecret", appSecret
-                ))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
-                .block();  // ✅ 동기 호출로 변경 (즉시 토큰 적용)
-
-        if (response != null && response.get("access_token") != null) {
-            this.accessToken = (String) response.get("access_token");
-            long expiresIn = ((Number) response.get("expires_in")).longValue();
-            this.tokenExpirationTime = LocalDateTime.now().plusSeconds(expiresIn);
-
-            // ✅ Redis에 저장하여 캐싱
-            redisTemplate.opsForValue().set("stocknote:access-token", accessToken, expiresIn - 10, TimeUnit.SECONDS);
-
-            return accessToken;
-        } else {
-            throw new RuntimeException("Access Token 발급 응답이 비어있습니다.");
-        }
-    }
 
     public synchronized String getWebSocketApprovalKey() {
         if (websocketApprovalKey == null) {
@@ -153,6 +120,83 @@ public class StockTokenService {
         } catch (Exception e) {
             log.error("WebSocket approval key request failed", e);
             throw new RuntimeException("WebSocket approval key 발급 실패: " + e.getMessage(), e);
+        }
+    }
+
+    private String refreshAccessToken() {
+        try {
+            // 기존 Redis에 저장된 refresh_token 가져오기
+            String cachedRefreshToken = redisTemplate.opsForValue().get("stocknote:refresh-token");
+
+            if (cachedRefreshToken != null) {
+                return tokenWebClient
+                        .post()
+                        .uri("/oauth2/tokenP")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(Map.of(
+                                "grant_type", "refresh_token",
+                                "refresh_token", cachedRefreshToken,
+                                "appkey", appKey,
+                                "appsecret", appSecret
+                        ))
+                        .retrieve()
+                        .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                        .retryWhen(reactor.util.retry.Retry.fixedDelay(3, java.time.Duration.ofSeconds(2)))  // ✅ 3번 재시도, 2초 간격
+                        .doOnError(e -> log.error("❌ [ACCESS TOKEN 갱신 실패] {}", e.getMessage()))
+                        .blockOptional()
+                        .map(this::processTokenResponse)
+                        .orElseThrow(() -> new RuntimeException("Access Token 갱신 실패"));
+            }
+
+            return requestNewAccessToken();
+
+        } catch (Exception e) {
+            log.error("❌ Access Token 갱신 실패: {}", e.getMessage());
+            throw new RuntimeException("Access Token 갱신 중 오류 발생", e);
+        }
+    }
+
+    private String requestNewAccessToken() {
+        return tokenWebClient
+                .post()
+                .uri("/oauth2/tokenP")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of(
+                        "grant_type", "client_credentials",
+                        "appkey", appKey,
+                        "appsecret", appSecret
+                ))
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                .retryWhen(reactor.util.retry.Retry.fixedDelay(3, java.time.Duration.ofSeconds(2)))  // ✅ 3번 재시도, 2초 간격
+                .doOnError(e -> log.error("❌ [ACCESS TOKEN 신규 발급 실패] {}", e.getMessage()))
+                .blockOptional()
+                .map(this::processTokenResponse)
+                .orElseThrow(() -> new RuntimeException("Access Token 발급 실패"));
+    }
+
+    private String processTokenResponse(Map<String, Object> response) {
+        if (response != null && response.get("access_token") != null) {
+            this.accessToken = (String) response.get("access_token");
+            long expiresIn = ((Number) response.get("expires_in")).longValue();
+            this.tokenExpirationTime = LocalDateTime.now().plusSeconds(expiresIn);
+
+            // 🚀 5분 전 미리 갱신
+            long redisExpireTime = Math.max(expiresIn - 300, 10);
+
+            // Redis에 access_token 저장
+            redisTemplate.opsForValue().set("stocknote:access-token", accessToken, redisExpireTime, TimeUnit.SECONDS);
+
+            // refresh_token도 저장 (응답에 포함된 경우)
+            if (response.get("refresh_token") != null) {
+                String refreshToken = (String) response.get("refresh_token");
+                redisTemplate.opsForValue().set("stocknote:refresh-token", refreshToken, 30, TimeUnit.DAYS);
+            }
+
+            log.info("🚀 [ACCESS TOKEN 발급 성공] 만료까지: {}초", expiresIn);
+            return accessToken;
+        } else {
+            throw new RuntimeException("Access Token 응답이 비어있습니다.");
         }
     }
 }
