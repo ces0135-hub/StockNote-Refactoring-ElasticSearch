@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.*;
 public class PfStockController {
   private final PfStockService pfStockService;
 
-
-
   @PostMapping("/AddStock")
   public GlobalResponse<String> addPortfolioStock(@PathVariable("portfolio_no") Long portfolioNo,
       @RequestBody PfStockRequest pfStockRequest) {

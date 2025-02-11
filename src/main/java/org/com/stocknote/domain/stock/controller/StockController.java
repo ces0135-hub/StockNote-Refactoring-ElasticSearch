@@ -3,18 +3,16 @@ package org.com.stocknote.domain.stock.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.com.stocknote.domain.post.service.PostService;
 import org.com.stocknote.domain.stock.dto.request.StockAddRequest;
-import org.com.stocknote.domain.stock.dto.request.StockVoteRequest;
 import org.com.stocknote.domain.stock.entity.Stock;
-import org.com.stocknote.domain.stock.entity.VoteStatistics;
 import org.com.stocknote.domain.stock.service.StockService;
-import org.com.stocknote.domain.stock.service.StockVoteService;
+import org.com.stocknote.domain.stockVote.service.StockVoteService;
 import org.com.stocknote.domain.stockApi.dto.response.StockInfoResponse;
 import org.com.stocknote.domain.stockApi.dto.response.StockResponse;
 import org.com.stocknote.global.globalDto.GlobalResponse;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.com.stocknote.websocket.service.WebSocketService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,8 +28,8 @@ import java.util.stream.Collectors;
 public class StockController {
 
     private final StockService stockService;
-    private final StockVoteService stockVoteService;
     private final WebSocketService webSocketService;
+    private final PostService postService;
 
     @GetMapping
     @Operation(summary = "종목 이름 조회")
@@ -60,6 +58,15 @@ public class StockController {
         return GlobalResponse.success();
     }
 
+    @DeleteMapping
+    @Operation(summary = "종목 삭제")
+    public GlobalResponse deleteStock(@RequestParam("stockCode") String stockCode,
+                                      @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        String email = principalDetails.getUsername();
+        stockService.deleteStock(stockCode, email);
+        return GlobalResponse.success();
+    }
+
     @GetMapping("/list")
     @Operation(summary = "나의 관심 종목 조회")
     public GlobalResponse getStockList(@AuthenticationPrincipal PrincipalDetails principalDetails) {
@@ -73,22 +80,11 @@ public class StockController {
         });
         return GlobalResponse.success(myStocks);
     }
-
-    @PostMapping("/{stockCode}/vote")
-    @Operation(summary = "종목 투표")
-    public GlobalResponse<Void> vote(
-            @PathVariable String stockCode,
-            @RequestBody StockVoteRequest request,
-            @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        String email = principalDetails.getUsername();
-        stockVoteService.vote(stockCode, request, email);
-        return GlobalResponse.success();
-    }
-
-    @GetMapping("/{stockCode}/vote-statistics")
-    @Operation(summary = "종목 투표 통계 조회")
-    public ResponseEntity<VoteStatistics> getVoteStatistics(
-            @PathVariable String stockCode) {
-        return ResponseEntity.ok(stockVoteService.getVoteStatistics(stockCode));
+    @GetMapping("/posts")
+    @Operation(summary = "종목 관련 게시글 조회")
+    public GlobalResponse getPosts(@RequestParam("sName") String sName,
+                                   @RequestParam(value = "page", defaultValue = "0") int page,
+                                   @RequestParam(value = "size", defaultValue = "3") int size) {
+        return GlobalResponse.success(postService.getPostsByStockName(sName, page, size));
     }
 }

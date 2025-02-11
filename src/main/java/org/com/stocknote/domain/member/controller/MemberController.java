@@ -3,10 +3,9 @@ package org.com.stocknote.domain.member.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.com.stocknote.domain.member.dto.MyCommentResponse;
-import org.com.stocknote.domain.member.dto.ChangeNameRequest;
-import org.com.stocknote.domain.member.dto.MemberDto;
-import org.com.stocknote.domain.member.dto.MyPostResponse;
+import org.com.stocknote.domain.keyword.dto.KeywordRequest;
+import org.com.stocknote.domain.keyword.dto.KeywordResponse;
+import org.com.stocknote.domain.member.dto.*;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.member.service.MemberService;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
@@ -15,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,7 +31,7 @@ public class MemberController {
 
     @GetMapping("/profile")
     @PreAuthorize("isAuthenticated()")
-    @Tag(name = " 회원정보 조회 API", description = "회원정보 가져옴.")
+    @Operation(summary = "회원 프로필 조회")
     public GlobalResponse<MemberDto> getUserProfile(
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
@@ -42,7 +42,7 @@ public class MemberController {
 
     @PatchMapping("/profile/name")
     @PreAuthorize("isAuthenticated()")
-    @Tag(name = " 회원 닉네임 변경 API", description = "닉네임 변경")
+    @Operation(summary = "회원 이름 변경")
     public GlobalResponse<MemberDto> changeUserProfile(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestBody ChangeNameRequest request
@@ -79,4 +79,5 @@ public class MemberController {
         return org.com.stocknote.global.dto.GlobalResponse.success(
                 memberService.findPostsByMember(member, pageable));
     }
+
 }

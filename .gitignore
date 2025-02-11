@@ -1,8 +1,13 @@
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
-!/src/main//build/
-!/src/test//build/
+!/src/main/build/
+!/src/test/build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+!**/src/main/**/out/
+!**/src/test/**/out/
 
 # User-specific stuff
 .idea/**/workspace.xml
@@ -196,3 +201,40 @@ build/
 /bin/**
 /bin/
 bin/
+out/
+/out/**
+
+# Terraform
+*.tfvars
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+crash.log
+
+# Local .terraform directories
+**/.terraform/*
+
+# Crash log files
+crash.*.log
+
+# Sensitive variables files
+*.auto.tfvars
+*.auto.tfvars.json
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration files
+.terraformrc
+terraform.rc
+
+DDl.sql
+logstash.conf
+**/logstash/config/*.yml
+**/logstash/pipeline/*.conf
+elasticsearch/logstash/
+

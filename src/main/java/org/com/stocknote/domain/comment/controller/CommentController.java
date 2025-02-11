@@ -6,8 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.comment.dto.CommentDetailResponse;
 import org.com.stocknote.domain.comment.dto.CommentRequest;
 import org.com.stocknote.domain.comment.dto.CommentUpdateDto;
+import org.com.stocknote.domain.comment.entity.Comment;
 import org.com.stocknote.domain.comment.service.CommentService;
 import org.com.stocknote.domain.member.entity.Member;
+import org.com.stocknote.domain.notification.service.CommentNotificationService;
 import org.com.stocknote.global.dto.GlobalResponse;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,8 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommentService commentService;
-
-
+    private final CommentNotificationService commentNotificationService;
 
 //    @GetMapping
 //    public GlobalResponse<Page<CommentDetailResponse>> getComments(@PathVariable(value = "postId") Long postId, Pageable pageable) {
@@ -43,7 +44,10 @@ public class CommentController {
     ) {
 
         Member member = principalDetails.user();
-        return GlobalResponse.success(commentService.createComment(postId, commentRequest, member));
+        Comment comment= commentService.createComment(postId, commentRequest, member);
+        commentNotificationService.createCommentNotification(postId,comment);
+
+        return GlobalResponse.success(comment.getId());
     }
   
     @Operation(summary = "댓글 수정")
@@ -70,6 +74,17 @@ public class CommentController {
         Member member = principalDetails.user();
         commentService.deleteComment(commentId, member);
         return GlobalResponse.success();
+    }
+
+    @GetMapping("/check")
+    @Operation(summary = "사용자의 게시글 댓글 작성 여부 확인")
+    public GlobalResponse<Boolean> hasUserCommentedOnPost(
+            @PathVariable(value = "postId") Long postId,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        Member member = principalDetails.user();
+        boolean hasCommented = commentService.hasUserCommentedOnPost(postId, member);
+        return GlobalResponse.success(hasCommented);
     }
 
 }

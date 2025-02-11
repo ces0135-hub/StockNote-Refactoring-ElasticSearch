@@ -98,4 +98,14 @@ public class StockService {
                 })
                 .collect(Collectors.toList());
     }
+
+    public void deleteStock (String code, String email) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        Stock stock = stockRepository.findByCode(code)
+                .orElseThrow(() -> new CustomException(ErrorCode.STOCK_NOT_FOUND));
+        MemberStock memberStock = memberStockRepository.findByMemberAndStock(member, stock)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_STOCK_NOT_FOUND));
+        memberStockRepository.delete(memberStock);
+    }
 }

@@ -21,9 +21,17 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven("https://repo.spring.io/milestone")
 }
+val querydslVersion = "5.0.0"
 
 dependencies {
+
+    //querydsl
+    implementation("com.querydsl:querydsl-jpa:$querydslVersion:jakarta")
+    annotationProcessor("com.querydsl:querydsl-apt:$querydslVersion:jakarta")
+    annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+    annotationProcessor("jakarta.persistence:jakarta.persistence-api")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -46,7 +54,6 @@ dependencies {
 
     //redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
-
 
     // JWT
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
@@ -79,6 +86,20 @@ dependencies {
     //fileUtil
     implementation("commons-io:commons-io:2.13.0")
 
+    // QueryDSL 설정
+    implementation ("com.querydsl:querydsl-jpa:5.0.0:jakarta")
+    annotationProcessor ("com.querydsl:querydsl-apt:5.0.0:jakarta")
+    annotationProcessor ("jakarta.annotation:jakarta.annotation-api")
+    annotationProcessor ("jakarta.persistence:jakarta.persistence-api")
+
+    //ElasitcSearch
+    implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
+
+    implementation("com.github.javafaker:javafaker:1.0.2") {
+        exclude(group = "org.yaml", module = "snakeyaml")
+    }
+    implementation("org.yaml:snakeyaml:2.0")
+
 }
 
 tasks.withType<Test> {
@@ -94,11 +115,7 @@ tasks {
         }
         ignoreFailures = true  // 테스트 실패해도 빌드 진행
     }
-    
-    bootJar {
-        archiveFileName.set("app.jar")
-    }
-    
+
     processResources {
         // 리소스 파일 복사 확인
         doFirst {

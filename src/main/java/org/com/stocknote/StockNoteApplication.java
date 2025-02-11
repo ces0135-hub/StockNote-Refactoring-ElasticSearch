@@ -14,3 +14,5 @@ public class StockNoteApplication {
         SpringApplication.run(StockNoteApplication.class, args);
     }
 }
+
+

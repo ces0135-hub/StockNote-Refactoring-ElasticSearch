@@ -19,7 +19,11 @@ import java.util.List;
 @SuperBuilder
 public class Stock {
     @Id
-    private String code; // ID를 자동생성에서 직접 코드 사용으로 변경
+    private String code;
+
+    @Column(name = "stock_index")
+    private Long stockIndex;  // AUTO_INCREMENT는 DB에서 관리
+
     private String name;
     private String market;
 

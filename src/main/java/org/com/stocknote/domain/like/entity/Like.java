@@ -13,7 +13,7 @@ import org.com.stocknote.global.base.BaseEntity;
 @Entity
 @Table(
         name = "likes",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "post_id"}),
+        uniqueConstraints = @UniqueConstraint(columnNames = {"member_id", "post_id"}),
         indexes = {
                 @Index(name = "idx_post_id", columnList = "post_id")
         }

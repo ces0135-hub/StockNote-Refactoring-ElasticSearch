@@ -16,6 +16,11 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
+        jdbc:
+          batch_size: 1000
+          order_inserts: true
+          order_updates: true
+          batch_versioned_data: true
         default_batch_fetch_size: 100
         format_sql: true
         highlight_sql: true
@@ -23,6 +28,8 @@ spring:
   sql:
     init:
       mode: never
+  elasticsearch:
+    uris: http://211.188.54.177:9200
 logging:
   level:
     root: INFO

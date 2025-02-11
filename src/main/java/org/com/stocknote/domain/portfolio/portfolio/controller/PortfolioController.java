@@ -14,7 +14,9 @@ import org.com.stocknote.domain.portfolio.portfolioStock.entity.PfStock;
 import org.com.stocknote.domain.portfolio.portfolioStock.service.PfStockService;
 import org.com.stocknote.domain.stock.entity.Stock;
 import org.com.stocknote.global.dto.GlobalResponse;
+import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,16 +29,28 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/portfolios")
 public class PortfolioController {
   private final PortfolioService portfolioService;
-  private final PfStockService pfStockService;
-  private final MemberService memberService;
 
   @GetMapping
-  public GlobalResponse<List<PortfolioResponse>> getPortfolioList() {
-    List<Portfolio> portfolio = portfolioService.getPortfolioList();
+  public GlobalResponse<List<PortfolioResponse>> getPortfolioList(
+      @AuthenticationPrincipal PrincipalDetails principalDetails
+  ) {
+    String email = principalDetails.getUsername();
+    List<Portfolio> portfolio = portfolioService.getPortfolioList(email);
     List<PortfolioResponse> response =
         portfolio.stream().map(PortfolioResponse::from).collect(Collectors.toList());
     return GlobalResponse.success(response);
   }
+
+// 엘라스틱으로 대체 (Test용 코드)
+//  @GetMapping("/my")
+//  public GlobalResponse<PortfolioResponse> getMyPortfolioList(
+//      @AuthenticationPrincipal PrincipalDetails principalDetails
+//  ) {
+//    String email = principalDetails.getUsername();
+//    Portfolio portfolio = portfolioService.getMyPortfolioList(email);
+//    PortfolioResponse response = PortfolioResponse.from(portfolio);
+//    return GlobalResponse.success(response);
+//  }
 
   @GetMapping("/{portfolio_no}")
   public GlobalResponse<PortfolioResponse> getPortfolioStock(
@@ -47,9 +61,12 @@ public class PortfolioController {
   }
 
   @PostMapping
-  public GlobalResponse<String> addPortfolio(@RequestBody PortfolioRequest portfolioRequest)
+  public GlobalResponse<String> addPortfolio(
+      @RequestBody PortfolioRequest portfolioRequest,
+      @AuthenticationPrincipal PrincipalDetails principalDetails)
   {
-    portfolioService.save(portfolioRequest);
+    String email = principalDetails.getUsername();
+    portfolioService.save(portfolioRequest, email);
     return GlobalResponse.success("PortfolioList post");
   }
 
