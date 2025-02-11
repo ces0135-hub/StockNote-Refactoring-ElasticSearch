@@ -47,10 +47,10 @@
 //
 //    @Transactional
 //    public void initializeDummyData() {
-//        List<Member> dummyMembers = generateDummyMembers(100);
+//        List<Member> dummyMembers = generateDummyMembers(1000);
 //        System.out.println(dummyMembers.size() + "명의 더미 회원 생성 완료");
 //
-//        generateDummyPosts(dummyMembers, 10000);
+//        generateDummyPosts(dummyMembers, 100000);
 //        System.out.println("10000개의 더미 게시글 생성 완료");
 //
 //        generateDummyComments(dummyMembers, 50000);
@@ -75,7 +75,6 @@
 //            members.add(Member.builder()
 //                    .name(faker.name().fullName())
 //                    .email(faker.internet().emailAddress())
-//                    .introduction(faker.lorem().sentence())
 //                    .role(Role.USER)
 //                    .build());
 //        }
