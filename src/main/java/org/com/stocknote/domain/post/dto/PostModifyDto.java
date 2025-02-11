@@ -3,6 +3,7 @@ package org.com.stocknote.domain.post.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import org.com.stocknote.domain.comment.entity.Comment;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.entity.PostCategory;

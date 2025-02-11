@@ -22,10 +22,7 @@
 //import org.springframework.context.annotation.Profile;
 //import org.springframework.transaction.annotation.Transactional;
 //
-//import java.util.ArrayList;
-//import java.util.List;
-//import java.util.Locale;
-//import java.util.Random;
+//import java.util.*;
 //
 //@Configuration
 //@Profile({"dev", "local"})
@@ -165,16 +162,25 @@
 //        int stockCount = random.nextInt(6) + 3; // 3~8개
 //        List<PfStock> pfStocks = new ArrayList<>();
 //
-//        for (int i = 0; i < stockCount; i++) {
-//            Stock randomStock = stocks.get(random.nextInt(stocks.size()));
-//            int stockPrice = (random.nextInt(200) + 1) * 1000; // 1000원 ~ 200,000원
-//            int count = random.nextInt(100) + 1; // 1~100주
+//        // 이미 선택된 주식을 추적하기 위한 Set
+//        Set<Stock> usedStocks = new HashSet<>();
+//
+//        for (int i = 0; i < stockCount && usedStocks.size() < stocks.size(); i++) {
+//            Stock randomStock;
+//            do {
+//                randomStock = stocks.get(random.nextInt(stocks.size()));
+//            } while (usedStocks.contains(randomStock));  // 이미 사용된 주식이면 다시 선택
+//
+//            usedStocks.add(randomStock);  // 선택된 주식 기록
+//
+//            int stockPrice = (random.nextInt(200) + 1) * 1000;
+//            int count = random.nextInt(100) + 1;
 //
 //            PfStock pfStock = PfStock.builder()
 //                    .pfstockCount(count)
 //                    .pfstockPrice(stockPrice)
 //                    .pfstockTotalPrice(stockPrice * count)
-//                    .currentPrice(stockPrice + (random.nextInt(20000) - 10000)) // 현재가 변동
+//                    .currentPrice(stockPrice + (random.nextInt(20000) - 10000))
 //                    .stock(randomStock)
 //                    .portfolio(portfolio)
 //                    .build();
