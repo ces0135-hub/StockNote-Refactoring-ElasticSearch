@@ -38,21 +38,22 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     );
 
     //인기 순으로 정렬(댓글순 + 좋아요순 3일 이내)
-    @Query("""
-    SELECT p FROM Post p
-    WHERE p.deletedAt IS NULL 
-    ORDER BY 
-        CASE 
-            WHEN p.createdAt >= ?1 THEN size(p.likes) 
-            ELSE 0 
-        END DESC,
-        CASE 
-            WHEN p.createdAt >= ?1 THEN size(p.comments)
-            ELSE 0 
-        END DESC,
-        p.createdAt DESC
+    @Query(value = """
+        SELECT p FROM Post p
+        LEFT JOIN p.likes l
+        LEFT JOIN p.comments c
+        WHERE p.deletedAt IS NULL 
+        AND p.createdAt >= :threeDaysAgo
+        GROUP BY p
+        ORDER BY COUNT(l) DESC, COUNT(c) DESC, p.createdAt DESC
+    """,
+            countQuery = """
+        SELECT COUNT(p) FROM Post p
+        WHERE p.deletedAt IS NULL 
+        AND p.createdAt >= :threeDaysAgo
     """)
-    Page<Post> findPopularPosts(LocalDateTime threeDaysAgo, Pageable pageable);
+    Page<Post> findPopularPosts(@Param("threeDaysAgo") LocalDateTime threeDaysAgo, Pageable pageable);
+
 
     // 좋아요 순으로 정렬 (7일 이내)
     @Query("SELECT p FROM Post p WHERE p.deletedAt IS NULL AND p.createdAt >= :sevenDaysAgo ORDER BY size(p.likes) DESC")

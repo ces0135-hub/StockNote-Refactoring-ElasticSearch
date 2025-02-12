@@ -32,10 +32,11 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
 
     private final PostService postService;
+    private final KeywordNotificationService keywordNotificationService;
     private final SearchDocService searchDocService;
 //    private final KeywordNotificationService keywordNotificationService;
     private final KeywordNotificationElasticService keywordNotificationElasticService;
-
+  
     @Transactional
     @PostMapping
     @Operation(summary = "게시글 작성")

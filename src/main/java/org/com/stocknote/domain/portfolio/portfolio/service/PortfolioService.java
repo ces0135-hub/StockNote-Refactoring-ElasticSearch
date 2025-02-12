@@ -33,9 +33,8 @@ public class PortfolioService {
 
 
   public List<Portfolio> getPortfolioList(String email) {
-    Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-    return portfolioRepository.findByMember(member);
+    Long memberId = memberRepository.findByEmail(email).orElseThrow().getId();
+    return portfolioRepository.findPortfoliosWithStocks(memberId);
   }
 
   public Portfolio getMyPortfolioList(String email) {
