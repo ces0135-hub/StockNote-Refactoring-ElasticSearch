@@ -22,4 +22,6 @@ public interface StockRepository extends JpaRepository<Stock, String> {
 
   @Query("SELECT s.name FROM Stock s")
   List<String> findAllName();
+
+    List<Stock> findByNameStartingWithIgnoreCase(String searchKeyword);
 }

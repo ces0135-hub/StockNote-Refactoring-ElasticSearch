@@ -46,7 +46,7 @@ public class PostController {
     ) {
         Member member = principalDetails.user();
         Post post = postService.createPost(postResponseDto, member);
-        PostDoc postDoc= searchDocService.savePostDoc(post);
+        PostDoc postDoc= searchDocService.transformPostDoc(post);
         keywordNotificationElasticService.createKeywordNotification(postDoc);
         return GlobalResponse.success(post.getId());
     }
