@@ -1,6 +1,7 @@
 package org.com.stocknote.domain.post.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.com.stocknote.domain.hashtag.entity.Hashtag;
 import org.com.stocknote.domain.hashtag.service.HashtagService;
 import org.com.stocknote.domain.like.repository.LikeRepository;
@@ -16,18 +17,21 @@ import org.com.stocknote.domain.post.dto.*;
 import org.com.stocknote.domain.post.repository.PostRepository;
 import org.com.stocknote.domain.post.repository.PostSearchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PostService {
     private final PostRepository postRepository;
     private final HashtagService hashtagService;
@@ -113,11 +117,22 @@ public class PostService {
         //댓글은 CASCADE로 삭제됨
         postRepository.delete(post);
     }
-    @Cacheable(value = POPULAR_POSTS_CACHE_KEY, key = "#pageable.pageNumber", cacheManager = "cacheManager")
+
     @Transactional(readOnly = true)
     public Page<PostResponseDto> getPopularPosts(Pageable pageable) {
-        LocalDateTime threeDaysAgo = LocalDateTime.now().minusDays(3);
+        log.info("🔥 캐시 확인: getPopularPosts 실행 (page = {})", pageable.getPageNumber());
 
+        String cacheKey = POPULAR_POSTS_CACHE_KEY + ":" + pageable.getPageNumber();
+
+        // 🔹 Redis에서 캐시된 데이터 조회
+        Object cachedData = redisTemplate.opsForValue().get(cacheKey);
+        if (cachedData instanceof Page) {
+            log.info("✅ 캐시된 데이터 반환 (page = {})", pageable.getPageNumber());
+            return (Page<PostResponseDto>) cachedData;
+        }
+
+        // 🔹 캐시된 데이터가 없으면 DB에서 조회
+        LocalDateTime threeDaysAgo = LocalDateTime.now().minusDays(3);
         Page<Post> popularPosts = postRepository.findPopularPosts(threeDaysAgo, pageable);
 
         List<PostResponseDto> sortedPosts = popularPosts.stream()
@@ -130,10 +145,16 @@ public class PostService {
                 })
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(sortedPosts, pageable, popularPosts.getTotalElements());
+        Page<PostResponseDto> response = new PageImpl<>(sortedPosts, pageable, popularPosts.getTotalElements());
+
+        // 🔹 Redis에 캐싱 (TTL: 5분 설정)
+        redisTemplate.opsForValue().set(cacheKey, response, Duration.ofMinutes(5));
+        log.info("🚀 새로운 데이터 Redis에 캐싱 완료 (key = {})", cacheKey);
+
+        return response;
     }
 
-    // 좋아요 순 조회
+// 좋아요 순 조회
     @Transactional(readOnly = true)
     public Page<PostResponseDto> getPopularPostsByLikes(Pageable pageable) {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);

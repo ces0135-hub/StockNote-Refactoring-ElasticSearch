@@ -1,5 +1,6 @@
 package org.com.stocknote.domain.post.dto;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.com.stocknote.domain.comment.dto.CommentDetailResponse;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.post.entity.Post;
