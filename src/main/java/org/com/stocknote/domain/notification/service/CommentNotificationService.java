@@ -2,7 +2,6 @@ package org.com.stocknote.domain.notification.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.com.stocknote.domain.notification.repository.KeywordNotificationRepository;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.comment.entity.Comment;
 import org.com.stocknote.domain.notification.dto.CommentNotificationResponse;
@@ -58,7 +57,6 @@ public class CommentNotificationService {
                 // 또는 메서드 레퍼런스를 사용: .map(NotificationResponse::from)
                 .collect(Collectors.toList());
     }
-
 
     public void markAsRead(Long notificationId) {
         CommentNotification commentNotification = commentNotificationRepository.findById(notificationId)

@@ -35,12 +35,9 @@ public class WebSocketService {
     private WebSocketClient client;
     private volatile StockPriceResponse latestPriceResponse;
     private final Map<String, WebSocketClient> activeClients = new HashMap<>();
-    /**
-     * 주식 가격 구독 시작
-     */
+
     public void subscribeStockPrice(String stockCode) {
         try {
-            // 종목별로 하나의 WebSocket 연결만 유지
             if (!activeClients.containsKey(stockCode)) {
                 initializeWebSocketConnection(stockCode);
             } else {

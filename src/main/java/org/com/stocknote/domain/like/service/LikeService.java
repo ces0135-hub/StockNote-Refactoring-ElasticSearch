@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.like.entity.Like;
 import org.com.stocknote.domain.like.repository.LikeRepository;
 import org.com.stocknote.domain.member.entity.Member;
-import org.com.stocknote.domain.member.repository.MemberRepository;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.repository.PostRepository;
 import org.com.stocknote.global.cache.service.CacheService;

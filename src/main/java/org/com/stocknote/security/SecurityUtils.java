@@ -16,7 +16,6 @@ public class SecurityUtils {
     this.memberRepository = memberRepository;
   }
 
-  // 현재 인증된 사용자의 이메일을 가져오는 메서드
   public String getCurrentUserEmail() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     if (authentication == null || !authentication.isAuthenticated()) {
@@ -25,7 +24,6 @@ public class SecurityUtils {
     return authentication.getName();
   }
 
-  // 현재 인증된 사용자의 Member 엔티티를 가져오는 메서드
   public Member getCurrentMember() {
     String email = getCurrentUserEmail();
     return memberRepository.findByEmail(email)

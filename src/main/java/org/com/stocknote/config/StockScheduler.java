@@ -1,6 +1,5 @@
 package org.com.stocknote.config;
 
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +17,6 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
-import java.util.TimeZone;
 
 @Configuration
 @EnableScheduling
@@ -49,7 +47,7 @@ public class StockScheduler {
           StandardCopyOption.REPLACE_EXISTING);
 
       ProcessBuilder processBuilder = new ProcessBuilder("python", tempScript.getAbsolutePath());
-      processBuilder.redirectErrorStream(true); // 에러 스트림을 표준 출력으로 리다이렉트
+      processBuilder.redirectErrorStream(true);
       Process process = processBuilder.start();
 
       // 실시간으로 로그 출력

@@ -22,7 +22,7 @@ public class Stock {
     private String code;
 
     @Column(name = "stock_index")
-    private Long stockIndex;  // AUTO_INCREMENT는 DB에서 관리
+    private Long stockIndex;
 
     private String name;
     private String market;

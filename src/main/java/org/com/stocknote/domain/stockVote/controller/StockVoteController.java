@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.stockVote.dto.StockVoteListResponse;
 import org.com.stocknote.domain.stockVote.dto.StockVoteRequest;
-import org.com.stocknote.domain.stockVote.dto.StockVoteResponse;
 import org.com.stocknote.domain.stockVote.entity.VoteStatistics;
 import org.com.stocknote.domain.stockVote.service.StockVoteService;
 import org.com.stocknote.global.globalDto.GlobalResponse;

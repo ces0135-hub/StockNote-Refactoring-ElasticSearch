@@ -89,7 +89,6 @@ public class SearchDocService {
     }
 
     String category = condition.getCategory();
-    // ALL이거나 null인 경우는 카테고리 없이 검색
     if (category == null || PostCategory.ALL.name().equals(category)) {
       return switch (condition.getSearchType()) {
         case TITLE -> postDocRepository.searchByTitle(condition.getKeyword(), pageable);

@@ -1,13 +1,10 @@
 package org.com.stocknote.domain.searchDoc.repository;
 
-import org.com.stocknote.domain.post.dto.PostSearchConditionDto;
 import org.com.stocknote.domain.searchDoc.document.PostDoc;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.annotations.Query;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
-
-import java.util.List;
 
 public interface PostDocRepository extends ElasticsearchRepository<PostDoc, String> {
   @Query("{\"match\": {\"title\": {\"query\": \"?0\"}}}")

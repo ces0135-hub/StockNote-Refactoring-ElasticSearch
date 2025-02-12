@@ -39,16 +39,13 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
-        // Enhanced logging for debugging
         logger.debug("Full Request URI: {}", request.getRequestURI());
         logger.debug("Full Query String: {}", request.getQueryString());
 
-        // Log all parameters
         request.getParameterMap().forEach((key, values) ->
                 logger.debug("Parameter - {}: {}", key, Arrays.toString(values))
         );
 
-        // Log session attributes
         if (request.getSession() != null) {
             Enumeration<String> attributeNames = request.getSession().getAttributeNames();
             while (attributeNames.hasMoreElements()) {
@@ -75,8 +72,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     protected String determineTargetUrl(HttpServletRequest request) {
         String redirectUri = request.getParameter("redirect_uri");
         logger.info("Checking redirect_uri parameter: {}", redirectUri);
-
-        // Exclude notification and SSE paths
         if (redirectUri != null && (
                 redirectUri.contains("/notifications") ||
                         redirectUri.contains("/sse") ||
@@ -86,23 +81,18 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             return URI + DEFAULT_SUCCESS_URL;
         }
 
-        // Check session for redirect URI
         if (redirectUri == null && request.getSession() != null) {
             redirectUri = (String) request.getSession().getAttribute("REDIRECT_URI");
             logger.info("Retrieved redirect URI from session: {}", redirectUri);
 
-            // Remove URI from session after use
             request.getSession().removeAttribute("REDIRECT_URI");
         }
 
-        // Validate redirect URI
         if (redirectUri != null && !redirectUri.isEmpty() && !"/".equals(redirectUri) && isAllowedRedirectPath(redirectUri)) {
             String fullRedirectUrl = URI + redirectUri;
             logger.info("Using redirect URL: {}", fullRedirectUrl);
             return fullRedirectUrl;
         }
-
-        // Default to main page
         logger.warn("No valid redirect URI found. Using default success URL.");
         return URI + DEFAULT_SUCCESS_URL;
     }

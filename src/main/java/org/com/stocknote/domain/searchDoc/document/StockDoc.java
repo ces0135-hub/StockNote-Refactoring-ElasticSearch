@@ -1,6 +1,5 @@
 package org.com.stocknote.domain.searchDoc.document;
 
-
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.*;
@@ -9,8 +8,8 @@ import org.springframework.data.elasticsearch.annotations.*;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor // 추가
-@AllArgsConstructor // 추가
+@NoArgsConstructor
+@AllArgsConstructor
 public class StockDoc {
   @Id
   private String code;

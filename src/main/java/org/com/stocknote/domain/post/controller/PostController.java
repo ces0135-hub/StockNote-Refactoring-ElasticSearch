@@ -15,7 +15,7 @@ import org.com.stocknote.domain.post.entity.PostCategory;
 import org.com.stocknote.domain.post.service.PostService;
 import org.com.stocknote.domain.searchDoc.document.PostDoc;
 import org.com.stocknote.domain.searchDoc.service.SearchDocService;
-import org.com.stocknote.global.dto.GlobalResponse;
+import org.com.stocknote.global.globalDto.GlobalResponse;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -73,7 +73,6 @@ public class PostController {
             @PathVariable("id") Long id,
             @Valid @RequestBody PostModifyDto postModifyDto
     ) {
-        System.out.println(postModifyDto);
         postService.updatePost(id, postModifyDto);
         return GlobalResponse.success("Post updated successfully");
     }
@@ -93,7 +92,6 @@ public class PostController {
         return GlobalResponse.success(postService.getPopularPosts(pageable));
     }
 
-    // 좋아요 순 조회
     @GetMapping("/popular/likes")
     @Operation(summary = "좋아요 순 인기글 조회")
     public GlobalResponse<Page<PostResponseDto>> getPopularPostsByLikes(
@@ -102,7 +100,6 @@ public class PostController {
         return GlobalResponse.success(postService.getPopularPostsByLikes(pageable));
     }
 
-    // 댓글 순 조회
     @GetMapping("/popular/comments")
     @Operation(summary = "댓글 순 인기글 조회")
     public GlobalResponse<Page<PostResponseDto>> getPopularPostsByComments(
@@ -111,14 +108,12 @@ public class PostController {
         return GlobalResponse.success(postService.getPopularPostsByComments(pageable));
     }
 
-    // 게시글 검색
     @GetMapping("/search")
     @Operation(summary = "게시글 검색")
     public GlobalResponse<Page<PostResponseDto>> searchPosts(
             @ModelAttribute PostSearchConditionDto condition,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        //sql 검색결과
         return GlobalResponse.success(postService.searchPosts(condition, pageable));
     }
 

@@ -1,6 +1,5 @@
 package org.com.stocknote.domain.post.dto;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.com.stocknote.domain.comment.dto.CommentDetailResponse;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.post.entity.Post;
@@ -46,10 +45,8 @@ public record PostResponseDto(
         );
     }
 
-    // 지연 로딩용 메서드 추가
     public List<CommentDetailResponse> getComments() {
         if (comments == null) {
-            // 실제 댓글 로딩 로직 (서비스 레이어에서 처리)
             return Collections.emptyList();
         }
         return comments;
@@ -64,7 +61,6 @@ public record PostResponseDto(
             postDoc.getMemberDoc().getName(),
             postDoc.getMemberDoc().getProfile(),
                 null,
-//            LocalDateTime.parse(postDoc.getCreatedAt()),
             null,
             postDoc.getCategory(),
                 null,

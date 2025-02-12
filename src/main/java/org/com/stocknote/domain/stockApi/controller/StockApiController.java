@@ -25,39 +25,45 @@ import java.time.LocalDate;
 public class StockApiController {
     private final StockApiService stockApiService;
 
-    // 전체 정보 불러오기
     @GetMapping("/kospi")
+    @Operation(summary = "코스피 현재 지수 조회")
     public Mono<CurrentIndexResponse> getKospiData() {
         return stockApiService.getKOSPI();
     }
 
     @GetMapping("/kosdaq")
+    @Operation(summary = "코스닥 현재 지수 조회")
     public Mono<CurrentIndexResponse> getKosdaqData() {
         return stockApiService.getKOSDAQ();
     }
 
     @GetMapping("/kospi200")
+    @Operation(summary = "코스피200 현재 지수 조회")
     public Mono<CurrentIndexResponse> getKospi200Data() {
         return stockApiService.getKOSPI200();
     }
 
     // 필터링한 정보 불러오기
     @GetMapping("/filtered/kospi")
+    @Operation(summary = "코스피 필터링 정보 조회")
     public Mono<StockIndexDto> getFilteredKOSPIData() {
         return stockApiService.getFilteredKOSPI();
     }
 
     @GetMapping("/filtered/kosdaq")
+    @Operation(summary = "코스닥 필터링 정보 조회")
     public Mono<StockIndexDto> getFilteredKOSDAQData() {
         return stockApiService.getFilteredKOSDAQ();
     }
 
     @GetMapping("/filtered/kospi200")
+    @Operation(summary = "코스피200 필터링 정보 조회")
     public Mono<StockIndexDto> getFilteredKOSPI200Data() {
         return stockApiService.getFilteredKOSPI200();
     }
 
     @GetMapping("/volume")
+    @Operation(summary = "거래량 조회")
     public Mono<VolumeResponse> getVolume() {
         return stockApiService.getVolumeData();
     }

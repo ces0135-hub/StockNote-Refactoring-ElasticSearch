@@ -7,7 +7,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Range;
 
-
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -29,7 +28,6 @@ public class RedisSortedSetService {
                     byte[] fullValueBytes = (value + SUFFIX).getBytes(StandardCharsets.UTF_8);
                     connection.zAdd(keyBytes, 0, fullValueBytes);
 
-                    // 모든 부분 문자열 저장
                     for (int i = 1; i <= value.length(); i++) {
                         byte[] substringBytes = value.substring(0, i).getBytes(StandardCharsets.UTF_8);
                         connection.zAdd(keyBytes, 0, substringBytes);
@@ -76,6 +74,3 @@ public class RedisSortedSetService {
         }
     }
 }
-
-
-

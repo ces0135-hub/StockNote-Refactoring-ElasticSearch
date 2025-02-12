@@ -17,9 +17,7 @@ import org.com.stocknote.global.exception.CustomException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
 
@@ -158,6 +156,5 @@ public class PortfolioService {
 
     portfolioRepository.save(portfolio);
   }
-
 
 }

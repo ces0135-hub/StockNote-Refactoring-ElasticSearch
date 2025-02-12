@@ -53,9 +53,9 @@ public enum ErrorCode {
 
     //like
     ALREADY_LIKED(HttpStatus.BAD_REQUEST,"이미 좋아요한 글입니다."),
+
+    //post
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다.");
-
-
 
 
 

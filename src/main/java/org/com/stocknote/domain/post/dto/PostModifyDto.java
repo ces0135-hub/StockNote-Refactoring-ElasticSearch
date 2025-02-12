@@ -13,16 +13,15 @@ import java.util.List;
 @Getter
 @Setter
 public class PostModifyDto {
-    @NotBlank(message = "Title is required")
+    @NotBlank(message = "제목은 필수로 입력해주세요")
     private String title;
 
-    @NotBlank(message = "Body is required")
+    @NotBlank(message = "내용을 필수로 입력해주세요")
     private String content;
 
     private List<String> hashtags;
 
     private String category;
-
 
     public Post toEntity(Long id, Member member) {
         PostCategory postCategory = PostCategory.valueOf(category);

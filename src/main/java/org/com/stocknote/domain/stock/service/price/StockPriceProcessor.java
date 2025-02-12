@@ -36,7 +36,6 @@ public class StockPriceProcessor {
 
             StockResponse stockResponse;
             if (stock != null && memberStock != null) {
-                // MemberStock이 있는 경우 (내 주식 목록용)
                 stockResponse = StockResponse.of(stock, memberStock);
                 stockResponse.updatePriceInfo(currentPrice, change, isPositive);
             } else {

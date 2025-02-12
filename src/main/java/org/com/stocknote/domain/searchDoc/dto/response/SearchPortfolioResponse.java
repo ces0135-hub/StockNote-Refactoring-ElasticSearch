@@ -2,8 +2,6 @@ package org.com.stocknote.domain.searchDoc.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
-import org.com.stocknote.domain.portfolio.portfolioStock.dto.response.PfStockResponse;
 import org.com.stocknote.domain.searchDoc.document.PortfolioDoc;
 import org.com.stocknote.domain.searchDoc.document.PortfolioStockDoc;
 
