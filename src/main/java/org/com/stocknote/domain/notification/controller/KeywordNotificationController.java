@@ -2,6 +2,7 @@ package org.com.stocknote.domain.notification.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.notification.dto.KeywordNotificationResponse;
+import org.com.stocknote.domain.notification.service.KeywordNotificationElasticService;
 import org.com.stocknote.domain.notification.service.KeywordNotificationService;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.springframework.http.ResponseEntity;

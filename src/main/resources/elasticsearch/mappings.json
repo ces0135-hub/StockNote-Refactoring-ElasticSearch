@@ -1,5 +1,14 @@
 {
   "properties": {
+    "id": {
+      "type": "text"
+    },
+    "created_at": {
+      "type": "text"
+    },
+    "modified_at": {
+      "type": "text"
+    },
     "title": {
       "type": "text",
       "analyzer": "korean",
@@ -29,16 +38,13 @@
         }
       }
     },
-    "hashtags": {
-      "type": "text",
-      "fields": {
-        "keyword": {
-          "type": "keyword",
-          "ignore_above": 256
-        }
-      }
+    "comment_count": {
+      "type": "integer"
     },
-    "type": {
+    "like_count": {
+      "type": "integer"
+    },
+    "hashtags": {
       "type": "text",
       "fields": {
         "keyword": {

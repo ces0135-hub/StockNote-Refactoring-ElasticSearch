@@ -7,7 +7,6 @@ import org.com.stocknote.domain.like.repository.LikeRepository;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.notification.repository.CommentNotificationRepository;
 import org.com.stocknote.domain.notification.repository.KeywordNotificationRepository;
-import org.com.stocknote.domain.post.dto.PostCreateDto;
 import org.com.stocknote.domain.post.dto.PostModifyDto;
 import org.com.stocknote.domain.post.dto.PostResponseDto;
 import org.com.stocknote.domain.post.dto.PostSearchConditionDto;
@@ -41,12 +40,12 @@ public class PostService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Transactional
-    public Post createPost(PostCreateDto postCreateDto, Member member) {
+    public Post createPost(PostResponseDto postResponseDto, Member member) {
 
-        Post post = postCreateDto.toEntity(member);
+        Post post = postResponseDto.toEntity(member);
         Post savedPost = postRepository.save(post);
 
-        hashtagService.createHashtags(savedPost.getId(), postCreateDto.getHashtags());
+        hashtagService.createHashtags(savedPost.getId(), postResponseDto.hashtags());
         return post;
     }
 

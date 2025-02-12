@@ -7,6 +7,7 @@ import org.com.stocknote.domain.keyword.dto.KeywordRequest;
 import org.com.stocknote.domain.keyword.dto.KeywordResponse;
 import org.com.stocknote.domain.keyword.service.KeywordService;
 import org.com.stocknote.domain.member.entity.Member;
+import org.com.stocknote.domain.searchDoc.service.KeywordDocService;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class KeywordController {
 
     private final KeywordService keywordService;
+    private final KeywordDocService keywordDocService;
 
     // 키워드 전체 조회
     @GetMapping("/keywords")
@@ -40,6 +42,7 @@ public class KeywordController {
     ) {
         Member member = principalDetails.user();
         KeywordResponse response = keywordService.updateKeywords(member, request);
+        keywordDocService.save(member, request);
         return ResponseEntity.ok(response);
     }
 }

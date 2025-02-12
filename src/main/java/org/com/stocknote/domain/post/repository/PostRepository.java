@@ -14,11 +14,28 @@ import java.time.LocalDateTime;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
-    Page<Post> findByCategory(PostCategory category, Pageable pageable);
+    @Query("SELECT DISTINCT p FROM Post p " +
+            "LEFT JOIN FETCH p.member m " +
+            "LEFT JOIN FETCH p.comments c " +
+            "WHERE p.category = :category " +
+            "AND p.deletedAt IS NULL " +
+            "ORDER BY p.createdAt DESC")
 
-    Long id(Long id);
+    Page<Post> findByCategory(
+            @Param("category") PostCategory category,
+            Pageable pageable
+    );
 
-    Page<Post> findByMember(Member member, Pageable pageable);
+    @Query("SELECT DISTINCT p FROM Post p " +
+            "LEFT JOIN FETCH p.member m " +
+            "LEFT JOIN FETCH p.comments c " +
+            "WHERE p.member = :member " +
+            "AND p.deletedAt IS NULL " +
+            "ORDER BY p.createdAt DESC")
+    Page<Post> findByMember(
+            @Param("member") Member member,
+            Pageable pageable
+    );
 
     //인기 순으로 정렬(댓글순 + 좋아요순 3일 이내)
     @Query(value = """
@@ -49,13 +66,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findPopularPosts(Pageable pageable);
 
 
-    // 좋아요 순으로 정렬
-    @Query("SELECT p FROM Post p WHERE p.deletedAt IS NULL ORDER BY size(p.likes) DESC")
-    Page<Post> findPopularPostsByLikes(Pageable pageable);
-
-    // 댓글 순으로 정렬
-    @Query("SELECT p FROM Post p WHERE p.deletedAt IS NULL ORDER BY size(p.comments) DESC")
-    Page<Post> findPopularPostsByComments(Pageable pageable);
+//    // 좋아요 순으로 정렬
+//    @Query("SELECT p FROM Post p WHERE p.deletedAt IS NULL ORDER BY size(p.likes) DESC")
+//    Page<Post> findPopularPostsByLikes(Pageable pageable);
+//
+//    // 댓글 순으로 정렬
+//    @Query("SELECT p FROM Post p WHERE p.deletedAt IS NULL ORDER BY size(p.comments) DESC")
+//    Page<Post> findPopularPostsByComments(Pageable pageable);
 
 
     @Query("SELECT DISTINCT p FROM Post p " +

@@ -42,13 +42,15 @@ public class CommentService {
     }
 
     public Page<CommentDetailResponse> getComments(Long postId, Pageable pageable) {
-        Page<CommentDetailResponse> comments = commentRepository.findByPostId(pageable, postId)
-                .map(comment -> {
-                            Member member = memberRepository.findById(comment.getMember().getId()).orElseThrow(() -> new IllegalArgumentException("user not found"));
-                            return new CommentDetailResponse(comment.getId(), comment.getBody(), comment.getCreatedAt(), member.getId(), member.getName(),member.getProfile());
-                        }
-                );
-        return comments;
+        return commentRepository.findByPostId(postId, pageable)
+                .map(comment -> new CommentDetailResponse(
+                        comment.getId(),
+                        comment.getBody(),
+                        comment.getCreatedAt(),
+                        comment.getMember().getId(), //이미 로딩된 member 사용
+                        comment.getMember().getName(),
+                        comment.getMember().getProfile()
+                ));
     }
 
     @Transactional
