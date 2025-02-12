@@ -3,7 +3,6 @@ package org.com.stocknote.domain.notification.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.com.stocknote.domain.notification.entity.CommentNotification;
 import org.com.stocknote.domain.notification.entity.KeywordNotification;
 import org.com.stocknote.domain.post.entity.PostCategory;
 
@@ -32,4 +31,3 @@ public class KeywordNotificationResponse {
                 .build();
     }
 }
-

@@ -54,7 +54,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     """)
     Page<Post> findPopularPosts(@Param("threeDaysAgo") LocalDateTime threeDaysAgo, Pageable pageable);
 
-
     // 좋아요 순으로 정렬 (7일 이내)
     @Query("SELECT p FROM Post p WHERE p.deletedAt IS NULL AND p.createdAt >= :sevenDaysAgo ORDER BY size(p.likes) DESC")
     Page<Post> findPopularPostsByLikes(@Param("sevenDaysAgo") LocalDateTime sevenDaysAgo, Pageable pageable);
@@ -62,18 +61,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // 댓글 순으로 정렬 (7일 이내)
     @Query("SELECT p FROM Post p WHERE p.deletedAt IS NULL AND p.createdAt >= :sevenDaysAgo ORDER BY size(p.comments) DESC")
     Page<Post> findPopularPostsByComments(@Param("sevenDaysAgo") LocalDateTime sevenDaysAgo, Pageable pageable);
-    @Query("SELECT p FROM Post p WHERE p.deletedAt IS NULL ORDER BY size(p.likes) DESC, size(p.comments) DESC")
-    Page<Post> findPopularPosts(Pageable pageable);
-
-
-//    // 좋아요 순으로 정렬
-//    @Query("SELECT p FROM Post p WHERE p.deletedAt IS NULL ORDER BY size(p.likes) DESC")
-//    Page<Post> findPopularPostsByLikes(Pageable pageable);
-//
-//    // 댓글 순으로 정렬
-//    @Query("SELECT p FROM Post p WHERE p.deletedAt IS NULL ORDER BY size(p.comments) DESC")
-//    Page<Post> findPopularPostsByComments(Pageable pageable);
-
 
     @Query("SELECT DISTINCT p FROM Post p " +
             "JOIN Hashtag h ON h.postId = p.id " +

@@ -9,6 +9,8 @@ import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.member.repository.MemberRepository;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.repository.PostRepository;
+import org.com.stocknote.global.error.ErrorCode;
+import org.com.stocknote.global.exception.CustomException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,7 +27,7 @@ public class MemberService {
     @Transactional
     public Member updateProfile(Long id, ChangeNameRequest request) {
         Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다. ID: " + id));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         member.setName(request.getName());
         return member;

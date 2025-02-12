@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class ChangeNameRequest {
-    @NotBlank(message = "Name cannot be empty")
-    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
+    @NotBlank(message = "이름을 작성해주세요")
+    @Size(min = 2, max = 50, message = "2~50자로 작성해주세요")
     private String name;
 }

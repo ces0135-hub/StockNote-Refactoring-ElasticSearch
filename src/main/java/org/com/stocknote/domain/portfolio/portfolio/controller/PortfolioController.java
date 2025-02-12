@@ -1,5 +1,7 @@
 package org.com.stocknote.domain.portfolio.portfolio.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.member.entity.Member;
@@ -13,7 +15,7 @@ import org.com.stocknote.domain.portfolio.portfolioStock.dto.response.PfStockRes
 import org.com.stocknote.domain.portfolio.portfolioStock.entity.PfStock;
 import org.com.stocknote.domain.portfolio.portfolioStock.service.PfStockService;
 import org.com.stocknote.domain.stock.entity.Stock;
-import org.com.stocknote.global.dto.GlobalResponse;
+import org.com.stocknote.global.globalDto.GlobalResponse;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,10 +29,12 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/portfolios")
+@Tag(name = "포트폴리오 API", description = "포트폴리오 API")
 public class PortfolioController {
   private final PortfolioService portfolioService;
 
   @GetMapping
+  @Operation(summary = "포트폴리오 조회")
   public GlobalResponse<List<PortfolioResponse>> getPortfolioList(
       @AuthenticationPrincipal PrincipalDetails principalDetails
   ) {
@@ -53,6 +57,7 @@ public class PortfolioController {
 //  }
 
   @GetMapping("/{portfolio_no}")
+  @Operation(summary = "포트폴리오 조회")
   public GlobalResponse<PortfolioResponse> getPortfolioStock(
       @PathVariable("portfolio_no") Long portfolioNo) {
     Portfolio portfolio = portfolioService.getPortfolio(portfolioNo);
@@ -61,6 +66,7 @@ public class PortfolioController {
   }
 
   @PostMapping
+  @Operation(summary = "포트폴리오 추가")
   public GlobalResponse<String> addPortfolio(
       @RequestBody PortfolioRequest portfolioRequest,
       @AuthenticationPrincipal PrincipalDetails principalDetails)
@@ -71,6 +77,7 @@ public class PortfolioController {
   }
 
   @PatchMapping("/{portfolio_no}")
+  @Operation(summary = "포트폴리오 수정")
   public GlobalResponse<String> updatePortfolio(@PathVariable("portfolio_no") Long portfolioNo,
       @Valid @RequestBody PortfolioPatchRequest request) {
     portfolioService.update(portfolioNo, request);
@@ -78,6 +85,7 @@ public class PortfolioController {
   }
 
   @DeleteMapping("/{portfolio_no}")
+  @Operation(summary = "포트폴리오 삭제")
   public GlobalResponse<String> deletePortfolio(@PathVariable("portfolio_no") Long portfolioNo) {
     portfolioService.delete(portfolioNo);
     return GlobalResponse.success("Portfolio deleted successfully");

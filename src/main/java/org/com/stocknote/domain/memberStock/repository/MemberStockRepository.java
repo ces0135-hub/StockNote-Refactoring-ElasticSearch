@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MemberStockRepository extends JpaRepository<MemberStock, Long> {
-    List<MemberStock> findByMemberId(Long memberId);
-    List<MemberStock> findByStockCode(String stockCode);
-
     boolean existsByMemberAndStock (Member member, Stock stock);
 
     List<MemberStock> findByMemberEmailOrderByAddedAtDesc (String email);

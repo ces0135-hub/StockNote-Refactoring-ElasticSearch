@@ -1,4 +1,4 @@
-package org.com.stocknote.domain.post.config;
+package org.com.stocknote.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

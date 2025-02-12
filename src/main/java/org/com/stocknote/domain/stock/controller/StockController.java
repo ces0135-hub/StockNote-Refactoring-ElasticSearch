@@ -7,7 +7,6 @@ import org.com.stocknote.domain.post.service.PostService;
 import org.com.stocknote.domain.stock.dto.request.StockAddRequest;
 import org.com.stocknote.domain.stock.entity.Stock;
 import org.com.stocknote.domain.stock.service.StockService;
-import org.com.stocknote.domain.stockVote.service.StockVoteService;
 import org.com.stocknote.domain.stockApi.dto.response.StockInfoResponse;
 import org.com.stocknote.domain.stockApi.dto.response.StockResponse;
 import org.com.stocknote.global.globalDto.GlobalResponse;

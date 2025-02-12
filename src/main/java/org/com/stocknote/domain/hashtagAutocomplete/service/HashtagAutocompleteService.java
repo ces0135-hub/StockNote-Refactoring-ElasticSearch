@@ -16,7 +16,6 @@ import java.util.*;
 public class HashtagAutocompleteService {
     private final StockRepository stockRepository;
     private final RedisSortedSetService redisSortedSetService;
-    private static final int MAX_SIZE = 10;
 
     @PostConstruct
     public void init() {
@@ -32,9 +31,6 @@ public class HashtagAutocompleteService {
         if (keyword == null || keyword.trim().isEmpty()) {
             return Collections.emptyList();
         }
-
         return redisSortedSetService.autocomplete(keyword.trim());
     }
 }
-
-

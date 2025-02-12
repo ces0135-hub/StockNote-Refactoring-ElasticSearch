@@ -7,7 +7,6 @@ import jakarta.persistence.OneToMany;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.com.stocknote.domain.comment.entity.Comment;
-import org.com.stocknote.domain.keyword.entity.Keyword;
 import org.com.stocknote.domain.like.entity.Like;
 import org.com.stocknote.domain.memberStock.entity.MemberStock;
 import org.com.stocknote.domain.post.entity.Post;

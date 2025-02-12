@@ -33,12 +33,10 @@ public class SaveRequestFilter extends OncePerRequestFilter {
         try {
             String currentPath = request.getRequestURI();
 
-            // OAuth2 인증 요청일 때만 처리
             if (currentPath.contains("/oauth2/authorization")) {
                 String redirectUri = request.getParameter("redirect_uri");
                 logger.debug("OAuth2 authorization request detected. Redirect URI: {}", redirectUri);
 
-                // 리다이렉트 URI가 있고 허용된 경로일 때만 저장
                 if (redirectUri != null && !redirectUri.isEmpty() && isAllowedRedirectPath(redirectUri)) {
                     HttpSession session = request.getSession(true);
                     session.setAttribute("REDIRECT_URI", redirectUri);

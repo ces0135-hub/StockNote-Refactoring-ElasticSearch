@@ -10,7 +10,6 @@ import org.com.stocknote.domain.member.repository.MemberRepository;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.com.stocknote.oauth.token.entity.Token;
 import org.com.stocknote.oauth.token.service.TokenService;
-import org.springframework.security.core.userdetails.User;
 import org.com.stocknote.global.error.ErrorCode;
 import org.com.stocknote.global.exception.CustomException;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,11 +50,9 @@ public class TokenProvider {
         return generateToken(authentication, ACCESS_TOKEN_EXPIRE_TIME);
     }
 
-
-    // 1. refresh token 발급
     public void generateRefreshToken(Authentication authentication, String accessToken) {
         String refreshToken = generateToken(authentication, REFRESH_TOKEN_EXPIRE_TIME);
-        tokenService.saveOrUpdate(authentication.getName(), refreshToken, accessToken); // redis에 저장
+        tokenService.saveOrUpdate(authentication.getName(), refreshToken, accessToken);
     }
 
     private String generateToken(Authentication authentication, long expireTime) {
@@ -65,8 +62,6 @@ public class TokenProvider {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining());
-
-        System.out.println("authorities: " + authorities);
 
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
         Long memberId = principalDetails.user().getId();
@@ -83,7 +78,7 @@ public class TokenProvider {
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaims(token);
 
-        Long memberId = Long.parseLong(claims.getSubject());  // memberId로 파싱
+        Long memberId = Long.parseLong(claims.getSubject());
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -101,7 +96,6 @@ public class TokenProvider {
                 claims.get(KEY_ROLE).toString()));
     }
 
-    // 3. accessToken 재발급
     public String reissueAccessToken(String accessToken) {
         if (StringUtils.hasText(accessToken)) {
             Token token = tokenService.findByAccessTokenOrThrow(accessToken);

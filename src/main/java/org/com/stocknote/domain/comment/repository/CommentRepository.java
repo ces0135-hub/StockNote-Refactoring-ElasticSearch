@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-//    Page<Comment> findByPostId(Pageable pageable, Long postId);
+
     Page<Comment> findByMember(Member member, Pageable pageable);
     boolean existsByPostIdAndMember(Long postId, Member member);
     @Query(value = "SELECT DISTINCT c FROM Comment c " +

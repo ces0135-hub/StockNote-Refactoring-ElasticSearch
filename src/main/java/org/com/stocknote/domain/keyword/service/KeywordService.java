@@ -33,7 +33,6 @@ public class KeywordService {
 
         List<Keyword> savedKeywords = keywordRepository.saveAll(newKeywords);
 
-        // Convert Keyword entities to KeywordDto
         List<KeywordResponse.KeywordDto> keywordDtos = savedKeywords.stream()
                 .map(keyword -> KeywordResponse.KeywordDto.builder()
                         .keyword(keyword.getKeyword())
@@ -50,7 +49,6 @@ public class KeywordService {
     public KeywordResponse getKeywords(Member member) {
         List<Keyword> memberKeywords = keywordRepository.findByMemberId(member.getId());
 
-        // Convert Keyword entities to KeywordDto
         List<KeywordResponse.KeywordDto> keywordDtos = memberKeywords.stream()
                 .map(keyword -> KeywordResponse.KeywordDto.builder()
                         .keyword(keyword.getKeyword())
