@@ -120,4 +120,24 @@ public class SearchDocService {
       return Page.empty(pageable);
     }
   }
+
+  public PostDoc transformPostDoc(Post post) {
+    List<Hashtag> hashtags = hashtagRepository.findByPostId(post.getId());
+
+    List<String> hashtagList = hashtags.stream()
+            .map(Hashtag::getName)
+            .collect(Collectors.toList());
+
+    PostDoc postDoc = PostDoc.builder()
+            .id(post.getId().toString())
+            .createdAt(post.getCreatedAt().toString())
+            .modifiedAt(post.getModifiedAt().toString())
+            .title(post.getTitle())
+            .body(post.getBody())
+            .category(post.getCategory())
+            .hashtags(hashtagList) // 본문에서 해시태그 추출하는 메소드 필요
+            .memberDoc(convertToMemberDoc(post.getMember())) // Member를 MemberDoc으로 변환하는 메소드 필요
+            .build();
+    return postDoc;
+  }
 }
