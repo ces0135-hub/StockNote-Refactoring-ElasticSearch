@@ -50,7 +50,8 @@ public class StockService {
         }
 
         String searchKeyword = keyword.toLowerCase();
-        return stockRepository.findByNameStartingWithIgnoreCase(searchKeyword);
+        return stockRepository.findByNameContainingIgnoreCaseOrCodeContainingIgnoreCase(searchKeyword,
+                searchKeyword);
     }
 
     @Transactional
