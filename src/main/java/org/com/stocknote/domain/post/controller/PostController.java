@@ -7,11 +7,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.notification.service.KeywordNotificationElasticService;
-import org.com.stocknote.domain.notification.service.KeywordNotificationService;
 import org.com.stocknote.domain.post.dto.PostModifyDto;
 import org.com.stocknote.domain.post.dto.PostResponseDto;
-import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.dto.PostSearchConditionDto;
+import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.entity.PostCategory;
 import org.com.stocknote.domain.post.service.PostService;
 import org.com.stocknote.domain.searchDoc.document.PostDoc;
@@ -34,7 +33,7 @@ public class PostController {
 
     private final PostService postService;
     private final SearchDocService searchDocService;
-    private final KeywordNotificationService keywordNotificationService;
+//    private final KeywordNotificationService keywordNotificationService;
     private final KeywordNotificationElasticService keywordNotificationElasticService;
 
     @Transactional

@@ -17,14 +17,25 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT DISTINCT p FROM Post p " +
             "LEFT JOIN FETCH p.member m " +
             "LEFT JOIN FETCH p.comments c " +
-            "WHERE p.category = :category")
-    Page<Post> findByCategory(@Param("category") PostCategory category, Pageable pageable);
+            "WHERE p.category = :category " +
+            "AND p.deletedAt IS NULL " +
+            "ORDER BY p.createdAt DESC")
+
+    Page<Post> findByCategory(
+            @Param("category") PostCategory category,
+            Pageable pageable
+    );
 
     @Query("SELECT DISTINCT p FROM Post p " +
             "LEFT JOIN FETCH p.member m " +
             "LEFT JOIN FETCH p.comments c " +
-            "WHERE p.member = :member")
-    Page<Post> findByMember(@Param("member") Member member, Pageable pageable);
+            "WHERE p.member = :member " +
+            "AND p.deletedAt IS NULL " +
+            "ORDER BY p.createdAt DESC")
+    Page<Post> findByMember(
+            @Param("member") Member member,
+            Pageable pageable
+    );
 
     //인기 순으로 정렬(댓글순 + 좋아요순 3일 이내)
     @Query("""
