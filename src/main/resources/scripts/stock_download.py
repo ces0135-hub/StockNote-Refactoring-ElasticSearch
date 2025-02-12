@@ -135,14 +135,31 @@ class StockDownloader:
             }
         )
 
+    # def init_stock_index(self):
+    #     try:
+    #         with self.engine.begin() as connection:
+    #             # 컬럼 재설정 - AUTO_INCREMENT를 포함하여 다시 정의
+    #             connection.execute(text("""
+    #             DROP TABLE IF EXISTS stock;
+    #             CREATE TABLE stock (
+    #                 code VARCHAR(20) PRIMARY KEY,
+    #                 stock_index BIGINT NOT NULL AUTO_INCREMENT,
+    #                 name VARCHAR(100),
+    #                 market VARCHAR(20),
+    #                 UNIQUE KEY idx_stock_index (stock_index)
+    #             );
+    #         """))
+    #     except Exception as e:
+    #         print(f"Error initializing stock_index: {e}")
+
     def update_stock_data(self, df):
         with self.engine.begin() as connection:
-            # 기존 데이터 삭제 대신 MERGE(UPSERT) 방식으로 변경
             for _, row in df.iterrows():
+                # stock_index는 AUTO_INCREMENT이므로 제외
                 connection.execute(
                     text("""
-                        INSERT INTO stock (code, name, market) 
-                        VALUES (:code, :name, :market)
+                        INSERT INTO stock (code, name, market, stock_index) 
+                        VALUES (:code, :name, :market, 0)
                         ON DUPLICATE KEY UPDATE 
                             name = VALUES(name),
                             market = VALUES(market)
@@ -180,12 +197,39 @@ class StockDownloader:
 
         self.update_stock_data(df)
 
+    def update_index(self):
+        """
+        순차적으로 모든 주식의 인덱스를 업데이트합니다.
+        """
+        with self.engine.begin() as connection:
+            # 모든 주식 코드를 가져옵니다
+            result = connection.execute(text("SELECT code FROM stock ORDER BY code"))
+            stocks = result.fetchall()
+
+            # 각 주식에 대해 순차적으로 인덱스를 업데이트합니다
+            for i, (code,) in enumerate(stocks, start=1):
+                connection.execute(
+                    text("""
+                        UPDATE stock 
+                        SET stock_index = :index 
+                        WHERE code = :code
+                    """),
+                    {
+                        "index": i,
+                        "code": code
+                    }
+                )
+
 if __name__ == "__main__":
     base_dir = os.getcwd()
     downloader = StockDownloader(base_dir)
+
+    # downloader.init_stock_index()
 
     # KOSPI 데이터 다운로드 (기존 데이터 삭제 후 새로운 데이터 추가)
     downloader.kospi_download()
 
     # KOSDAQ 데이터 다운로드 (기존 데이터에 추가)
     downloader.kosdaq_download()
+
+    downloader.update_index()

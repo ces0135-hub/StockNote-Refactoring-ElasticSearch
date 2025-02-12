@@ -17,3 +17,7 @@
 - pipeline.id: post
   path.config: "/usr/share/logstash/pipeline/post.conf"
   pipeline.workers: 1
+
+- pipeline.id: keyword
+  path.config: "/usr/share/logstash/pipeline/keyword.conf"
+  pipeline.workers: 1
