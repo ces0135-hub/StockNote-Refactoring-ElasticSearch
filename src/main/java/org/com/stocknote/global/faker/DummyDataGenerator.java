@@ -28,7 +28,6 @@
 //import java.util.Random;
 //
 //@Configuration
-//@Profile({"dev", "local"})
 //@RequiredArgsConstructor
 //public class DummyDataGenerator {
 //    // 더미데이터 부하테스트 -> 개발 환경에서만 사용
@@ -47,29 +46,38 @@
 //
 //    @Transactional
 //    public void initializeDummyData() {
-//        List<Member> dummyMembers = generateDummyMembers(1000);
+//        List<Member> dummyMembers = generateDummyMembers(500);
 //        System.out.println(dummyMembers.size() + "명의 더미 회원 생성 완료");
 //
-//        generateDummyPosts(dummyMembers, 100000);
-//        System.out.println("10000개의 더미 게시글 생성 완료");
+//        generateDummyPosts(dummyMembers, 60000);
+//        System.out.println("100000개의 더미 게시글 생성 완료");
 //
-//        generateDummyComments(dummyMembers, 50000);
+//        generateDummyComments(dummyMembers, 5000);
 //        System.out.println("50000개의 더미댓글 생성 완료");
 //        generateDummyPortfolioData();
 //        System.out.println("주식데이터 생성 완료");
 //    }
+
 //    @Transactional
 //    public void generateDummyPortfolioData() {
 //        List<Member> members = memberRepository.findAll();
-//        List<Stock> stocks = generateDummyStocks();
-//        System.out.println(stocks.size() + "개의 더미 주식 데이터 생성 완료");
+//        List<Stock> stocks = stockRepository.findAll();
 //
 //        generateDummyPortfolios(members, stocks);
 //        System.out.println("포트폴리오 더미 데이터 생성 완료");
 //    }
+
+//    private List<Stock> createDefaultStocks() {
+//        List<Stock> defaultStocks = new ArrayList<>();
+//        defaultStocks.add(Stock.builder().name("삼성전자").code("005930").build());
+//        defaultStocks.add(Stock.builder().name("카카오").code("035720").build());
+//        defaultStocks.add(Stock.builder().name("네이버").code("035420").build());
 //
-//
-//    private List<Member> generateDummyMembers(int count) {
+//        return stockRepository.saveAll(defaultStocks);
+//    }
+
+//    @Transactional
+//    public List<Member> generateDummyMembers(int count) {
 //        List<Member> members = new ArrayList<>();
 //        for (int i = 0; i < count; i++) {
 //            members.add(Member.builder()
@@ -80,8 +88,8 @@
 //        }
 //        return memberRepository.saveAll(members);
 //    }
-//
-//    private void generateDummyPosts(List<Member> members, int count) {
+//    @Transactional
+//    public void generateDummyPosts(List<Member> members, int count) {
 //        for (int i = 0; i < count; i += BATCH_SIZE) {
 //            List<Post> batch = new ArrayList<>();
 //            for (int j = 0; j < BATCH_SIZE && i + j < count; j++) {
@@ -98,8 +106,8 @@
 //            postRepository.saveAll(batch);
 //        }
 //    }
-//
-//    private void generateDummyComments(List<Member> members, int totalComments) {
+//    @Transactional
+//    public void generateDummyComments(List<Member> members, int totalComments) {
 //        List<Post> posts = postRepository.findAll();
 //        List<Comment> allComments = new ArrayList<>();
 //        int createdComments = 0;
@@ -118,27 +126,8 @@
 //        }
 //        System.out.println(createdComments + "개의 더미 댓글 생성 완료");
 //    }
-//
-//    private List<Stock> generateDummyStocks() {
-//        List<Stock> stocks = new ArrayList<>();
-//        // KOSPI, KOSDAQ 시장 구분
-//        String[] markets = {"KOSPI", "KOSDAQ"};
-//
-//        // 200개의 더미 주식 데이터 생성
-//        for (int i = 0; i < 200; i++) {
-//            String code = String.format("%06d", i); // 6자리 코드 생성
-//            String market = markets[random.nextInt(markets.length)];
-//
-//            stocks.add(Stock.builder()
-//                    .code(code)
-//                    .name(faker.company().name() + (random.nextBoolean() ? " 주식회사" : ""))
-//                    .market(market)
-//                    .build());
-//        }
-//        return stockRepository.saveAll(stocks);
-//    }
-//
-//    private void generateDummyPortfolios(List<Member> members, List<Stock> stocks) {
+//    @Transactional
+//    public void generateDummyPortfolios(List<Member> members, List<Stock> stocks) {
 //        for (Member member : members) {
 //            // 각 회원당 1~3개의 포트폴리오 생성
 //            int portfolioCount = random.nextInt(3) + 1;
@@ -160,8 +149,8 @@
 //            }
 //        }
 //    }
-//
-//    private void generateDummyPfStocks(Portfolio portfolio, List<Stock> stocks) {
+//    @Transactional
+//    public void generateDummyPfStocks(Portfolio portfolio, List<Stock> stocks) {
 //        int stockCount = random.nextInt(6) + 3; // 3~8개
 //        List<PfStock> pfStocks = new ArrayList<>();
 //
@@ -183,8 +172,8 @@
 //        }
 //        pfStockRepository.saveAll(pfStocks);
 //    }
-//
-//    private void generateDummyNotes(Portfolio portfolio, List<Stock> stocks, Member member) {
+//    @Transactional
+//    public void generateDummyNotes(Portfolio portfolio, List<Stock> stocks, Member member) {
 //        int noteCount = random.nextInt(10) + 5; // 5~15개의 노트
 //        List<Note> notes = new ArrayList<>();
 //
