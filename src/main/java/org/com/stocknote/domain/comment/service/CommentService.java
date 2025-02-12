@@ -11,6 +11,7 @@ import org.com.stocknote.domain.member.repository.MemberRepository;
 import org.com.stocknote.domain.notification.repository.CommentNotificationRepository;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.repository.PostRepository;
+import org.com.stocknote.global.cache.service.CacheService;
 import org.com.stocknote.global.error.ErrorCode;
 import org.com.stocknote.global.exception.CustomException;
 import org.springframework.data.domain.Page;
@@ -28,7 +29,7 @@ public class CommentService {
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final CommentNotificationRepository commentNotificationRepository;
-
+    private final CacheService cacheService;
 
     @Transactional(readOnly = true)
     public CommentDetailResponse getCommentDetail(Long commentId) {
@@ -55,6 +56,8 @@ public class CommentService {
         Post post= postRepository.findById(postId).orElseThrow();
         Comment comment = new Comment(post, commentRequest.getBody(), member);
         commentRepository.save(comment);
+        cacheService.clearPopularPostsCache();
+
         return comment;
     }
 

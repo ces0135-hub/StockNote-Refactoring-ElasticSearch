@@ -17,7 +17,9 @@ import org.com.stocknote.domain.post.dto.*;
 import org.com.stocknote.domain.post.repository.PostRepository;
 import org.com.stocknote.domain.post.repository.PostSearchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +37,8 @@ public class PostService {
     private final LikeRepository likeRepository;
     @Autowired
     private final PostSearchRepository postSearchRepository;
-
+    private static final String POPULAR_POSTS_CACHE_KEY = "popularPosts";
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Transactional
     public Post createPost(PostCreateDto postCreateDto, Member member) {
@@ -111,10 +114,11 @@ public class PostService {
         //댓글은 CASCADE로 삭제됨
         postRepository.delete(post);
     }
-
+    @Cacheable(value = POPULAR_POSTS_CACHE_KEY, key = "#pageable.pageNumber", cacheManager = "cacheManager")
     @Transactional(readOnly = true)
     public Page<PostResponseDto> getPopularPosts(Pageable pageable) {
         LocalDateTime threeDaysAgo = LocalDateTime.now().minusDays(3);
+
         Page<Post> popularPosts = postRepository.findPopularPosts(threeDaysAgo, pageable);
 
         List<PostResponseDto> sortedPosts = popularPosts.stream()

@@ -23,8 +23,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import static org.com.stocknote.domain.post.entity.QPost.post;
-
 @RestController
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
@@ -33,7 +31,7 @@ public class PostController {
 
     private final PostService postService;
     private final KeywordNotificationService keywordNotificationService;
-    private final KeywordNotificationElasticService keywordNotificationElasticService;
+
 
     @PostMapping
     @Operation(summary = "게시글 작성")
