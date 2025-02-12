@@ -8,6 +8,7 @@ import org.com.stocknote.domain.searchDoc.document.PostDoc;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public record PostResponseDto(
@@ -42,6 +43,15 @@ public record PostResponseDto(
                 post.getLikes().size(),
                 post.getComments().size()
         );
+    }
+
+    // 지연 로딩용 메서드 추가
+    public List<CommentDetailResponse> getComments() {
+        if (comments == null) {
+            // 실제 댓글 로딩 로직 (서비스 레이어에서 처리)
+            return Collections.emptyList();
+        }
+        return comments;
     }
 
     public static PostResponseDto fromPost(PostDoc postDoc) {

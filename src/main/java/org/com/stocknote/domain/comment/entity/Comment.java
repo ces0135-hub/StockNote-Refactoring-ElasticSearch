@@ -22,7 +22,7 @@ public class Comment extends BaseEntity {
     private Post post;
 
     @Setter
-    @Column(nullable = false)
+    @Column(nullable = false, length = 500) // 최대 길이 제한
     private String body;
 
     @ManyToOne(fetch = FetchType.LAZY)
