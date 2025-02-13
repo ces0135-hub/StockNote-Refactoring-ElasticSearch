@@ -1,12 +1,16 @@
 package org.com.stocknote.domain.portfolio.note.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.portfolio.note.dto.NoteResponse;
 import org.com.stocknote.domain.portfolio.note.entity.Note;
 import org.com.stocknote.domain.portfolio.note.service.NoteService;
 import org.com.stocknote.domain.portfolio.portfolio.service.PortfolioService;
+import org.com.stocknote.global.globalDto.GlobalResponse;
+import org.com.stocknote.oauth.entity.PrincipalDetails;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.com.stocknote.global.dto.GlobalResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
