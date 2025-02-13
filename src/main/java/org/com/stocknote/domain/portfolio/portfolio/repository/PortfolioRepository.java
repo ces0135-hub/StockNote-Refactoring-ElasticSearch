@@ -13,11 +13,12 @@ import java.util.List;
 public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
   List<Portfolio> findByMember(Member member);
 
-  @Query("SELECT p FROM Portfolio p " +
-          "JOIN FETCH p.pfStockList ps " +
-          "JOIN FETCH ps.stock " +
+  @Query("SELECT DISTINCT p FROM Portfolio p " +
+          "LEFT JOIN FETCH p.pfStockList ps " +
+          "LEFT JOIN FETCH ps.stock " +
           "WHERE p.member.id = :memberId")
   List<Portfolio> findPortfoliosWithStocks(@Param("memberId") Long memberId);
+
 
 
 }

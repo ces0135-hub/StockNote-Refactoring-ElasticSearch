@@ -34,7 +34,7 @@ public class CommentNotificationService {
                     .relatedPostId(post.getId())
                     .relatedCommentId(comment.getId())
                     .isRead(false)
-                    .content(comment.getMember().getName() + "님이 댓글을 남겼습니다.")
+                    .content(comment.getMember().getName() + " left a comment.")
                     .build();
 
             commentNotificationRepository.save(commentNotification);
