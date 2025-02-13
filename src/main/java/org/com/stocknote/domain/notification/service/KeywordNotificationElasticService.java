@@ -35,7 +35,6 @@ public class KeywordNotificationElasticService {
                 String.join(" ", postDoc.getHashtags())
         );
 
-        System.out.println("matchingKeywords: " + matchingKeywords);
 
         matchingKeywords.forEach(keywordDoc -> {
             KeywordNotification notification = KeywordNotification.builder()
