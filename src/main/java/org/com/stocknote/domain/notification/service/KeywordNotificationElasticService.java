@@ -16,13 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class KeywordNotificationElasticService {
     private final KeywordDocRepository keywordDocRepository;
     private final KeywordNotificationRepository keywordNotificationRepository;
     private final SseEmitterService sseEmitterService;
 
-    @Transactional
     public void createKeywordNotification(PostDoc postDoc) {
 
         List<KeywordDoc> matchingKeywords = keywordDocRepository.findMatchingKeywords(
@@ -52,7 +52,7 @@ public class KeywordNotificationElasticService {
     }
 
     private String createNotificationContent(PostDoc postDoc, String keyword) {
-        return String.format("'%s' 키워드와 관련된 게시글이 등록되었습니다: %s",
+        return String.format("'%s' A post related to the keyword has been published : %s",
                 keyword,
                 postDoc.getTitle()
         );

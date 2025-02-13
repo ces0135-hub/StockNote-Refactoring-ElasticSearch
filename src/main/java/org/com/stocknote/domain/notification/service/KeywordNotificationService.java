@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class KeywordNotificationService {
     private final KeywordRepository keywordRepository;
@@ -26,7 +27,6 @@ public class KeywordNotificationService {
     private final HashtagService hashtagService;
     private final SseEmitterService sseEmitterService;
 
-    @Transactional
     public void createKeywordNotification(Post post) {
         // 변수를 블록 외부에서 선언
         List<Keyword> allKeywords;
@@ -72,7 +72,7 @@ public class KeywordNotificationService {
     }
 
     private String createNotificationContent(Post post, Keyword keyword) {
-        return String.format("'%s' 키워드와 관련된 게시글이 등록되었습니다: %s",
+        return String.format("'%s' A post related to the keyword has been published : %s",
                 keyword.getKeyword(),
                 post.getTitle()
         );
