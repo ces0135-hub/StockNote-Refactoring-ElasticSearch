@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface KeywordDocRepository extends ElasticsearchRepository<KeywordDoc, String> {
-
     @Query("""
     {
       "bool": {
@@ -25,8 +24,8 @@ public interface KeywordDocRepository extends ElasticsearchRepository<KeywordDoc
           {
             "bool": {
               "should": [
-                {"term": {"keyword": "#{#title}"}},
-                {"term": {"keyword": "#{#hashtags}"}}
+                {"match": {"keyword": "#{#title}"}},
+                {"match": {"keyword": "#{#hashtags}"}}
               ]
             }
           }
