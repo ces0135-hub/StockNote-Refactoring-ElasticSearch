@@ -1,6 +1,7 @@
 package org.com.stocknote.domain.post.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.com.stocknote.domain.hashtag.entity.Hashtag;
 import org.com.stocknote.domain.hashtag.service.HashtagService;
 import org.com.stocknote.domain.like.repository.LikeRepository;
@@ -17,15 +18,18 @@ import org.com.stocknote.domain.post.repository.PostRepository;
 import org.com.stocknote.domain.post.repository.PostSearchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PostService {
     private final PostRepository postRepository;
     private final HashtagService hashtagService;
@@ -34,7 +38,8 @@ public class PostService {
     private final LikeRepository likeRepository;
     @Autowired
     private final PostSearchRepository postSearchRepository;
-
+    private static final String POPULAR_POSTS_CACHE_KEY = "popularPosts";
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Transactional
     public Post createPost(PostResponseDto postResponseDto, Member member) {
@@ -66,8 +71,6 @@ public class PostService {
                     .stream()
                     .map(Hashtag::getName)
                     .toList();
-
-//            Long likeCount = likeRepository.countByPostId(post.getId());
             return PostResponseDto.fromPost(post, hashtags);
 
         });
@@ -82,8 +85,6 @@ public class PostService {
                 .stream()
                 .map(Hashtag::getName)
                 .toList();
-
-//        Long likeCount = likeRepository.countByPostId(post.getId());
         return PostResponseDto.fromPost(post, hashtags);
     }
 
@@ -107,12 +108,18 @@ public class PostService {
         hashtagService.deleteHashtagsByPostId(id);
         commentNotificationRepository.deleteByRelatedPostId(id);
         keywordNotificationRepository.deleteByRelatedPostId(id);
-        //댓글은 CASCADE로 삭제됨
         postRepository.delete(post);
     }
 
     @Transactional(readOnly = true)
     public Page<PostResponseDto> getPopularPosts(Pageable pageable) {
+        String cacheKey = POPULAR_POSTS_CACHE_KEY + ":" + pageable.getPageNumber();
+
+        Object cachedData = redisTemplate.opsForValue().get(cacheKey);
+        if (cachedData instanceof Page) {
+            return (Page<PostResponseDto>) cachedData;
+        }
+
         LocalDateTime threeDaysAgo = LocalDateTime.now().minusDays(3);
         Page<Post> popularPosts = postRepository.findPopularPosts(threeDaysAgo, pageable);
 
@@ -126,7 +133,11 @@ public class PostService {
                 })
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(sortedPosts, pageable, popularPosts.getTotalElements());
+        Page<PostResponseDto> response = new PageImpl<>(sortedPosts, pageable, popularPosts.getTotalElements());
+
+        redisTemplate.opsForValue().set(cacheKey, response, Duration.ofMinutes(5));
+
+        return response;
     }
 
     // 좋아요 순 조회
@@ -135,17 +146,7 @@ public class PostService {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
         Page<Post> popularPosts = postRepository.findPopularPostsByLikes(sevenDaysAgo, pageable);
 
-        List<PostResponseDto> sortedPosts = popularPosts.stream()
-                .map(post -> {
-                    List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId())
-                            .stream()
-                            .map(Hashtag::getName)
-                            .toList();
-                    return PostResponseDto.fromPost(post, hashtags);
-                })
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(sortedPosts, pageable, popularPosts.getTotalElements());
+        return getPostResponseDtos(pageable, popularPosts);
     }
 
     // 댓글 순 조회
@@ -154,26 +155,14 @@ public class PostService {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
         Page<Post> popularPosts = postRepository.findPopularPostsByComments(sevenDaysAgo, pageable);
 
-        List<PostResponseDto> sortedPosts = popularPosts.stream()
-                .map(post -> {
-                    List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId())
-                            .stream()
-                            .map(Hashtag::getName)
-                            .toList();
-                    return PostResponseDto.fromPost(post, hashtags);
-                })
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(sortedPosts, pageable, popularPosts.getTotalElements());
+        return getPostResponseDtos(pageable, popularPosts);
     }
 
     // 검색 기능
     @Transactional(readOnly = true)
     public Page<PostResponseDto> searchPosts(PostSearchConditionDto condition, Pageable pageable) {
-        // 검색 실행
         Page<Post> searchResults = postSearchRepository.search(condition, pageable);  // postRepositoryCustom -> postSearchRepository
 
-        // PostResponseDto로 변환
         return searchResults.map(post -> {
             List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId())
                     .stream()
@@ -188,5 +177,18 @@ public class PostService {
 
         return postRepository.findByHashtagNameOrderByCreatedAtDesc(sName, pageRequest)
                 .map(PostStockResponse::from);
+    }
+    private Page<PostResponseDto> getPostResponseDtos (Pageable pageable, Page<Post> popularPosts) {
+        List<PostResponseDto> sortedPosts = popularPosts.stream()
+                .map(post -> {
+                    List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId())
+                            .stream()
+                            .map(Hashtag::getName)
+                            .toList();
+                    return PostResponseDto.fromPost(post, hashtags);
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(sortedPosts, pageable, popularPosts.getTotalElements());
     }
 }

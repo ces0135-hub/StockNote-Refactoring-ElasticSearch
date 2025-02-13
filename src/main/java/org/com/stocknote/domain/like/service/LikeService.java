@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.like.entity.Like;
 import org.com.stocknote.domain.like.repository.LikeRepository;
 import org.com.stocknote.domain.member.entity.Member;
-import org.com.stocknote.domain.member.repository.MemberRepository;
 import org.com.stocknote.domain.post.entity.Post;
 import org.com.stocknote.domain.post.repository.PostRepository;
+import org.com.stocknote.global.cache.service.CacheService;
+import org.com.stocknote.global.error.ErrorCode;
+import org.com.stocknote.global.exception.CustomException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,16 +17,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class LikeService {
 
     private final LikeRepository likeRepository;
-    private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final CacheService cacheService;
 
     @Transactional
     public void likePost(Long postId, Member member) {
-        Post post = postRepository.findById(postId).orElseThrow();
-        boolean alreadyLiked = likeRepository.findByMemberIdAndPostId(member.getId(), postId).isPresent();
-        if (alreadyLiked) {
-            throw new IllegalStateException("User has already liked this post.");
+        if (likeRepository.existsByMemberIdAndPostId(member.getId(), postId)) {
+            throw new CustomException(ErrorCode.ALREADY_LIKED);
         }
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         Like like = Like.builder()
                 .member(member)
@@ -32,6 +34,7 @@ public class LikeService {
                 .build();
 
         likeRepository.save(like);
+        cacheService.clearPopularPostsCache();
     }
 
     @Transactional

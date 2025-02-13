@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.com.stocknote.oauth.service.CustomOAuth2UserService;
 import org.com.stocknote.oauth.token.TokenAuthenticationFilter;
 import org.com.stocknote.oauth.token.TokenExceptionFilter;
-import org.com.stocknote.oauth.token.TokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -35,7 +34,6 @@ public class SecurityConfig {
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
     private final CorsConfigurationSource corsConfigurationSource;
     private final SaveRequestFilter saveRequestFilter;
-    private final TokenProvider tokenProvider;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean

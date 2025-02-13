@@ -35,8 +35,6 @@ public class StockApiService {
     private final StockTokenService stockTokenService;
     private final StockRepository stockRepository;
     private final ObjectMapper objectMapper;
-
-    //임시 추가
     private final RestTemplate restTemplate;
 
     public Mono<CurrentIndexResponse> getKOSPI() {

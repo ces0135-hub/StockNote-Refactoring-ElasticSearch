@@ -89,7 +89,6 @@ public class SearchDocService {
     }
 
     String category = condition.getCategory();
-    // ALL이거나 null인 경우는 카테고리 없이 검색
     if (category == null || PostCategory.ALL.name().equals(category)) {
       return switch (condition.getSearchType()) {
         case TITLE -> postDocRepository.searchByTitle(condition.getKeyword(), pageable);
@@ -119,5 +118,25 @@ public class SearchDocService {
       log.error("Invalid category: {}", category);
       return Page.empty(pageable);
     }
+  }
+
+  public PostDoc transformPostDoc(Post post) {
+    List<Hashtag> hashtags = hashtagRepository.findByPostId(post.getId());
+
+    List<String> hashtagList = hashtags.stream()
+            .map(Hashtag::getName)
+            .collect(Collectors.toList());
+
+    PostDoc postDoc = PostDoc.builder()
+            .id(post.getId().toString())
+            .createdAt(post.getCreatedAt().toString())
+            .modifiedAt(post.getModifiedAt().toString())
+            .title(post.getTitle())
+            .body(post.getBody())
+            .category(post.getCategory())
+            .hashtags(hashtagList) // 본문에서 해시태그 추출하는 메소드 필요
+            .memberDoc(convertToMemberDoc(post.getMember())) // Member를 MemberDoc으로 변환하는 메소드 필요
+            .build();
+    return postDoc;
   }
 }

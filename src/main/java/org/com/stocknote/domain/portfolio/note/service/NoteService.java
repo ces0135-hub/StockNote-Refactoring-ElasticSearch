@@ -6,7 +6,6 @@ import org.com.stocknote.domain.member.repository.MemberRepository;
 import org.com.stocknote.domain.portfolio.note.entity.Note;
 import org.com.stocknote.domain.portfolio.note.repository.NoteRepository;
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
-import org.com.stocknote.domain.portfolio.portfolio.repository.PortfolioRepository;
 import org.com.stocknote.domain.portfolio.portfolioStock.dto.request.PfStockPatchRequest;
 import org.com.stocknote.domain.portfolio.portfolioStock.entity.PfStock;
 import org.com.stocknote.domain.stock.entity.Stock;

@@ -8,5 +8,4 @@ import java.util.List;
 
 @Repository
 public interface PfStockRepository extends JpaRepository<PfStock, Long> {
-  List<PfStock> findByPortfolioId(Long portfolioId);
 }

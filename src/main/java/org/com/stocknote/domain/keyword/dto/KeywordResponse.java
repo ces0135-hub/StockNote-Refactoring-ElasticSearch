@@ -1,7 +1,6 @@
 package org.com.stocknote.domain.keyword.dto;
 
 import lombok.*;
-import org.com.stocknote.domain.keyword.entity.Keyword;
 import org.com.stocknote.domain.post.entity.PostCategory;
 
 import java.util.List;

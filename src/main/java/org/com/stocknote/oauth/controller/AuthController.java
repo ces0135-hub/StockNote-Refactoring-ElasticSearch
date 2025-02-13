@@ -1,11 +1,10 @@
-package org.com.stocknote.controller;
+package org.com.stocknote.oauth.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.com.stocknote.oauth.service.OAuth2TokenService;
 import org.com.stocknote.oauth.token.TokenProvider;
-import org.com.stocknote.oauth.token.entity.Token;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,7 +13,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -29,9 +27,6 @@ public class AuthController {
     @GetMapping("/google/manual")
     @Operation(summary = "수동 구글 로그인")
     public ResponseEntity<?> googleManualRedirect(@RequestParam String code) {
-        // 단순히 code를 확인만 하고,
-        // 이후에 '/auth/google/token' 같은 API 호출을 유도해도 되고,
-        // 여기서 바로 처리해도 됩니다.
 
         return ResponseEntity.ok(
                 "수동 구글 로그인 완료! 전달받은 code: " + code +

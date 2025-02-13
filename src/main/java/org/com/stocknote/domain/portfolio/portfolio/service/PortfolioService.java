@@ -17,9 +17,7 @@ import org.com.stocknote.global.exception.CustomException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
 
@@ -33,9 +31,8 @@ public class PortfolioService {
 
 
   public List<Portfolio> getPortfolioList(String email) {
-    Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-    return portfolioRepository.findByMember(member);
+    Long memberId = memberRepository.findByEmail(email).orElseThrow().getId();
+    return portfolioRepository.findPortfoliosWithStocks(memberId);
   }
 
   public Portfolio getMyPortfolioList(String email) {
@@ -159,6 +156,5 @@ public class PortfolioService {
 
     portfolioRepository.save(portfolio);
   }
-
 
 }

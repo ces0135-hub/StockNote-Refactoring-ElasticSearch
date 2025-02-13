@@ -2,14 +2,13 @@ package org.com.stocknote.domain.post.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.com.stocknote.domain.post.entity.PostCategory;
 
 @Getter
 @Setter
 public class PostSearchConditionDto {
     private String keyword;
     private SearchType searchType = SearchType.ALL;
-    private String category; // enum 문자열로 받음
+    private String category;
 
     public String getCategory() {
         return category != null ? category.toUpperCase() : null;

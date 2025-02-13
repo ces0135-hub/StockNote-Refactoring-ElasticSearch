@@ -10,7 +10,7 @@ import org.com.stocknote.domain.comment.entity.Comment;
 import org.com.stocknote.domain.comment.service.CommentService;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.notification.service.CommentNotificationService;
-import org.com.stocknote.global.dto.GlobalResponse;
+import org.com.stocknote.global.globalDto.GlobalResponse;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,16 +19,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/posts/{postId}/comments")
 @RequiredArgsConstructor
 @Tag(name = "게시판 댓글 API", description = "댓글(comment)")
-public class CommentController {
+public class CommentController{
 
     private final CommentService commentService;
     private final CommentNotificationService commentNotificationService;
-
-//    @GetMapping
-//    public GlobalResponse<Page<CommentDetailResponse>> getComments(@PathVariable(value = "postId") Long postId, Pageable pageable) {
-//        return GlobalResponse.success(commentService.getComments(postId, pageable));
-//    }
-
 
     @GetMapping("/{commentId}")
     @Operation(summary = "댓글 상세 조회")
@@ -86,5 +80,4 @@ public class CommentController {
         boolean hasCommented = commentService.hasUserCommentedOnPost(postId, member);
         return GlobalResponse.success(hasCommented);
     }
-
 }

@@ -8,6 +8,7 @@ import org.com.stocknote.domain.searchDoc.document.PostDoc;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public record PostResponseDto(
@@ -44,6 +45,13 @@ public record PostResponseDto(
         );
     }
 
+    public List<CommentDetailResponse> getComments() {
+        if (comments == null) {
+            return Collections.emptyList();
+        }
+        return comments;
+    }
+
     public static PostResponseDto fromPost(PostDoc postDoc) {
         return new PostResponseDto(
             Long.valueOf(postDoc.getId()),
@@ -53,7 +61,6 @@ public record PostResponseDto(
             postDoc.getMemberDoc().getName(),
             postDoc.getMemberDoc().getProfile(),
                 null,
-//            LocalDateTime.parse(postDoc.getCreatedAt()),
             null,
             postDoc.getCategory(),
                 null,

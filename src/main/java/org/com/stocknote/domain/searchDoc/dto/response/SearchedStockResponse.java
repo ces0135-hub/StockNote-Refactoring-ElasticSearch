@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import org.com.stocknote.domain.searchDoc.document.StockDoc;
-import org.com.stocknote.domain.stock.entity.Stock;
 
 @Data
 @Getter

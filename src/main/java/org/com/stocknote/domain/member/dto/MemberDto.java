@@ -1,6 +1,5 @@
 package org.com.stocknote.domain.member.dto;
 
-import jdk.jshell.Snippet;
 import lombok.*;
 import org.com.stocknote.domain.member.entity.Member;
 
@@ -24,5 +23,4 @@ public class MemberDto {
                 .profile(member.getProfile())
                 .build();
     }
-
 }

@@ -34,10 +34,7 @@ public class HashtagService {
 
     @Transactional
     public void updateHashtags(Long postId, List<String> newHashtagNames) {
-        // Delete existing hashtags
         hashtagRepository.deleteByPostId(postId);
-
-        // Create new hashtags
         createHashtags(postId, newHashtagNames);
     }
 

@@ -1,6 +1,6 @@
 package org.com.stocknote.domain.member.entity;
 
-public enum AuthProvider {// 일반 회원가입
+public enum AuthProvider {
     KAKAO,
     GOOGLE,
 }

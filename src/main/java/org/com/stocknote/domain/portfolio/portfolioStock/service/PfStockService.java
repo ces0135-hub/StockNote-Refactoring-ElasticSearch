@@ -2,7 +2,6 @@ package org.com.stocknote.domain.portfolio.portfolioStock.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.com.stocknote.domain.portfolio.note.entity.Note;
 import org.com.stocknote.domain.portfolio.note.repository.NoteRepository;
 import org.com.stocknote.domain.portfolio.note.service.NoteService;
 import org.com.stocknote.domain.portfolio.portfolio.entity.Portfolio;
@@ -18,9 +17,6 @@ import org.com.stocknote.domain.stockApi.dto.response.StockPriceResponse;
 import org.com.stocknote.domain.stockApi.service.StockApiService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -56,7 +52,7 @@ public class PfStockService {
 
   @Transactional
   public void buyPfStock(Long portfolioNo, Long pfStockNo,
-      PfStockPatchRequest pfStockPatchRequest) {
+                          PfStockPatchRequest pfStockPatchRequest) {
     Portfolio portfolio = portfolioService.getPortfolio(portfolioNo);
     PfStock pfStock = pfStockRepository.findById(pfStockNo).orElse(null);
 
@@ -139,47 +135,10 @@ public class PfStockService {
 
   @Transactional
   public void deletePfStock(Long portfolioNo, Long pfStockNo) {
-    // Portfolio는 ID로만 조회
     Portfolio portfolio = portfolioRepository.getReferenceById(portfolioNo);
     PfStock pfStock = pfStockRepository.getReferenceById(pfStockNo);
 
     noteRepository.save(noteService.deleteStock(portfolio, pfStock));
     pfStockRepository.deleteById(pfStockNo);
   }
-//
-//  @Transactional
-//  public void deletePfStock(Long portfolioNo, Long pfStockNo) {
-//    Portfolio portfolio = portfolioService.getPortfolio(portfolioNo);
-//    PfStock pfStock = pfStockRepository.findById(pfStockNo).orElse(null);
-//
-//    // Portfolio의 편의 메소드를 사용하여 관계 해제
-//    portfolio.removePfStock(pfStock);
-//
-//    // Note 생성 및 저장
-//    noteRepository.save(noteService.deleteStock(portfolio, pfStock));
-//
-//    // 이제 삭제
-//    pfStockRepository.delete(pfStock);
-//  }
-
-//  // stock service로 이동 예정
-//  public List<Stock> searchStocks(String keyword) {
-//    if (keyword == null || keyword.trim().isEmpty()) {
-//      return Collections.emptyList();
-//    }
-//
-//    String searchKeyword = keyword.toLowerCase();
-//    return stockRepository.findByNameContainingIgnoreCaseOrCodeContainingIgnoreCase(searchKeyword,
-//        searchKeyword);
-//  }
-
-  // 임시 데이터
-  public Stock saveTempStock(Stock stock) {
-    return stockRepository.save(stock);
-  }
-
-  public Stock getTempStock(String n) {
-    return stockRepository.findById(n).orElse(null);
-  }
-
 }

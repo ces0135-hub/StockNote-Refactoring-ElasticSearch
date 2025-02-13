@@ -17,6 +17,6 @@ public class HashtagAutocompleteController {
 
     @GetMapping("/search/{q}")
     public List<String> query(@PathVariable("q") String query) {
-        return hashtagAutocompleteService.autocorrect(query);
+        return hashtagAutocompleteService.autocomplete(query);
     }
 }
