@@ -97,7 +97,7 @@ public class NoteService {
     Member member = memberRepository.findByEmail(email)
         .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     List<Note> noteList = noteRepository.findByMemberId(member.getId());
-    return noteRepository.findAll();
+    return noteList;
   }
   public List<Note> getAllNoteList() {
     return noteRepository.findAll();
