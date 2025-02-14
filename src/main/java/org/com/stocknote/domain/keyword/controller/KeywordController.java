@@ -42,7 +42,7 @@ public class KeywordController {
     ) {
         Member member = principalDetails.user();
         KeywordResponse response = keywordService.updateKeywords(member, request);
-        keywordDocService.save(member, request);
+        keywordDocService.updateKeywords(member, request);
         return ResponseEntity.ok(response);
     }
 }
