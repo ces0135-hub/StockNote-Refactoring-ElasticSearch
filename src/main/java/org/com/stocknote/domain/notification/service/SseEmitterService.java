@@ -1,5 +1,6 @@
 package org.com.stocknote.domain.notification.service;
 
+import org.com.stocknote.domain.notification.dto.CommentNotificationResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -51,5 +52,8 @@ public class SseEmitterService {
                 emitters.remove(memberId);
             }
         }
+    }
+
+    public void sendNotification (String string, CommentNotificationResponse from) {
     }
 }

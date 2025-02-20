@@ -17,6 +17,7 @@ import org.com.stocknote.domain.searchDoc.document.PostDoc;
 import org.com.stocknote.domain.searchDoc.service.SearchDocService;
 import org.com.stocknote.global.globalDto.GlobalResponse;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
 @Tag(name = "커뮤니티 게시글 API", description = "게시글(Post)")
+@ConditionalOnProperty(name = "elasticsearch.enabled", havingValue = "true")
 public class PostController {
 
     private final PostService postService;

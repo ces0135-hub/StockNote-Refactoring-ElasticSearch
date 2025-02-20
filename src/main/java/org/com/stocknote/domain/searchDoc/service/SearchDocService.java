@@ -16,6 +16,7 @@ import org.com.stocknote.domain.searchDoc.repository.PostDocRepository;
 import org.com.stocknote.domain.searchDoc.repository.StockDocRepository;
 import org.com.stocknote.global.error.ErrorCode;
 import org.com.stocknote.global.exception.CustomException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "elasticsearch.enabled", havingValue = "true")
 public class SearchDocService {
   private final StockDocRepository stockDocRepository;
   private final PortfolioDocRepository portfolioDocRepository;

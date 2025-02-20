@@ -11,6 +11,8 @@ spring:
     exclude:
       - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
       - org.springframework.boot.autoconfigure.session.SessionAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchAutoConfiguration
   jpa:
     hibernate:
       ddl-auto: update
@@ -29,7 +31,8 @@ spring:
     init:
       mode: never
   elasticsearch:
-    uris: http://211.188.54.177:9200
+    enabled: false
+#    uris: http://211.188.54.177:9200
 logging:
   level:
     root: INFO

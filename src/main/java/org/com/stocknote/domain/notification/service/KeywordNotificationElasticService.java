@@ -2,14 +2,13 @@ package org.com.stocknote.domain.notification.service;
 
 import lombok.RequiredArgsConstructor;
 
-import org.com.stocknote.domain.keyword.repository.KeywordRepository;
 import org.com.stocknote.domain.notification.dto.KeywordNotificationResponse;
 import org.com.stocknote.domain.notification.entity.KeywordNotification;
 import org.com.stocknote.domain.notification.repository.KeywordNotificationRepository;
 import org.com.stocknote.domain.searchDoc.document.KeywordDoc;
 import org.com.stocknote.domain.searchDoc.document.PostDoc;
 import org.com.stocknote.domain.searchDoc.repository.KeywordDocRepository;
-import org.com.stocknote.domain.searchDoc.repository.PostDocRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +17,7 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "elasticsearch.enabled", havingValue = "true")
 public class KeywordNotificationElasticService {
     private final KeywordDocRepository keywordDocRepository;
     private final KeywordNotificationRepository keywordNotificationRepository;

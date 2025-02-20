@@ -101,6 +101,9 @@ dependencies {
     implementation("org.yaml:snakeyaml:2.0")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2")
 
+    // AOP
+    implementation("org.springframework.boot:spring-boot-starter-aop")
+
 }
 
 tasks.withType<Test> {

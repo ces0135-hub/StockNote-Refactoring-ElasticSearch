@@ -15,6 +15,7 @@ import org.com.stocknote.domain.stockApi.dto.response.StockResponse;
 import org.com.stocknote.domain.stockApi.service.StockApiService;
 import org.com.stocknote.global.error.ErrorCode;
 import org.com.stocknote.global.exception.CustomException;
+import org.com.stocknote.global.util.SecurityUtil;
 import org.com.stocknote.websocket.service.WebSocketService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,8 +56,8 @@ public class StockService {
     }
 
     @Transactional
-    public void addStock(String name, String email) {
-
+    public void addStock(String name) {
+        String email = SecurityUtil.getCurrentUserEmail();
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         Stock stock = stockRepository.findByName(name)
@@ -69,7 +70,8 @@ public class StockService {
     }
 
     @Transactional(readOnly = true)
-    public List<StockResponse> getMyStocks(String email) {
+    public List<StockResponse> getMyStocks() {
+        String email = SecurityUtil.getCurrentUserEmail();
         List<MemberStock> memberStocks = memberStockRepository
                 .findByMemberEmailOrderByAddedAtDesc(email);
 
@@ -99,7 +101,8 @@ public class StockService {
                 .collect(Collectors.toList());
     }
 
-    public void deleteStock (String code, String email) {
+    public void deleteStock (String code) {
+        String email = SecurityUtil.getCurrentUserEmail();
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         Stock stock = stockRepository.findByCode(code)

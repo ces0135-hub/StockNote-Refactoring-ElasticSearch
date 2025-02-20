@@ -60,7 +60,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
                     if (existingMember.isPresent()) {
                         throw new OAuth2AuthenticationException(
-                                "Email already exists with different provider: " + userInfo.email());
+                                "EmailAspect already exists with different provider: " + userInfo.email());
                     }
 
                     Member newMember = Member.builder()

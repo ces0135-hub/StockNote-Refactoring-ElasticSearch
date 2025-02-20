@@ -15,6 +15,7 @@ import org.com.stocknote.domain.searchDoc.dto.response.SearchedStockResponse;
 import org.com.stocknote.domain.searchDoc.service.SearchDocService;
 import org.com.stocknote.global.globalDto.GlobalResponse;
 import org.com.stocknote.oauth.entity.PrincipalDetails;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/searchDocs")
 @Tag(name = "검색 API", description = "검색(Search)")
+@ConditionalOnProperty(name = "elasticsearch.enabled", havingValue = "true")
 public class SearchDocController {
   private final SearchDocService searchDocService;
 

@@ -9,10 +9,9 @@ import org.com.stocknote.domain.stock.entity.Stock;
 import org.com.stocknote.domain.stock.service.StockService;
 import org.com.stocknote.domain.stockApi.dto.response.StockInfoResponse;
 import org.com.stocknote.domain.stockApi.dto.response.StockResponse;
+import org.com.stocknote.global.aop.InjectEmail;
 import org.com.stocknote.global.globalDto.GlobalResponse;
-import org.com.stocknote.oauth.entity.PrincipalDetails;
 import org.com.stocknote.websocket.service.WebSocketService;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,27 +49,25 @@ public class StockController {
 
     @PostMapping
     @Operation(summary = "종목 추가")
-    public GlobalResponse addStock(@RequestBody StockAddRequest request,
-                                   @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        String email = principalDetails.getUsername();
-        stockService.addStock(request.getStockName(), email);
+    @InjectEmail
+    public GlobalResponse addStock(@RequestBody StockAddRequest request) {
+        stockService.addStock(request.getStockName());
         return GlobalResponse.success();
     }
 
     @DeleteMapping
     @Operation(summary = "종목 삭제")
-    public GlobalResponse deleteStock(@RequestParam("stockCode") String stockCode,
-                                      @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        String email = principalDetails.getUsername();
-        stockService.deleteStock(stockCode, email);
+    @InjectEmail
+    public GlobalResponse deleteStock(@RequestParam("stockCode") String stockCode) {
+        stockService.deleteStock(stockCode);
         return GlobalResponse.success();
     }
 
     @GetMapping("/list")
     @Operation(summary = "나의 관심 종목 조회")
-    public GlobalResponse getStockList(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        String email = principalDetails.getUsername();
-        List<StockResponse> myStocks = stockService.getMyStocks(email);
+    @InjectEmail
+    public GlobalResponse getStockList() {
+        List<StockResponse> myStocks = stockService.getMyStocks();
 
         myStocks.forEach(stock -> {
             if (stock.getPrice() != null) {
@@ -79,6 +76,7 @@ public class StockController {
         });
         return GlobalResponse.success(myStocks);
     }
+
     @GetMapping("/posts")
     @Operation(summary = "종목 관련 게시글 조회")
     public GlobalResponse getPosts(@RequestParam("sName") String sName,
